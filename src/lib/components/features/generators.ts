@@ -4,7 +4,7 @@ import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript';
 
 // Create generators for feature components
-export const featureGenerators = {
+export const featuresGenerators = {
   web_feature_cards: createGenerator({
     propertyMappings: [
       { componentProp: 'title' },
@@ -57,7 +57,7 @@ export const featureGenerators = {
 };
 
 // Override the HTML generator for feature card to access parent block
-featureGenerators.web_feature_card.html = function(block: Blockly.Block): string {
+featuresGenerators.web_feature_card.html = function(block: Blockly.Block): string {
   const icon = block.getFieldValue('ICON');
   const title = block.getFieldValue('TITLE');
   const description = block.getFieldValue('DESCRIPTION');

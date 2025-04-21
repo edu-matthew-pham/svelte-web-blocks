@@ -4,7 +4,7 @@ import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript';
 
 // Create generators for form components
-export const formGenerators = {
+export const formsGenerators = {
   web_basic_form: createGenerator({
     propertyMappings: [
       { componentProp: 'title' },

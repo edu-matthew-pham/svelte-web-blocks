@@ -1,4 +1,6 @@
 import type * as Blockly from 'blockly';
+import type { Block } from 'blockly';
+import type { JavascriptGenerator as BlocklyJsGenerator } from 'blockly/javascript';
 
 export interface WebBlockDefinitions {
   [key: string]: {
@@ -22,7 +24,7 @@ export interface BlockInputConfig {
   precision?: number;
 }
 
-export type BlockCategory = "component" | "item" | "document" | "javascript" | "reactive" | "dataObjects" | "expressions" | "lists" | "logic" | "loops";
+export type BlockCategory = "component" | "item" | "document" | "javascript" | "reactive" | "dataObjects" | "expressions" | "lists" | "logic" | "loops" | "dom";
 
 export interface BlockConfig {
   type: string;
@@ -67,4 +69,10 @@ export interface ComponentNode {
   type: string;
   properties?: Record<string, any>;
   children?: ComponentNode[];
+}
+
+// Properly extend the Blockly JavaScript generator type
+export interface JavascriptGenerator extends BlocklyJsGenerator {
+  // Add any additional properties or methods we need that aren't in the original type
+  blockToHighLevel(block: Block): any;
 }

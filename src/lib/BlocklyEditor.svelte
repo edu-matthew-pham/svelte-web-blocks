@@ -6,6 +6,7 @@
   import { defaultToolbox } from '$lib/toolbox/default-toolbox.js';
   import { WorkspaceSvg } from 'blockly';
   import { createBlocksFromJson } from '$lib/blocks/parser.js';
+  import { javascriptGenerator } from 'blockly/javascript';
 
   // Props
   export let initialXml = '';
@@ -23,6 +24,11 @@
   let jsonCode = '';
   let activeTab = 'blocks'; // 'blocks', 'json', or 'code'
 
+  // Before the forEach loop, add this type definition
+  type GeneratorFunction = Function & {
+    highLevel?: (block: any) => any;
+  };
+
   // Initialize Blockly when the component mounts
   onMount(() => {
     if (!blocklyDiv) return;
@@ -32,9 +38,35 @@
       Blockly.Blocks[type] = blockDef;
     });
 
-    // Register custom generators
-    Object.keys(webGenerators).forEach((key) => {
-      Blockly.JavaScript[key] = webGenerators[key];
+    // Safety check for javascriptGenerator
+    console.log("javascriptGenerator available?", !!javascriptGenerator);
+    
+    // Ensure forBlock exists
+    if (!javascriptGenerator.forBlock) {
+      javascriptGenerator.forBlock = {};
+    }
+
+    // Register custom generators with proper safety checks
+    Object.entries(webGenerators).forEach(([blockType, generatorObj]) => {
+      if (typeof generatorObj === 'function') {
+        // Register the generator function
+        javascriptGenerator.forBlock[blockType] = generatorObj;
+        
+        // Use type assertion for highLevel property
+        const typedFunc = generatorObj as GeneratorFunction;
+        if (typedFunc.highLevel && typeof typedFunc.highLevel === 'function') {
+          javascriptGenerator.forBlock[blockType].highLevel = typedFunc.highLevel as (block: any) => any;
+        }
+      } else if (generatorObj && typeof generatorObj === 'object' && generatorObj.html) {
+        // Register using the html property
+        javascriptGenerator.forBlock[blockType] = generatorObj.html;
+        
+        // Use type assertion for the object form
+        const typedObj = generatorObj as { html: Function, highLevel?: (block: any) => any };
+        if (typedObj.highLevel && typeof typedObj.highLevel === 'function') {
+          javascriptGenerator.forBlock[blockType].highLevel = typedObj.highLevel;
+        }
+      }
     });
 
     // Create custom blocks from JSON if provided

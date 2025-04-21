@@ -43,6 +43,12 @@ const documentBlocks: Record<string, BlockConfig> = {
         name: "CONTENT",
         label: "Content",
         check: "web_component"
+      },
+      {
+        type: "statement",
+        name: "SCRIPTS",
+        label: "Scripts",
+        check: "web_component"
       }
     ],
     connections: {

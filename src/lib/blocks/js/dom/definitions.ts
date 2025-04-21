@@ -1,0 +1,279 @@
+import { createBlockDefinitions } from '$lib/utils/block-factory.js';
+import type { WebBlockConfigs } from '$lib/types.js';
+
+// Define DOM manipulation block configurations
+const jsDomBlockConfigs: WebBlockConfigs = {
+  // Selection and reference
+  js_select_element: {
+    type: 'js_select_element',
+    category: 'dom',
+    color: 180,
+    tooltip: "Select a DOM element and store it as a variable",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector",
+    inputs: [
+      { type: "label", text: "Select Element" },
+      { type: "row", children: [
+        { type: "label", text: "Selector" },
+        { type: "field_text", name: "SELECTOR", default: "#element-id" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Store as" },
+        { type: "field_text", name: "VARIABLE", default: "element" }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Unified property manipulation
+  js_element_property: {
+    type: 'js_element_property',
+    category: 'dom',
+    color: 180,
+    tooltip: "Get or set an element's property, attribute, or style",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/API/Element",
+    inputs: [
+      { type: "label", text: "Element Property" },
+      { type: "row", children: [
+        { type: "field_dropdown", name: "ACTION", options: [
+          ["Set", "set"],
+          ["Get", "get"]
+        ]},
+        { type: "label", text: "on element" },
+        { type: "field_text", name: "ELEMENT", default: "element" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Property type" },
+        { type: "field_dropdown", name: "PROPERTY_TYPE", options: [
+          ["Text", "text"],
+          ["HTML", "html"],
+          ["Attribute", "attribute"],
+          ["Style", "style"],
+          ["Value", "value"]
+        ]}
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Property name" },
+        { type: "field_text", name: "PROPERTY", default: "textContent" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Value (for set)" },
+        { type: "field_text", name: "VALUE", default: "New content" }
+      ]}
+    ],
+    connections: { previous: false, next: false, output: "String" }
+  },
+  
+  // Class manipulation
+  js_element_class: {
+    type: 'js_element_class',
+    category: 'dom',
+    color: 180,
+    tooltip: "Add, remove, or toggle a class on an element",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/API/Element/classList",
+    inputs: [
+      { type: "label", text: "Element Class" },
+      { type: "row", children: [
+        { type: "field_dropdown", name: "ACTION", options: [
+          ["Add", "add"],
+          ["Remove", "remove"],
+          ["Toggle", "toggle"],
+          ["Check", "contains"]
+        ]},
+        { type: "label", text: "class" }
+      ]},
+      { type: "row", children: [
+        { type: "field_text", name: "CLASS", default: "active" },
+        { type: "label", text: "on element" },
+        { type: "field_text", name: "ELEMENT", default: "element" }
+      ]}
+    ],
+    connections: { previous: false, next: false, output: "Strings" }
+  },
+  
+  // Event handling
+  js_event_handler: {
+    type: 'js_event_handler',
+    category: 'dom',
+    color: 180,
+    tooltip: "Create an event handler for a DOM element",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener",
+    inputs: [
+      { type: "label", text: "Event Handler" },
+      { type: "row", children: [
+        { type: "label", text: "When element" },
+        { type: "field_text", name: "ELEMENT", default: "element" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "receives event" },
+        { type: "field_dropdown", name: "EVENT", options: [
+          ["click", "click"],
+          ["change", "change"],
+          ["submit", "submit"],
+          ["keyup", "keyup"],
+          ["focus", "focus"],
+          ["blur", "blur"],
+          ["mouseenter", "mouseenter"],
+          ["mouseleave", "mouseleave"]
+        ]}
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Prevent default" },
+        { type: "field_checkbox", name: "PREVENT_DEFAULT", checked: false }
+      ]},
+      { type: "statement", name: "HANDLER", check: "web_component", label: "Do" }
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Element creation
+  js_create_element: {
+    type: 'js_create_element',
+    category: 'dom',
+    color: 180,
+    tooltip: "Create a new DOM element",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement",
+    inputs: [
+      { type: "label", text: "Create Element" },
+      { type: "row", children: [
+        { type: "label", text: "Tag" },
+        { type: "field_dropdown", name: "TAG", options: [
+          ["div", "div"],
+          ["p", "p"],
+          ["span", "span"],
+          ["button", "button"],
+          ["input", "input"],
+          ["img", "img"],
+          ["a", "a"],
+          ["ul", "ul"],
+          ["li", "li"],
+          ["tr", "tr"],
+          ["td", "td"]
+        ]}
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Store as" },
+        { type: "field_text", name: "VARIABLE", default: "newElement" }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // DOM tree manipulation
+  js_tree_operation: {
+    type: 'js_tree_operation',
+    category: 'dom',
+    color: 180,
+    tooltip: "Perform operations on the DOM tree",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/API/Node",
+    inputs: [
+      { type: "label", text: "DOM Tree Operation" },
+      { type: "row", children: [
+        { type: "field_dropdown", name: "ACTION", options: [
+          ["Append", "append"],
+          ["Prepend", "prepend"],
+          ["Insert before", "before"],
+          ["Replace", "replace"],
+          ["Remove", "remove"]
+        ]},
+        { type: "label", text: "element" }
+      ]},
+      { type: "row", children: [
+        { type: "field_text", name: "CHILD", default: "newElement" },
+        { type: "label", text: "to/from" },
+        { type: "field_text", name: "PARENT", default: "container" }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Iterative data manipulation
+  js_iterate_data: {
+    type: 'js_iterate_data',
+    category: 'dom',
+    color: 180,
+    tooltip: "Create DOM elements from an array of data",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach",
+    inputs: [
+      { type: "label", text: "Create Elements from Data" },
+      { type: "row", children: [
+        { type: "label", text: "Data source" },
+        { type: "field_text", name: "DATA_SOURCE", default: "items" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Container" },
+        { type: "field_text", name: "CONTAINER", default: "#item-list" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Element type" },
+        { type: "field_dropdown", name: "ELEMENT_TYPE", options: [
+          ["List item (li)", "li"],
+          ["Div", "div"],
+          ["Paragraph (p)", "p"],
+          ["Table row (tr)", "tr"]
+        ]}
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Template" },
+        { type: "field_text", name: "TEMPLATE", default: "${item.name}" }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Table population
+  js_populate_table: {
+    type: 'js_populate_table',
+    category: 'dom',
+    color: 180,
+    tooltip: "Populate a table with data from an array",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/API/HTMLTableElement",
+    inputs: [
+      { type: "label", text: "Populate Table" },
+      { type: "row", children: [
+        { type: "label", text: "Data source" },
+        { type: "field_text", name: "DATA_SOURCE", default: "users" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Table selector" },
+        { type: "field_text", name: "TABLE", default: "#data-table" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Columns (comma separated)" },
+        { type: "field_text", name: "COLUMNS", default: "name,email,role" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Include headers" },
+        { type: "field_checkbox", name: "HEADERS", checked: true }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Template-based element creation
+  js_create_from_template: {
+    type: 'js_create_from_template',
+    category: 'dom',
+    color: 180,
+    tooltip: "Create elements from a template and data",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals",
+    inputs: [
+      { type: "label", text: "Create from Template" },
+      { type: "row", children: [
+        { type: "label", text: "Template" },
+        { type: "field_multiline", name: "TEMPLATE", default: "<div class=\"item\">${item.name}</div>" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Data source" },
+        { type: "field_text", name: "DATA_SOURCE", default: "items" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Container" },
+        { type: "field_text", name: "CONTAINER", default: "#container" }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  }
+};
+
+// Create and export the DOM block definitions
+export const jsDomDefinitions = createBlockDefinitions(jsDomBlockConfigs);

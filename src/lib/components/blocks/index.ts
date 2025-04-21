@@ -15,7 +15,7 @@ const componentModules = [
   import('../footer/index.js'),
   import('../forms/index.js'),
   import('../dynamic/index.js'),
-  
+  import('$lib/blocks/js/dom/index.js'),
   // Add new components here
 ];
 

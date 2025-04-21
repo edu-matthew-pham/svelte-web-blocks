@@ -1,4 +1,6 @@
 import type { DynamicCardItem } from '../types.js';
+import pkg from 'js-beautify';
+const {html} = pkg;
 
 /**
  * Creates HTML for a grid or list of cards based on provided data
@@ -84,7 +86,8 @@ export function createCarouselIndicatorsHTML(componentId: string, slideCount: nu
 export function createDocumentHTML(
   title: string,
   theme: string,
-  content: string
+  content: string, 
+  scripts: string
 ): string {
   // Check if using Bootstrap standard theme (light/dark) or Bootswatch theme
   const isBootstrapTheme = theme === 'light' || theme === 'dark';
@@ -92,7 +95,7 @@ export function createDocumentHTML(
     ? `<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">`
     : `<link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/${theme}/bootstrap.min.css" rel="stylesheet">`;
 
-  return `<!DOCTYPE html>
+  const htmlString = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -101,6 +104,9 @@ export function createDocumentHTML(
   <!-- Bootstrap CSS -->
   ${cssLink}
   ${isBootstrapTheme ? `<meta name="theme" content="${theme}">` : ''}
+  <script>
+    ${scripts}
+  </script>
 </head>
 <body ${isBootstrapTheme ? `data-bs-theme="${theme}"` : ''}>
   ${content}
@@ -108,6 +114,15 @@ export function createDocumentHTML(
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>`;
+
+  // Format the final HTML
+  return html(htmlString, {
+    indent_size: 2,
+    indent_inner_html: true,
+    wrap_line_length: 0,
+    preserve_newlines: true,
+    max_preserve_newlines: 1
+  });
 }
 
 /**

@@ -11,7 +11,10 @@ export const documentGenerators = {
     childInputs: [
       { inputName: 'CONTENT' }
     ],
+    scriptInputs: [
+      { inputName: 'SCRIPTS' }
+    ],
     htmlRenderer: (props, children) => 
-      HTML.createDocumentHTML(props.title, props.theme, children.content) + '\n'
+      HTML.createDocumentHTML(props.title, props.theme, children.content, children.scripts)
   })
 }; 

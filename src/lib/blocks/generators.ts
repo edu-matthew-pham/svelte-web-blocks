@@ -35,8 +35,9 @@ export const webGenerators: WebBlockGeneratorFunctions = {
       const title = block.getFieldValue('TITLE');
       const theme = block.getFieldValue('THEME');
       const content = javascriptGenerator.statementToCode(block, 'CONTENT');
+      const scripts = javascriptGenerator.statementToCode(block, 'SCRIPTS');
       
-      return HTML.createDocumentHTML(title, theme, content) + '\n';
+      return HTML.createDocumentHTML(title, theme, content, scripts) + '\n';
     },
     
     highLevel: function(block: Blockly.Block) {
@@ -49,13 +50,23 @@ export const webGenerators: WebBlockGeneratorFunctions = {
         contentBlock = contentBlock.getNextBlock();
       }
       
+      // Process script blocks
+      const scripts = [];
+      let scriptBlock = block.getInputTargetBlock('SCRIPTS');
+      while (scriptBlock) {
+        const script = javascriptGenerator.blockToHighLevel(scriptBlock);
+        if (script) scripts.push(script);
+        scriptBlock = scriptBlock.getNextBlock();
+      }
+      
       return {
         type: "document",
         properties: {
           title: block.getFieldValue('TITLE'),
           theme: block.getFieldValue('THEME')
         },
-        children: children
+        children: children,
+        scripts: scripts
       };
     }
   },
