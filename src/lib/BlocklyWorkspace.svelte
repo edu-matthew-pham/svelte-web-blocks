@@ -60,6 +60,24 @@
       const mergedOptions = { ...defaultOptions, ...workspaceOptions };
       workspace = Blockly.inject(blocklyDiv, mergedOptions);
   
+      // Register the reactive value blocks callback
+      workspace.registerToolboxCategoryCallback(
+        'REACTIVE_VALUE_BLOCKS',
+        function(workspace) {
+          // Return flyout item definitions instead of blocks
+          return [
+            {
+              kind: 'block',
+              type: 'reactive_get_new_value'
+            },
+            {
+              kind: 'block',
+              type: 'reactive_get_old_value'
+            }
+          ];
+        }
+      );
+  
       // Load initial XML if provided
       if (initialXml) {
         try {

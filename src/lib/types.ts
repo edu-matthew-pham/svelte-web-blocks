@@ -22,7 +22,7 @@ export interface BlockInputConfig {
   precision?: number;
 }
 
-export type BlockCategory = "component" | "item" | "document";
+export type BlockCategory = "component" | "item" | "document" | "javascript" | "reactive" | "dataObjects" | "expressions" | "lists" | "logic" | "loops";
 
 export interface BlockConfig {
   type: string;
@@ -34,6 +34,7 @@ export interface BlockConfig {
   connections: {
     previous: string | false;
     next: string | false;
+    output?: string;
   };
 }
 
@@ -53,6 +54,7 @@ export interface WebBlockGeneratorFunctions {
 export interface BlockConnections {
   previous: string | false;
   next: string | false;
+  output?: string;
 }
 
 export interface DynamicCardItem {
