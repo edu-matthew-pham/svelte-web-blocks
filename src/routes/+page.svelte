@@ -117,23 +117,6 @@
 		color: #333;
 	}
 	
-	.code-container {
-		background-color: #f8f9fa;
-		border-radius: 8px;
-		padding: 1rem;
-		margin: 1rem 0;
-		overflow-x: auto;
-	}
-	
-	pre {
-		margin: 0;
-	}
-	
-	code {
-		font-family: monospace;
-		color: #e83e8c;
-	}
-	
 	a {
 		color: #0066cc;
 		text-decoration: none;
