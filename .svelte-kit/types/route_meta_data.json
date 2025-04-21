@@ -1,7 +1,7 @@
 {
 	"/": [],
-	"/api/html2pug": [
-		"src/routes/api/html2pug/+server.ts"
+	"/api/convert-to-pug": [
+		"src/routes/api/convert-to-pug/+server.ts"
 	],
 	"/example1": [],
 	"/example2": [],
