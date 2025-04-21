@@ -22,31 +22,77 @@ This project provides Svelte components for visual programming using Google Bloc
 npm install svelte-web-blocks
 ```
 
-## Quick Start
+## Usage
+
+### Basic Example
 
 ```javascript
 <script>
-  import { BlocklyWorkspace } from 'svelte-web-blocks';
+  import { BlocklyWorkspaceWithPreview } from 'svelte-web-blocks';
+  
+  // Variables to store generated code
+  let htmlOutput = '';
+  let jsonOutput = '';
 </script>
 
-<BlocklyWorkspace 
-  toolbox={yourToolboxConfig}
-  workspaceOptions={yourOptions}
+<BlocklyWorkspaceWithPreview 
+  bind:generatedHtml={htmlOutput}
+  bind:generatedJson={jsonOutput}
 />
 ```
 
-## Documentation
+### With JSON Utility Buttons
+```javascript
+<script>
+  import { BlocklyWorkspaceWithPreview } from 'svelte-web-blocks';
+  
+  // Variables to store generated code
+  let htmlOutput = '';
+  let jsonOutput = '';
+  
+  // Function to log JSON to console
+  function logJson() {
+    console.log(JSON.parse(jsonOutput));
+  }
+  
+  // Function to download JSON
+  function downloadJson() {
+    const blob = new Blob([jsonOutput], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'blockly-workspace.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+</script>
 
-For detailed documentation and examples, visit our [documentation page](#).
+<div class="workspace-container">
+  <BlocklyWorkspaceWithPreview 
+    bind:generatedHtml={htmlOutput}
+    bind:generatedJson={jsonOutput}
+  />
+</div>
+
+<div class="json-actions">
+  <button on:click={logJson}>Log JSON to Console</button>
+  <button on:click={downloadJson}>Download JSON</button>
+</div>
+```
 
 ## Examples
 
 This package includes several example components demonstrating different use cases:
 
-- `BasicBlockly.svelte`: Simple Blockly workspace setup
+- `QuickStart.svelte`: Simple Blockly workspace setup
+- `BasicBlockly.svelte`: Convert Blockly to HTML
+- `BlocklyToJson.svelte`: Convert Blockly to JSON
 - `JsonToBlocks.svelte`: Convert JSON structures to Blockly blocks
-- `HtmlToPug.svelte`: Transform HTML to PUG using visual blocks
-- `BlocklyToJson.svelte`: Export Blockly workspace to JSON
+- `HtmlToPug.svelte`: Transform HTML to PUG
+
+You can view a live deployment of these examples [here](https://svelte-web-blocks.vercel.app/).
 
 ## Contributing
 

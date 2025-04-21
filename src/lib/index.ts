@@ -6,3 +6,11 @@ export { webGenerators } from './blocks/generators.js';
 export { defaultToolbox } from './toolbox/default-toolbox.js';
 export { createBlocksFromJson } from './blocks/parser.js';
 export { convertHTMLToPug } from './blocks/pugTemplates.js';
+
+import BlocklyWorkspace from './BlocklyWorkspace.svelte';
+import BlocklyWorkspaceWithPreview from './BlocklyWorkspaceWithPreview.svelte';
+
+export {
+    BlocklyWorkspace,
+    BlocklyWorkspaceWithPreview
+};
