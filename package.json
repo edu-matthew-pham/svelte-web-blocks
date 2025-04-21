@@ -32,8 +32,7 @@
 			"import": "./dist/index.js",
 			"default": "./dist/index.js"
 		},
-		"./package.json": "./package.json",
-		"./styles.css": "./dist/styles.css"
+		"./package.json": "./package.json"
 	},
 	"peerDependencies": {
 		"svelte": "^5.0.0"
@@ -58,7 +57,6 @@
 		"@tailwindcss/typography": "^0.5.15",
 		"@tailwindcss/vite": "^4.0.0",
 		"@types/prismjs": "^1.26.5",
-		"cross-env": "^7.0.3",
 		"eslint": "^9.18.0",
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-svelte": "^3.0.0",
