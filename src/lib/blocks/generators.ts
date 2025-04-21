@@ -524,24 +524,7 @@ export const webGenerators: WebBlockGeneratorFunctions = {
   }
 };
 
-// Register high-level JSON generators with Blockly instead of HTML
+// Register HTML generators with Blockly for backward compatibility
 Object.keys(webGenerators).forEach(key => {
-  // Register the highLevel function as a custom property
   javascriptGenerator.forBlock[key] = webGenerators[key].html;
-  javascriptGenerator.forBlock[key].highLevel = webGenerators[key].highLevel;
 });
-
-// Add a function to generate high-level JSON from the workspace
-export function generateHighLevelJson(workspace: Blockly.Workspace): string {
-  const topBlocks = workspace.getTopBlocks(true);
-  const result = [];
-  
-  for (const block of topBlocks) {
-    const jsonObj = javascriptGenerator.blockToHighLevel(block);
-    if (jsonObj) {
-      result.push(jsonObj);
-    }
-  }
-  
-  return JSON.stringify(result, null, 2);
-}

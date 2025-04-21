@@ -5,5 +5,9 @@
       "src": "package.json",
       "use": "@vercel/node"
     }
-  ]
+  ],
+  "buildCommand": "npm run vercel-build",
+  "outputDirectory": ".svelte-kit/output/client",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install"
 } 
