@@ -1,81 +1,41 @@
-import type { WebBlockDefinitions } from '$lib/types.js';
-import { createBlockDefinition } from '$lib/utils/block-factory.js';
+import { createBlockDefinitions } from '$lib/utils/block-factory.js';
+import type { WebBlockConfigs } from '$lib/types.js';
 
-// Navigation block definitions
-export const navigationDefinitions: WebBlockDefinitions = {
-  // Header block definition
-  web_header: createBlockDefinition({
+// Define navigation block configurations
+const navigationBlockConfigs: WebBlockConfigs = {
+  web_header: {
+    type: 'web_header',
+    category: 'document',
     color: 230,
-    tooltip: "Create a website header with navigation",
-    helpUrl: "https://getbootstrap.com/docs/5.3/components/navbar/",
+    tooltip: "Add a page header with navigation",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/header",
     inputs: [
-      {
-        type: 'dummy',
-        fields: [
-          { type: 'label', text: "Header" }
-        ]
-      },
-      {
-        type: 'dummy',
-        fields: [
-          { type: 'label', text: "Logo Text" },
-          { type: 'text', name: "LOGO_TEXT", default: "My Website" }
-        ]
-      },
-      {
-        type: 'dummy',
-        fields: [
-          { type: 'label', text: "Include Signup" },
-          { type: 'checkbox', name: "INCLUDE_SIGNUP", default: true }
-        ]
-      },
-      {
-        type: 'statement',
-        name: "LINKS",
-        check: "nav_item",
-        fields: [
-          { type: 'label', text: "Navigation Links" }
-        ]
-      }
+      { type: "label", text: "Header" },
+      { type: "field_text", name: "LOGO_TEXT", default: "My Website" },
+      { type: "row", children: [
+        { type: "label", text: "Include Sign-up Button" },
+        { type: "field_checkbox", name: "INCLUDE_SIGNUP", checked: true }
+      ]},
+      { type: "statement", name: "LINKS", check: "web_nav_item", label: "Navigation links" }
     ],
-    connections: {
-      previous: true,
-      next: true
-    },
-    outputType: "web_component"
-  }),
+    connections: { previous: "web_component", next: "web_component" }
+  },
   
-  // Navigation item block definition
-  web_nav_item: createBlockDefinition({
+  web_nav_item: {
+    type: 'web_nav_item',
+    category: 'item',
     color: 230,
     tooltip: "Add a navigation link",
-    helpUrl: "https://getbootstrap.com/docs/5.3/components/navbar/",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a",
     inputs: [
-      {
-        type: 'dummy',
-        fields: [
-          { type: 'label', text: "Navigation Link" }
-        ]
-      },
-      {
-        type: 'dummy',
-        fields: [
-          { type: 'label', text: "Text" },
-          { type: 'text', name: "TEXT", default: "Home" }
-        ]
-      },
-      {
-        type: 'dummy',
-        fields: [
-          { type: 'label', text: "URL" },
-          { type: 'text', name: "URL", default: "index.html" }
-        ]
-      }
+      { type: "label", text: "Link" },
+      { type: "field_text", name: "TEXT", default: "Home" },
+      { type: "label", text: "URL" },
+      { type: "field_text", name: "URL", default: "#" }
     ],
-    connections: {
-      previous: true,
-      next: true
-    },
-    outputType: "nav_item"
-  })
-}; 
+    connections: { previous: "web_nav_item", next: "web_nav_item" }
+  }
+};
+
+// Create and export the navigation block definitions
+export const navigationDefinitions = createBlockDefinitions(navigationBlockConfigs); 

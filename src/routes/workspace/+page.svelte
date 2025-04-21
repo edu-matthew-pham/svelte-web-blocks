@@ -1,122 +1,60 @@
-<script lang="ts">
-    import BlocklyEditor from '$lib/components/workspace/BlocklyEditor.svelte';
-    import { onMount } from 'svelte';
+<script>
+    import BlocklyWorkspaceWithPreview from '$lib/BlocklyWorkspaceWithPreview.svelte';
     
-    let editor: BlocklyEditor;
-    let jsonInput = '';
+    // Variables to store generated code
+    let htmlOutput = '';
+    let jsonOutput = '';
     
-    function handleEditorChange(event: CustomEvent<{json: string, code?: string, xml?: string}>) {
-        // Update JSON display when workspace changes
-        if (event.detail && event.detail.json) {
-            jsonInput = event.detail.json;
-        }
+    // Function to log JSON to console
+    function logJson() {
+        console.log(jsonOutput);
     }
     
-    function loadJson() {
-        if (editor && jsonInput) {
-            editor.loadFromJson(jsonInput);
-        }
-    }
-    
-    function clearWorkspace() {
-        if (editor) {
-            editor.clearWorkspace();
-        }
+    // Function to download JSON
+    function downloadJson() {
+        const blob = new Blob([jsonOutput], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'blockly-workspace.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 </script>
 
-<div class="container">
-    <header>
-        <h1>Component-Based Blockly Editor</h1>
-        <p>Test the new component-based block system with bidirectional JSON support</p>
-    </header>
-    
-    <main>
-        <div class="editor-container">
-            <BlocklyEditor 
-                bind:this={editor}
-                showCodeView={true}
-                showJsonView={true}
-                on:change={handleEditorChange}
-            />
-        </div>
-        
-        <div class="controls">
-            <h3>Editor Controls</h3>
-            <div class="control-group">
-                <button on:click={clearWorkspace}>Clear Workspace</button>
-                <button on:click={loadJson}>Load from JSON</button>
-            </div>
-            <div class="json-input">
-                <h4>Edit JSON</h4>
-                <textarea bind:value={jsonInput} rows="10"></textarea>
-                <p class="hint">Edit the JSON above and click "Load from JSON" to convert it to blocks</p>
-            </div>
-        </div>
-    </main>
+<div class="workspace-container">
+  <BlocklyWorkspaceWithPreview 
+    bind:generatedHtml={htmlOutput}
+    bind:generatedJson={jsonOutput}
+  />
+</div>
+
+<div class="json-actions">
+  <button on:click={logJson}>Log JSON to Console</button>
+  <button on:click={downloadJson}>Download JSON</button>
 </div>
 
 <style>
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-    
-    header {
-        margin-bottom: 20px;
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 10px;
-    }
-    
-    h1 {
-        margin-bottom: 5px;
-    }
-    
-    .editor-container {
-        height: 500px;
-        margin-bottom: 20px;
-        border: 1px solid #ccc;
-    }
-    
-    .controls {
-        margin-top: 20px;
-    }
-    
-    .control-group {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 15px;
-    }
-    
-    button {
-        padding: 8px 16px;
-        background: #4285f4;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    
-    button:hover {
-        background: #3b78e7;
-    }
-    
-    .json-input {
-        margin-top: 15px;
-    }
-    
-    textarea {
-        width: 100%;
-        font-family: monospace;
-        border: 1px solid #ddd;
-        padding: 8px;
-    }
-    
-    .hint {
-        font-size: 0.8rem;
-        color: #666;
-        margin-top: 5px;
-    }
+
+  .json-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+  }
+  
+  button {
+    padding: 8px 16px;
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  button:hover {
+    background-color: #3367d6;
+  }
 </style>
-    

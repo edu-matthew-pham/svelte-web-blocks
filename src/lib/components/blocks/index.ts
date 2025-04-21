@@ -9,6 +9,13 @@ type ComponentModule = {
 const componentModules = [
   import('../document/index.js'),
   import('../navigation/index.js'),
+  import('../hero/index.js'),
+  import('../content/index.js'),
+  import('../features/index.js'),
+  import('../footer/index.js'),
+  import('../forms/index.js'),
+  import('../dynamic/index.js'),
+  
   // Add new components here
 ];
 

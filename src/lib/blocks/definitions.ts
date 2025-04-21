@@ -36,7 +36,7 @@ const COMMON_ICONS: [string, string][] = [
 const blockConfigs: WebBlockConfigs = {
   web_header: {
     type: 'web_header',
-    category: 'component',
+    category: 'document',
     color: 230,
     tooltip: "Add a page header with navigation",
     helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/header",

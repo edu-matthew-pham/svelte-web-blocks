@@ -1,0 +1,12 @@
+// Content component toolbox definition
+export const contentToolbox = `
+  <category name="Content" colour="120">
+    <block type="web_content_section">
+      <field name="HEADLINE">Section Title</field>
+      <field name="COLUMNS">1</field>
+    </block>
+    <block type="web_content_block">
+      <field name="CONTENT">### Heading\n\nAdd your **formatted** content *here*.\n\n- Bullet point\n- Another point\n\n[Link text](https://example.com)\n\n![Example image](https://picsum.photos/400/200)</field>
+    </block>
+  </category>
+`;
