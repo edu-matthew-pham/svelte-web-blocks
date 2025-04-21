@@ -11,6 +11,7 @@
 			<a href="/" class="logo">svelte-web-blocks</a>
 			<ul class="nav-links">
 				<li><a href="/">Home</a></li>
+				<li><a href="/quick-start">Quick Start</a></li>
 				<li><a href="/example1">Example 1</a></li>
 				<li><a href="/example2">Example 2</a></li>
 				<li><a href="/example3">Example 3</a></li>
