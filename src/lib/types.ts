@@ -62,3 +62,9 @@ export interface DynamicCardItem {
   title?: string;
   description?: string;
 }
+
+export interface ComponentNode {
+  type: string;
+  properties?: Record<string, any>;
+  children?: ComponentNode[];
+}
