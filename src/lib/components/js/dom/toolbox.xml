@@ -10,6 +10,22 @@
     <field name="VALUE">lightblue</field>
   </block>
 
+  <block type="js_element_property">
+    <field name="ACTION">set</field>
+    <field name="ELEMENT">document-1</field>
+    <field name="PROPERTY_TYPE">attribute</field>
+    <field name="PROPERTY">data-bs-theme</field>
+    <field name="VALUE">dark</field>
+  </block>
+
+  <block type="js_element_property">
+    <field name="ACTION">set</field>
+    <field name="ELEMENT">document-1</field>
+    <field name="PROPERTY_TYPE">html</field>
+    <field name="PROPERTY"></field>
+    <field name="VALUE"><![CDATA[<h1>Hello World</h1>]]></field>
+  </block>
+
     <block type="js_select_element"  disabled="true">
     <field name="SELECTOR">#element-id</field>
     <field name="VARIABLE">element</field>

@@ -222,7 +222,8 @@ export function elementProperty(
   action: string,
   propertyType: string,
   property: string,
-  value: string
+  value: string,
+  isExpression: boolean = false
 ): string {
   if (action === 'get') {
     if (propertyType === 'text') {
@@ -239,17 +240,21 @@ export function elementProperty(
     }
   } else { // set
     if (propertyType === 'text') {
-      return `${element}.textContent = ${value};`;
+      return `${element}.textContent = ${isExpression ? value : JSON.stringify(value)};`;
     } else if (propertyType === 'html') {
-      return `${element}.innerHTML = ${value};`;
+      return `${element}.innerHTML = ${isExpression ? value : JSON.stringify(value)};`;
     } else if (propertyType === 'attribute') {
-      return `${element}.setAttribute('${property}', ${value});`;
+      return `${element}.setAttribute('${property}', ${isExpression ? value : JSON.stringify(value)});`;
     } else if (propertyType === 'style') {
       const camel = property.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-      const raw = value.replace(/^['"]|['"]$/g, '');
-      return `${element}.style.${camel} = '${raw}';`;
+      if (isExpression) {
+        return `${element}.style.${camel} = ${value};`;
+      } else {
+        const raw = value.replace(/^['"]|['"]$/g, '');
+        return `${element}.style.${camel} = '${raw}';`;
+      }
     } else if (propertyType === 'value') {
-      return `${element}.value = ${value};`;
+      return `${element}.value = ${isExpression ? value : JSON.stringify(value)};`;
     }
   }
   return '';

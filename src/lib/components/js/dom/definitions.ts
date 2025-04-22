@@ -76,6 +76,10 @@ const jsDomBlockConfigs: WebBlockConfigs = {
       { type: "row", children: [
         { type: "label", text: "Value (for set)" },
         { type: "field_text", name: "VALUE", default: "lightblue" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Use as expression" },
+        { type: "field_checkbox", name: "IS_EXPRESSION", checked: false }
       ]}
     ],
     connections: { previous: "web_component", next: "web_component", output: "String" },
