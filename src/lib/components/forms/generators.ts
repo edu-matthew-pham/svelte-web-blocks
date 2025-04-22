@@ -8,20 +8,23 @@ export const formsGenerators = {
   web_basic_form: createGenerator({
     propertyMappings: [
       { componentProp: 'title' },
-      { componentProp: 'submitText' }
+      { componentProp: 'submitText' },
+      { componentProp: 'id' },
+      { componentProp: 'className' }
     ],
     childInputs: [
       { inputName: 'FIELDS' }
     ],
     
     // Custom HTML renderer that uses the existing template
-    htmlRenderer: (props, childrenHtml) => {
+    htmlRenderer: (props, childrenHtml, attributes) => {
       const { title, submitText } = props;
       
       return createFormHTML(
         title,
         submitText,
-        childrenHtml.fields || ''
+        childrenHtml.fields || '',
+        attributes
       );
     }
   }),
@@ -33,8 +36,19 @@ export const formsGenerators = {
       const required = block.getFieldValue('REQUIRED') === 'TRUE';
       const optionsString = block.getFieldValue('OPTIONS');
       
-      // Generate a sanitized ID from the label
-      const id = `field-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+      // Extract ID and CLASS values
+      const id = block.getFieldValue('ID') || '';
+      const className = block.getFieldValue('CLASS') || '';
+
+      
+      
+      // Create attributes object
+      const attributes = {
+        id: id,
+        className: className
+      };
+
+      console.log('Attributes', attributes);
       
       // For select or radio fields, process the options
       let parsedOptions = [];
@@ -42,7 +56,10 @@ export const formsGenerators = {
         parsedOptions = optionsString.split(',').map((opt: string) => opt.trim());
       }
       
-      return createFormFieldHTML(id, label, type, required, parsedOptions);
+      // Generate a sanitized ID from the label if no custom ID provided
+      const fieldId = id || `field-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+      
+      return createFormFieldHTML(fieldId, label, type, required, parsedOptions, attributes);
     },
     
     highLevel: function(block: Blockly.Block): any {
@@ -58,7 +75,9 @@ export const formsGenerators = {
           label: block.getFieldValue('LABEL'),
           fieldType: type,
           required: required,
-          options: options
+          options: options,
+          id: block.getFieldValue('ID'),
+          className: block.getFieldValue('CLASS')
         }
       };
     }

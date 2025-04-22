@@ -10,7 +10,15 @@ const formsBlockConfigs: WebBlockConfigs = {
     tooltip: "Add a form for user input",
     helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form",
     inputs: [
-      { type: "label", text: "Form" },
+      { type: "row", children: [
+        { type: "label", text: "Form" },
+        { type: "label", text: "ID" },
+        { type: "field_text", name: "ID", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Class" },
+        { type: "field_text", name: "CLASS", default: "" }
+      ]},
       { type: "row", children: [
         { type: "label", text: "Title" },
         { type: "field_text", name: "TITLE", default: "Contact Us" }
@@ -31,7 +39,15 @@ const formsBlockConfigs: WebBlockConfigs = {
     tooltip: "Add a field to your form",
     helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input",
     inputs: [
-      { type: "label", text: "Form Field" },
+      { type: "row", children: [
+        { type: "label", text: "Form Field" },
+        { type: "label", text: "ID" },
+        { type: "field_text", name: "ID", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Class" },
+        { type: "field_text", name: "CLASS", default: "" }
+      ]},
       { type: "row", children: [
         { type: "label", text: "Label" },
         { type: "field_text", name: "LABEL", default: "Email" }

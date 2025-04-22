@@ -415,13 +415,79 @@ ${htmlContent}
 }
 
 /**
+ * Creates HTML for a form field based on field type
+ * @param id Field ID (fallback if not provided in attributes)
+ * @param label Field label
+ * @param type Field type
+ * @param required Whether field is required
+ * @param options Options for select or radio fields
+ * @param attributes Additional HTML attributes for the input element (id, className)
+ * @param containerAttributes Optional attributes for the container div
+ * @returns HTML for the form field
+ */
+export function createFormFieldHTML(
+  id: string, 
+  label: string, 
+  type: string, 
+  required: boolean, 
+  options: string[] = [],
+  attributes?: { id?: string, className?: string },
+  containerAttributes: ComponentAttributes = {}
+): string {
+  // Use attributes.id if provided, otherwise use the id parameter
+  const fieldId = attributes?.id || id;
+  const className = attributes?.className ? ` ${attributes.className}` : '';
+  console.log('containerAttributes', containerAttributes);
+  
+  switch(type) {
+    case 'text':
+    case 'email':
+    case 'number':
+    case 'tel':
+    case 'date':
+    case 'time':
+      const inputHtml = `<input type="${type}" class="form-control${className}" id="${fieldId}" ${required ? 'required' : ''}>`;
+      return createStandardFieldHTML(fieldId, label, inputHtml, required, containerAttributes);
+      
+    case 'textarea':
+      const textareaHtml = `<textarea class="form-control${className}" id="${fieldId}" rows="3" ${required ? 'required' : ''}></textarea>`;
+      return createStandardFieldHTML(fieldId, label, textareaHtml, required, containerAttributes);
+      
+    case 'checkbox':
+      return createCheckboxFieldHTML(fieldId, label, required, containerAttributes);
+      
+    case 'radio':
+      const radioHtml = options.map((option, i) => 
+        createRadioOptionHTML(fieldId, option, i, required)
+      ).join('\n');
+      return createRadioGroupHTML(label, radioHtml, required, containerAttributes);
+      
+    case 'select':
+      const selectHtml = createSelectFieldHTML(fieldId, options, required, className);
+      return createStandardFieldHTML(fieldId, label, selectHtml, required, containerAttributes);
+    
+    default:
+      return '';
+  }
+}
+
+/**
  * Creates HTML for a basic form
  * @param title Form title
  * @param submitText Submit button text
  * @param formFields HTML string for form fields
+ * @param attributes Additional HTML attributes (id, className) 
  * @returns HTML for form component
  */
-export function createFormHTML(title: string, submitText: string, formFields: string): string {
+export function createFormHTML(
+  title: string, 
+  submitText: string, 
+  formFields: string,
+  attributes?: { id?: string, className?: string }
+): string {
+  const id = attributes?.id ? ` id="${attributes.id}"` : '';
+  const className = attributes?.className ? ` class="${attributes.className}"` : '';
+  
   return `<!-- @component: Form -->
 <section class="py-5">
   <div class="container">
@@ -430,7 +496,7 @@ export function createFormHTML(title: string, submitText: string, formFields: st
         <div class="card shadow-sm border-0">
           <div class="card-body p-4 p-md-5">
             <h2 class="text-center mb-4">${title}</h2>
-            <form>
+            <form${id}${className}>
               ${formFields}
               <div class="d-grid mt-4">
                 <button type="submit" class="btn btn-primary">${submitText}</button>
@@ -449,11 +515,25 @@ export function createFormHTML(title: string, submitText: string, formFields: st
  * @param id Field ID
  * @param label Field label
  * @param required Whether field is required
+ * @param containerAttributes Optional attributes for the container div
  * @returns HTML for checkbox form field
  */
-export function createCheckboxFieldHTML(id: string, label: string, required: boolean): string {
+export function createCheckboxFieldHTML(
+  id: string, 
+  label: string, 
+  required: boolean,
+  containerAttributes: ComponentAttributes = {}
+): string {
+  // Build HTML class attribute for container
+  const defaultClass = "mb-3 form-check";
+  const className = containerAttributes.className ? `${defaultClass} ${containerAttributes.className}` : defaultClass;
+  
+  // Build HTML id and data attributes for container
+  const containerId = containerAttributes.id ? ` id="${containerAttributes.id}"` : '';
+  const dataAttributes = containerAttributes.dataAttributes ? ` ${containerAttributes.dataAttributes}` : '';
+
   return `<!-- @item: FormField -->
-<div class="mb-3 form-check">
+<div${containerId} class="${className}"${dataAttributes}>
   <input type="checkbox" class="form-check-input" id="${id}" ${required ? 'required' : ''}>
   <label class="form-check-label" for="${id}">${label}</label>
 </div>\n`;
@@ -461,18 +541,19 @@ export function createCheckboxFieldHTML(id: string, label: string, required: boo
 
 /**
  * Creates HTML for a radio option
- * @param id Base field ID
- * @param option Option text
+ * @param id Base ID for the radio group
+ * @param option Option label
  * @param index Option index
- * @param required Whether field is required
+ * @param required Whether option is required
  * @returns HTML for radio option
  */
 export function createRadioOptionHTML(id: string, option: string, index: number, required: boolean): string {
-  const optId = `${id}-${index}`;
-  return `<div class="form-check">
-  <input class="form-check-input" type="radio" name="${id}" id="${optId}" ${index === 0 && required ? 'required' : ''} ${index === 0 ? 'checked' : ''}>
-  <label class="form-check-label" for="${optId}">${option}</label>
-</div>`;
+  const optionId = `${id}-${index}`;
+  const optionValue = option.toLowerCase().replace(/\s+/g, '-');
+  return `  <div class="form-check">
+    <input class="form-check-input" type="radio" name="${id}" id="${optionId}" value="${optionValue}" ${required && index === 0 ? 'required' : ''}>
+    <label class="form-check-label" for="${optionId}">${option}</label>
+  </div>`;
 }
 
 /**
@@ -480,14 +561,15 @@ export function createRadioOptionHTML(id: string, option: string, index: number,
  * @param id Field ID
  * @param options Array of options
  * @param required Whether field is required
+ * @param className Additional classes for the select element
  * @returns HTML for select input
  */
-export function createSelectFieldHTML(id: string, options: string[], required: boolean): string {
+export function createSelectFieldHTML(id: string, options: string[], required: boolean, className: string = ''): string {
   const optionsHtml = options.map((option: string) => 
     `<option value="${option.toLowerCase().replace(/\s+/g, '-')}">${option}</option>`
   ).join('\n    ');
   
-  return `<select class="form-select" id="${id}" ${required ? 'required' : ''}>
+  return `<select class="form-select${className}" id="${id}" ${required ? 'required' : ''}>
     <option value="" selected disabled>Please select...</option>
     ${optionsHtml}
   </select>`;
@@ -499,11 +581,28 @@ export function createSelectFieldHTML(id: string, options: string[], required: b
  * @param label Field label
  * @param inputHtml HTML for the input element
  * @param required Whether field is required
+ * @param containerAttributes Optional attributes for the container div
  * @returns HTML for standard form field
  */
-export function createStandardFieldHTML(id: string, label: string, inputHtml: string, required: boolean): string {
+export function createStandardFieldHTML(
+  id: string, 
+  label: string, 
+  inputHtml: string, 
+  required: boolean,
+  containerAttributes: ComponentAttributes = {}
+): string {
+  // Build HTML class attribute for container
+  const defaultClass = "mb-3";
+  const className = containerAttributes.className ? `${defaultClass} ${containerAttributes.className}` : defaultClass;
+
+  
+  
+  // Build HTML id and data attributes for container
+  const containerId = containerAttributes.id ? ` id="${containerAttributes.id}"` : '';
+  const dataAttributes = containerAttributes.dataAttributes ? ` ${containerAttributes.dataAttributes}` : '';
+
   return `<!-- @item: FormField -->
-<div class="mb-3">
+<div${containerId} class="${className}"${dataAttributes}>
   <label for="${id}" class="form-label">${label}${required ? ' *' : ''}</label>
   ${inputHtml}
 </div>\n`;
@@ -514,11 +613,25 @@ export function createStandardFieldHTML(id: string, label: string, inputHtml: st
  * @param label Field label
  * @param inputHtml HTML for the radio options
  * @param required Whether field is required
+ * @param containerAttributes Optional attributes for the container div
  * @returns HTML for radio group form field
  */
-export function createRadioGroupHTML(label: string, inputHtml: string, required: boolean): string {
+export function createRadioGroupHTML(
+  label: string, 
+  inputHtml: string, 
+  required: boolean,
+  containerAttributes: ComponentAttributes = {}
+): string {
+  // Build HTML class attribute for container
+  const defaultClass = "mb-3";
+  const className = containerAttributes.className ? `${defaultClass} ${containerAttributes.className}` : defaultClass;
+  
+  // Build HTML id and data attributes for container
+  const containerId = containerAttributes.id ? ` id="${containerAttributes.id}"` : '';
+  const dataAttributes = containerAttributes.dataAttributes ? ` ${containerAttributes.dataAttributes}` : '';
+
   return `<!-- @item: FormField -->
-<div class="mb-3">
+<div${containerId} class="${className}"${dataAttributes}>
   <label class="form-label d-block">${label}${required ? ' *' : ''}</label>
   ${inputHtml}
 </div>\n`;
@@ -828,46 +941,4 @@ export function createAccordionHTML(
     </div>
   </div>
 </section>\n`;
-}
-
-/**
- * Creates HTML for a form field based on field type
- * @param id Field ID
- * @param label Field label
- * @param type Field type
- * @param required Whether field is required
- * @param options Options for select or radio fields
- * @returns HTML for the form field
- */
-export function createFormFieldHTML(id: string, label: string, type: string, required: boolean, options: string[] = []): string {
-  switch(type) {
-    case 'text':
-    case 'email':
-    case 'number':
-    case 'tel':
-    case 'date':
-    case 'time':
-      const inputHtml = `<input type="${type}" class="form-control" id="${id}" ${required ? 'required' : ''}>`;
-      return createStandardFieldHTML(id, label, inputHtml, required);
-      
-    case 'textarea':
-      const textareaHtml = `<textarea class="form-control" id="${id}" rows="3" ${required ? 'required' : ''}></textarea>`;
-      return createStandardFieldHTML(id, label, textareaHtml, required);
-      
-    case 'checkbox':
-      return createCheckboxFieldHTML(id, label, required);
-      
-    case 'radio':
-      const radioHtml = options.map((option, i) => 
-        createRadioOptionHTML(id, option, i, required)
-      ).join('\n');
-      return createRadioGroupHTML(label, radioHtml, required);
-      
-    case 'select':
-      const selectHtml = createSelectFieldHTML(id, options, required);
-      return createStandardFieldHTML(id, label, selectHtml, required);
-    
-    default:
-      return '';
-  }
 } 

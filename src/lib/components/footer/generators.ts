@@ -18,6 +18,7 @@ export const footerGenerators = {
     // Custom HTML renderer that uses the existing template
     htmlRenderer: (props, children, attributes) => {
       const { copyright } = props;
+
       
       return createFooterHTML(
         copyright,
