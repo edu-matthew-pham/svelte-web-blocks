@@ -1,9 +1,13 @@
 <category name="Navigation" colour="230">
   <block type="web_header">
+    <field name="ID"></field>
+    <field name="CLASS"></field>
     <field name="LOGO_TEXT">My Website</field>
     <field name="INCLUDE_SIGNUP">TRUE</field>
   </block>
   <block type="web_nav_item">
+    <field name="ID"></field>
+    <field name="CLASS"></field>
     <field name="TEXT">Home</field>
     <field name="URL">home.html</field>
   </block>

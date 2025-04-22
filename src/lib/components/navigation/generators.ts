@@ -12,8 +12,8 @@ export const navigationGenerators = {
     childInputs: [
       { inputName: 'LINKS' }
     ],
-    htmlRenderer: (props, children) => 
-      HTML.createHeaderHTML(props.logoText, props.includeSignup, children.links) + '\n'
+    htmlRenderer: (props, children, attributes) => 
+      HTML.createHeaderHTML(props.logoText, props.includeSignup, children.links, attributes) + '\n'
   }),
   
   // Navigation item generator
@@ -22,7 +22,7 @@ export const navigationGenerators = {
       { componentProp: 'text', blockField: 'TEXT' },
       { componentProp: 'url', blockField: 'URL' }
     ],
-    htmlRenderer: (props, children) => 
-      HTML.createNavItemHTML(props.text, props.url)
+    htmlRenderer: (props, children, attributes) => 
+      HTML.createNavItemHTML(props.text, props.url, attributes)
   })
 }; 

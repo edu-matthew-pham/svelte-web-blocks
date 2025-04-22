@@ -10,7 +10,20 @@ const navigationBlockConfigs: WebBlockConfigs = {
     tooltip: "Add a page header with navigation",
     helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/header",
     inputs: [
-      { type: "label", text: "Header" },
+      { 
+        type: "combined_input", 
+        fields: [
+          { type: "label", text: "Header" },
+          { type: "label", text: "ID:" },
+          { type: "field_text", name: "ID", default: "" }
+        ]
+      },
+      { 
+        type: "field_text", 
+        name: "CLASS",
+        label: "Classes",
+        default: "" 
+      },
       { type: "field_text", name: "LOGO_TEXT", default: "My Website" },
       { type: "row", children: [
         { type: "label", text: "Include Sign-up Button" },
@@ -28,7 +41,20 @@ const navigationBlockConfigs: WebBlockConfigs = {
     tooltip: "Add a navigation link",
     helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a",
     inputs: [
-      { type: "label", text: "Link" },
+      { 
+        type: "combined_input", 
+        fields: [
+          { type: "label", text: "Link" },
+          { type: "label", text: "ID:" },
+          { type: "field_text", name: "ID", default: "" }
+        ]
+      },
+      { 
+        type: "field_text", 
+        name: "CLASS",
+        label: "Classes",
+        default: "" 
+      },
       { type: "field_text", name: "TEXT", default: "Home" },
       { type: "label", text: "URL" },
       { type: "field_text", name: "URL", default: "#" }

@@ -157,18 +157,28 @@ export function createDocumentHTML(
  * @param logoText Text for the logo/brand
  * @param includeSignup Whether to include signup button
  * @param navigationItems HTML string for navigation items
+ * @param attributes Optional ID, class and data attributes
  * @returns HTML for header component
  */
 export function createHeaderHTML(
   logoText: string,
   includeSignup: boolean,
-  navigationItems: string
+  navigationItems: string,
+  attributes: ComponentAttributes = {}
 ): string {
+  // Build HTML class attribute combining default classes with any user-provided classes
+  const defaultClass = "navbar navbar-expand-lg bg-body-tertiary border-bottom sticky-top";
+  const className = attributes.className ? `${defaultClass} ${attributes.className}` : defaultClass;
+  
+  // Build HTML id and data attributes
+  const id = attributes.id ? ` id="${attributes.id}"` : '';
+  const dataAttributes = attributes.dataAttributes ? ` ${attributes.dataAttributes}` : '';
+
   return `<!-- @component: Header
   logoText: "${logoText}"
   includeSignup: "${includeSignup}"
 -->
-<header class="navbar navbar-expand-lg bg-body-tertiary border-bottom sticky-top">
+<header${id} class="${className}"${dataAttributes}>
   <div class="container">
     <a class="navbar-brand fw-bold" href="/">${logoText}</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -232,14 +242,27 @@ export function createHeroHTML(
  * Creates HTML for a navigation item
  * @param text Text for the navigation link
  * @param url URL for the navigation link
+ * @param attributes Optional ID, class and data attributes
  * @returns HTML for navigation item
  */
-export function createNavItemHTML(text: string, url: string): string {
+export function createNavItemHTML(
+  text: string, 
+  url: string,
+  attributes: ComponentAttributes = {}
+): string {
+  // Build HTML class attribute combining default classes with any user-provided classes
+  const defaultClass = "nav-item";
+  const className = attributes.className ? `${defaultClass} ${attributes.className}` : defaultClass;
+  
+  // Build HTML id and data attributes
+  const id = attributes.id ? ` id="${attributes.id}"` : '';
+  const dataAttributes = attributes.dataAttributes ? ` ${attributes.dataAttributes}` : '';
+
   return `<!-- @item: NavItem
   text: "${text}"
   url: "${url}"
 -->
-<li class="nav-item">
+<li${id} class="${className}"${dataAttributes}>
   <a class="nav-link px-lg-3" href="${url}">${text}</a>
 </li>\n`;
 }
