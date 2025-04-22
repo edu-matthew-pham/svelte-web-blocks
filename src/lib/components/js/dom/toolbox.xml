@@ -1,6 +1,6 @@
-<category name="DOM Manipulation" colour="180"  disabled="true">
-  <!-- Element Selection -->
+<category name="DOM Manipulation" colour="180">
 
+  
   <!-- Unified Property Manipulation -->
   <block type="js_element_property">
     <field name="ACTION">set</field>
@@ -8,78 +8,44 @@
     <field name="PROPERTY_TYPE">style</field>
     <field name="PROPERTY">background-color</field>
     <field name="VALUE">lightblue</field>
-  </block>
-
-  <block type="js_element_property">
-    <field name="ACTION">set</field>
-    <field name="ELEMENT">document-1</field>
-    <field name="PROPERTY_TYPE">attribute</field>
-    <field name="PROPERTY">data-bs-theme</field>
-    <field name="VALUE">dark</field>
-  </block>
-
-  <block type="js_element_property">
-    <field name="ACTION">set</field>
-    <field name="ELEMENT">document-1</field>
-    <field name="PROPERTY_TYPE">html</field>
-    <field name="PROPERTY"></field>
-    <field name="VALUE"><![CDATA[<h1>Hello World</h1>]]></field>
-  </block>
-
-    <block type="js_select_element"  disabled="true">
-    <field name="SELECTOR">#element-id</field>
-    <field name="VARIABLE">element</field>
-  </block>
-  
-  <!-- Class Manipulation -->
-  <block type="js_element_class"  disabled="true">
-    <field name="ACTION">add</field>
-    <field name="ELEMENT">element</field>
-    <field name="CLASS">active</field>
+    <field name="IS_EXPRESSION">FALSE</field>
+    <field name="LOGGING_LEVEL">none</field>
   </block>
   
   <!-- Event Handling -->
-  <block type="js_event_handler"  disabled="true">
-    <field name="ELEMENT">element</field>
+  <block type="js_event_handler">
+    <field name="ELEMENT">myButton</field>
     <field name="EVENT">click</field>
     <field name="PREVENT_DEFAULT">FALSE</field>
   </block>
   
-  <!-- Element Creation -->
-  <block type="js_create_element"  disabled="true">
-    <field name="TAG">div</field>
-    <field name="VARIABLE">newElement</field>
-  </block>
-  
-  <!-- DOM Tree Manipulation -->
-  <block type="js_tree_operation"  disabled="true">
-    <field name="ACTION">append</field>
-    <field name="PARENT">container</field>
-    <field name="CHILD">newElement</field>
+  <!-- Class Manipulation -->
+  <block type="js_element_class" disabled="true">
+    <field name="ACTION">add</field>
+    <field name="CLASS">active</field>
+    <field name="ELEMENT">myElement</field>
   </block>
 
-  <!-- Iterative DOM Manipulation -->
-  <block type="js_iterate_data"  disabled="true">
-    <field name="DATA_SOURCE">items</field>
-    <field name="CONTAINER">#item-list</field>
-    <field name="ELEMENT_TYPE">li</field>
-    <field name="TEMPLATE">${item.name} - $${item.price}</field>
+  <!-- Element Modification (new) -->
+  <block type="js_modify_element" disabled="true">
+    <field name="ELEMENT">myElement</field>
+    <field name="IS_VARIABLE">FALSE</field>
+    <field name="ACTION">content</field>
+    <field name="PROPERTY">innerHTML</field>
+    <field name="VALUE">New content</field>
   </block>
   
-  <!-- Table-Specific Data Population -->
-  <block type="js_populate_table"  disabled="true">
-    <field name="DATA_SOURCE">users</field>
-    <field name="TABLE">#data-table</field>
-    <field name="COLUMNS">name,email,role</field>
-    <field name="HEADERS">true</field>
+  <!-- Element Deletion (new) -->
+  <block type="js_delete_element" disabled="true">
+    <field name="ELEMENT">elementToDelete</field>
+    <field name="IS_VARIABLE">FALSE</field>
   </block>
   
-  <!-- Data-Bound Elements -->
-  <block type="js_create_from_template"  disabled="true">
-    <field name="TEMPLATE"><div class="card">${item.title}<p>${item.description}</p></div></field>
-    <field name="DATA_SOURCE">products</field>
-    <field name="CONTAINER">#product-container</field>
+  <!-- Element Cloning (new) -->
+  <block type="js_clone_element" disabled="true">
+    <field name="SOURCE">sourceElement</field>
+    <field name="NEW_ID">clonedElement</field>
+    <field name="DEEP">TRUE</field>
+    <field name="CONTAINER">parentElement</field>
   </block>
-  
-  
 </category> 

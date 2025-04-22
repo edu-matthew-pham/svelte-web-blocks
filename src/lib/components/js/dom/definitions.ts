@@ -156,39 +156,6 @@ const jsDomBlockConfigs: WebBlockConfigs = {
     connections: { previous: "web_component", next: "web_component" }
   },
   
-  // Element creation
-  js_create_element: {
-    type: 'js_create_element',
-    category: 'dom',
-    color: 180,
-    tooltip: "Create a new DOM element",
-    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement",
-    inputs: [
-      { type: "label", text: "Create Element" },
-      { type: "row", children: [
-        { type: "label", text: "Tag" },
-        { type: "field_dropdown", name: "TAG", options: [
-          ["div", "div"],
-          ["p", "p"],
-          ["span", "span"],
-          ["button", "button"],
-          ["input", "input"],
-          ["img", "img"],
-          ["a", "a"],
-          ["ul", "ul"],
-          ["li", "li"],
-          ["tr", "tr"],
-          ["td", "td"]
-        ]}
-      ]},
-      { type: "row", children: [
-        { type: "label", text: "Store as" },
-        { type: "field_text", name: "VARIABLE", default: "newElement" }
-      ]}
-    ],
-    connections: { previous: "web_component", next: "web_component" }
-  },
-  
   // DOM tree manipulation
   js_tree_operation: {
     type: 'js_tree_operation',
@@ -300,6 +267,94 @@ const jsDomBlockConfigs: WebBlockConfigs = {
       { type: "row", children: [
         { type: "label", text: "Container" },
         { type: "field_text", name: "CONTAINER", default: "#container" }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Element modification block
+  js_modify_element: {
+    type: 'js_modify_element',
+    category: 'dom',
+    color: 180,
+    tooltip: "Modify an existing DOM element",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/API/Element",
+    inputs: [
+      { type: "label", text: "Modify Element" },
+      { type: "row", children: [
+        { type: "label", text: "Element ID or variable" },
+        { type: "field_text", name: "ELEMENT", default: "myElement" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Use as variable" },
+        { type: "field_checkbox", name: "IS_VARIABLE", checked: false }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Action" },
+        { type: "field_dropdown", name: "ACTION", options: [
+          ["Set content", "content"],
+          ["Set attribute", "attribute"],
+          ["Set style", "style"],
+          ["Clear", "clear"]
+        ]}
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Property/Name" },
+        { type: "field_text", name: "PROPERTY", default: "innerHTML" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Value" },
+        { type: "field_text", name: "VALUE", default: "New content" }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Delete element block
+  js_delete_element: {
+    type: 'js_delete_element',
+    category: 'dom',
+    color: 180,
+    tooltip: "Remove an element from the DOM",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/API/Element/remove",
+    inputs: [
+      { type: "label", text: "Delete Element" },
+      { type: "row", children: [
+        { type: "label", text: "Element ID or variable" },
+        { type: "field_text", name: "ELEMENT", default: "elementToDelete" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Use as variable" },
+        { type: "field_checkbox", name: "IS_VARIABLE", checked: false }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Clone element block
+  js_clone_element: {
+    type: 'js_clone_element',
+    category: 'dom',
+    color: 180,
+    tooltip: "Clone an existing DOM element",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/API/Node/cloneNode",
+    inputs: [
+      { type: "label", text: "Clone Element" },
+      { type: "row", children: [
+        { type: "label", text: "Element to clone" },
+        { type: "field_text", name: "SOURCE", default: "sourceElement" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "New element ID" },
+        { type: "field_text", name: "NEW_ID", default: "clonedElement" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Clone children" },
+        { type: "field_checkbox", name: "DEEP", checked: true }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Add to container" },
+        { type: "field_text", name: "CONTAINER", default: "parentElement" }
       ]}
     ],
     connections: { previous: "web_component", next: "web_component" }

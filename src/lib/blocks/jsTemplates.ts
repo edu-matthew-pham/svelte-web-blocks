@@ -2,6 +2,42 @@
  * JS Templates - Utility functions for generating JavaScript code from blocks
  */
 
+// Add this at the top of your file to track element counters
+const elementCounters: Record<string, number> = {};
+const containerCounters: Record<string, number> = {};
+
+/**
+ * Generate a unique variable name based on element type
+ */
+function generateVarName(elementType: string, id?: string): string {
+  if (id && id.trim() !== '') {
+    return id;
+  }
+  
+  // Initialize or increment counter for this element type
+  if (!elementCounters[elementType]) {
+    elementCounters[elementType] = 1;
+  } else {
+    elementCounters[elementType]++;
+  }
+  
+  return `el_${elementType}_${elementCounters[elementType]}`;
+}
+
+/**
+ * Generate a unique container reference variable name
+ */
+function generateContainerVarName(containerType: string): string {
+  // Initialize or increment counter for this container type
+  if (!containerCounters[containerType]) {
+    containerCounters[containerType] = 1;
+  } else {
+    containerCounters[containerType]++;
+  }
+  
+  return `container_${containerType}_${containerCounters[containerType]}`;
+}
+
 // Define common interfaces
 interface ObjectProperty {
     key: string;
@@ -400,29 +436,29 @@ interface ObjectProperty {
     return code;
   }
   
+  /**
+   * Generate code to modify an existing DOM element
+   */
   export function modifyElement(
-    selector: string,
-    action: 'text' | 'html' | 'class' | 'attribute' | 'style' | 'toggleClass',
-    options?: {
-      property?: string,
-      value?: string
-    }
+    element: string,
+    isVariable: boolean,
+    action: string,
+    property: string,
+    value: string
   ): string {
+    const elementRef = isVariable ? element : `document.getElementById('${element}')`;
+    
     switch (action) {
-      case 'text':
-        return `document.querySelector('${selector}').textContent = ${options?.value || '""'};`;
-      case 'html':
-        return `document.querySelector('${selector}').innerHTML = ${options?.value || '""'};`;
-      case 'class':
-        return `document.querySelector('${selector}').className = ${options?.value || '""'};`;
+      case 'content':
+        return `${elementRef}.innerHTML = \`${value}\`;\n`;
       case 'attribute':
-        return `document.querySelector('${selector}').setAttribute('${options?.property || ''}', ${options?.value || '""'});`;
+        return `${elementRef}.setAttribute('${property}', \`${value}\`);\n`;
       case 'style':
-        return `document.querySelector('${selector}').style.${options?.property || ''} = ${options?.value || '""'};`;
-      case 'toggleClass':
-        return `document.querySelector('${selector}').classList.toggle('${options?.value || ''}');`;
+        return `${elementRef}.style.${property} = \`${value}\`;\n`;
+      case 'clear':
+        return `${elementRef}.innerHTML = '';\n`;
       default:
-        return '';
+        return `// Unknown action: ${action}\n`;
     }
   }
   
@@ -676,4 +712,535 @@ interface ObjectProperty {
     return `${storeName}.listen('${key}', (newValue, oldValue) => {
     ${handler}
   });`;
+  }
+  
+  // --- DOM Element Creation ---
+
+  /**
+   * Create code for creating a basic DOM element
+   */
+  export function createElement(
+    elementType: string,
+    id: string,
+    className: string,
+    container: string,
+    options?: {
+      content?: string,
+      contentType?: 'html' | 'text' | 'empty',
+      attributes?: Record<string, string>
+    }
+  ): string {
+    // Generate variable name using the counter-based approach
+    const varName = generateVarName(elementType, id);
+    
+    let code = `const ${varName} = document.createElement('${elementType}');\n`;
+    
+    // Only set ID if explicitly provided
+    if (id && id.trim() !== '') {
+      code += `${varName}.id = '${id}';\n`;
+    }
+    
+    // Add class if provided
+    if (className && className.trim() !== '') {
+      code += `${varName}.className = '${className}';\n`;
+    }
+    
+    // Add content based on content type
+    if (options?.contentType && options.contentType !== 'empty' && options.content) {
+      if (options.contentType === 'html') {
+        code += `${varName}.innerHTML = \`${options.content}\`;\n`;
+      } else {
+        code += `${varName}.textContent = \`${options.content}\`;\n`;
+      }
+    }
+    
+    // Add attributes if provided
+    if (options?.attributes) {
+      for (const [key, value] of Object.entries(options.attributes)) {
+        code += `${varName}.setAttribute('${key}', '${value}');\n`;
+      }
+    }
+    
+    // Add to container
+    code += `document.getElementById('${container}').appendChild(${varName});\n`;
+    
+    return code;
+  }
+
+  /**
+   * Create code for container elements like div, section, form
+   */
+  export function createContainerElement(
+    tagName: string,
+    id: string,
+    className: string,
+    container: string,
+    contentType: 'html' | 'text' | 'empty',
+    content: string
+  ): string {
+
+    return createElement(tagName, id, className, container, {
+      content,
+      contentType
+    });
+  }
+
+  /**
+   * Create code for interactive elements like buttons, inputs
+   */
+  export function createInteractiveElement(
+    tagType: string,
+    id: string,
+    className: string,
+    labelText: string,
+    container: string,
+    attributesJson: string
+  ): string {
+    // Parse the tag to handle special input types
+    let tagName = tagType;
+    let type = '';
+    
+    if (tagType.startsWith('input[')) {
+      tagName = 'input';
+      type = tagType.substring(6, tagType.length - 1);
+    }
+    
+    // Parse attributes JSON
+    let attributes: Record<string, string> = {};
+    try {
+      attributes = JSON.parse(attributesJson);
+    } catch (e) {
+      console.error('Invalid JSON for attributes', e);
+    }
+    
+    // Add type attribute for inputs
+    if (type) {
+      attributes.type = type;
+    }
+    
+    // Handle special cases
+    if (tagName === 'button') {
+      return createElement(tagName, id, className, container, {
+        content: labelText,
+        contentType: 'text',
+        attributes
+      });
+    } else if (tagName === 'img') {
+      
+      attributes.alt = labelText;
+      attributes.src = attributes.src || '';
+      return createElement(tagName, id, className, container, { attributes });
+    } else if (tagName === 'select') {
+      let code = createElement(tagName, id, className, container, { attributes });
+      // If label text contains options in format "option1:value1,option2:value2"
+      if (labelText) {
+        const options = labelText.split(',');
+        for (const option of options) {
+          const [text, value] = option.split(':').map(s => s.trim());
+          code += `const option_${text.replace(/\s+/g, '_')} = document.createElement('option');\n`;
+          code += `option_${text.replace(/\s+/g, '_')}.textContent = '${text}';\n`;
+          if (value) {
+            code += `option_${text.replace(/\s+/g, '_')}.value = '${value}';\n`;
+          }
+          code += `${id}.appendChild(option_${text.replace(/\s+/g, '_')});\n`;
+        }
+      }
+      return code;
+    } else {
+      // For other input types
+      if (labelText && !['input[checkbox]', 'input[radio]'].includes(tagType)) {
+        attributes.placeholder = attributes.placeholder || labelText;
+      }
+      
+      let code = createElement(tagName, id, className, container, { attributes });
+      
+      // Add label for checkbox and radio
+      if (['input[checkbox]', 'input[radio]'].includes(tagType) && labelText) {
+        const labelId = `${id}_label`;
+        code += `const ${labelId} = document.createElement('label');\n`;
+        code += `${labelId}.htmlFor = '${id}';\n`;
+        code += `${labelId}.textContent = '${labelText}';\n`;
+        code += `document.getElementById('${container}').appendChild(${labelId});\n`;
+      }
+      
+      return code;
+    }
+  }
+
+  /**
+   * Create code for text elements like headings, paragraphs, links
+   */
+  export function createTextElement(
+    tagName: string,
+    id: string,
+    className: string,
+    content: string,
+    container: string,
+    href: string = ''
+  ): string {
+    // Make sure we have a valid variable name
+    const varName = generateVarName(tagName, id);
+    
+    let code = `const ${varName} = document.createElement('${tagName}');\n`;
+    
+    // Add ID if provided
+    if (id && id.trim() !== '') {
+      code += `${varName}.id = '${id}';\n`;
+    }
+    
+    // Add class if provided
+    if (className && className.trim() !== '') {
+      code += `${varName}.className = '${className}';\n`;
+    }
+    
+    // Add content
+    if (content) {
+      code += `${varName}.textContent = \`${content}\`;\n`;
+    }
+    
+    // Add href for links
+    if (tagName === 'a' && href) {
+      code += `${varName}.href = '${href}';\n`;
+    }
+    
+    // Add to container
+    code += `document.getElementById('${container}').appendChild(${varName});\n`;
+    
+    return code;
+  }
+
+  /**
+   * Create code for structured elements like lists and tables
+   */
+  export function createStructuredElement(
+    structureType: string,
+    id: string,
+    className: string,
+    container: string,
+    dataSource: string = '',
+    itemTemplate: string = '',
+    items: string = ''
+  ): string {
+    // Create unique variable name for the element
+    const varName = generateVarName(structureType, id);
+    
+    let code = `const ${varName} = document.createElement('${structureType}');\n`;
+    
+    // Add ID if provided
+    if (id && id.trim() !== '') {
+      code += `${varName}.id = '${id}';\n`;
+    }
+    
+    // Add class if provided
+    if (className && className.trim() !== '') {
+      code += `${varName}.className = '${className}';\n`;
+    }
+    
+    // Add to container with error handling
+    const containerVarName = generateContainerVarName(structureType);
+    code += `const ${containerVarName} = document.getElementById('${container}');\n`;
+    code += `if (${containerVarName}) {\n`;
+    code += `  ${containerVarName}.appendChild(${varName});\n`;
+    code += `} else {\n`;
+    code += `  console.error('Container #${container} not found, using document.body instead');\n`;
+    code += `  document.body.appendChild(${varName});\n`;
+    code += `}\n`;
+    
+    // Handle data source if provided
+    if (dataSource && dataSource.trim() !== '') {
+      // Data-driven content generation
+      if (['ul', 'ol'].includes(structureType)) {
+        code += `${dataSource}.forEach(function(item) {\n`;
+        const liVarName = generateVarName('li');
+        code += `  const ${liVarName} = document.createElement('li');\n`;
+        code += `  ${liVarName}.innerHTML = \`${itemTemplate}\`;\n`;
+        code += `  ${varName}.appendChild(${liVarName});\n`;
+        code += `});\n`;
+      } else if (structureType === 'table') {
+        // Assuming itemTemplate is a row template
+        code += `${dataSource}.forEach(function(item) {\n`;
+        const trVarName = generateVarName('tr');
+        code += `  const ${trVarName} = document.createElement('tr');\n`;
+        code += `  ${trVarName}.innerHTML = \`${itemTemplate}\`;\n`;
+        code += `  ${varName}.appendChild(${trVarName});\n`;
+        code += `});\n`;
+      } else if (structureType === 'dl') {
+        code += `${dataSource}.forEach(function(item) {\n`;
+        const dtVarName = generateVarName('dt');
+        const ddVarName = generateVarName('dd');
+        code += `  const ${dtVarName} = document.createElement('dt');\n`;
+        code += `  ${dtVarName}.innerHTML = \`${itemTemplate.split('|')[0] || '${item.term}'}\`;\n`;
+        code += `  const ${ddVarName} = document.createElement('dd');\n`;
+        code += `  ${ddVarName}.innerHTML = \`${itemTemplate.split('|')[1] || '${item.description}'}\`;\n`;
+        code += `  ${varName}.appendChild(${dtVarName});\n`;
+        code += `  ${varName}.appendChild(${ddVarName});\n`;
+        code += `});\n`;
+      }
+    } 
+    // Handle manual items
+    else if (items && items.trim() !== '') {
+      const itemList = items.split(',').map(item => item.trim());
+      
+      if (['ul', 'ol'].includes(structureType)) {
+        itemList.forEach((item, index) => {
+          const liVarName = generateVarName('li');
+          code += `const ${liVarName} = document.createElement('li');\n`;
+          code += `${liVarName}.textContent = '${item}';\n`;
+          code += `${varName}.appendChild(${liVarName});\n`;
+        });
+      } else if (structureType === 'table') {
+        // Simple table with one column for manual items
+        const theadVarName = generateVarName('thead');
+        const tbodyVarName = generateVarName('tbody');
+        code += `const ${theadVarName} = document.createElement('thead');\n`;
+        code += `const ${tbodyVarName} = document.createElement('tbody');\n`;
+        code += `${varName}.appendChild(${theadVarName});\n`;
+        code += `${varName}.appendChild(${tbodyVarName});\n`;
+        
+        itemList.forEach((item, index) => {
+          const trVarName = generateVarName('tr');
+          const tdVarName = generateVarName('td');
+          code += `const ${trVarName} = document.createElement('tr');\n`;
+          code += `const ${tdVarName} = document.createElement('td');\n`;
+          code += `${tdVarName}.textContent = '${item}';\n`;
+          code += `${trVarName}.appendChild(${tdVarName});\n`;
+          code += `${tbodyVarName}.appendChild(${trVarName});\n`;
+        });
+      } else if (structureType === 'dl') {
+        itemList.forEach((item, index) => {
+          const [term, desc] = item.split(':').map(s => s.trim());
+          if (term) {
+            const dtVarName = generateVarName('dt');
+            code += `const ${dtVarName} = document.createElement('dt');\n`;
+            code += `${dtVarName}.textContent = '${term}';\n`;
+            code += `${varName}.appendChild(${dtVarName});\n`;
+            
+            if (desc) {
+              const ddVarName = generateVarName('dd');
+              code += `const ${ddVarName} = document.createElement('dd');\n`;
+              code += `${ddVarName}.textContent = '${desc}';\n`;
+              code += `${varName}.appendChild(${ddVarName});\n`;
+            }
+          }
+        });
+      }
+    }
+    
+    return code;
+  }
+
+  /**
+   * Generate code to delete a DOM element
+   */
+  export function deleteElement(
+    element: string,
+    isVariable: boolean
+  ): string {
+    const elementRef = isVariable ? element : `document.getElementById('${element}')`;
+    return `if (${elementRef}) {\n  ${elementRef}.remove();\n}\n`;
+  }
+
+  /**
+   * Generate code to clone a DOM element
+   */
+  export function cloneElement(
+    source: string,
+    newId: string,
+    deep: boolean,
+    container: string
+  ): string {
+    return `const ${newId} = document.getElementById('${source}').cloneNode(${deep});\n` +
+           `${newId}.id = '${newId}';\n` +
+           `document.getElementById('${container}').appendChild(${newId});\n`;
+  }
+
+  /**
+   * Create structured items like list items, table rows, table cells
+   */
+  export function createStructuredItem(
+    itemType: string,
+    id: string,
+    className: string,
+    container: string,
+    contentType: 'single' | 'multiple',
+    content: string,
+    optionValues: string = '',
+    separator: string = ',',
+    attributes: Record<string, string> | string = {}
+  ): string {
+    let code = '';
+    
+    // Parse attributes if provided as string
+    if (typeof attributes === 'string') {
+      try {
+        attributes = JSON.parse(attributes);
+      } catch (e) {
+        console.error('Invalid JSON for attributes', e);
+        attributes = {};
+      }
+    }
+    
+    // Special handling for option elements
+    if (itemType === 'option') {
+      const optionTexts = content.split(separator).map(item => item.trim()).filter(item => item);
+      const optionValueArray = optionValues ? optionValues.split(separator).map(item => item.trim()) : [];
+      
+      // Ensure we have enough values (use text as value if not provided)
+      while (optionValueArray.length < optionTexts.length) {
+        optionValueArray.push(optionTexts[optionValueArray.length]);
+      }
+      
+      // Create option elements
+      optionTexts.forEach((text, index) => {
+        const varName = generateVarName('option');
+        
+        code += `const ${varName} = document.createElement('option');\n`;
+        
+        if (id && id.trim() !== '' && contentType === 'single') {
+          code += `${varName}.id = '${id}';\n`;
+        } else if (id && id.trim() !== '') {
+          code += `${varName}.id = '${id}_${index}';\n`;
+        }
+        
+        if (className && className.trim() !== '') {
+          code += `${varName}.className = '${className}';\n`;
+        }
+        
+        code += `${varName}.textContent = \`${text}\`;\n`;
+        code += `${varName}.value = \`${optionValueArray[index]}\`;\n`;
+        
+        // Add attributes
+        if (typeof attributes === 'object') {
+          for (const [key, value] of Object.entries(attributes)) {
+            code += `${varName}.setAttribute('${key}', '${value}');\n`;
+          }
+        }
+        
+        // Safe container reference with incremental naming
+        const containerVarName = generateContainerVarName('option');
+        code += `const ${containerVarName} = document.getElementById('${container}');\n`;
+        code += `if (${containerVarName}) {\n`;
+        code += `  ${containerVarName}.appendChild(${varName});\n`;
+        code += `} else {\n`;
+        code += `  console.error('Container #${container} not found');\n`;
+        code += `}\n`;
+      });
+      
+      return code;
+    }
+    
+    // For other item types (li, tr, td, etc.)
+    if (contentType === 'single') {
+      // Create a single item
+      const varName = generateVarName(itemType, id);
+      
+      code += `const ${varName} = document.createElement('${itemType}');\n`;
+      
+      // Add ID if provided
+      if (id && id.trim() !== '') {
+        code += `${varName}.id = '${id}';\n`;
+      }
+      
+      // Add class if provided
+      if (className && className.trim() !== '') {
+        code += `${varName}.className = '${className}';\n`;
+      }
+      
+      // Add content
+      if (content && content.trim() !== '') {
+        code += `${varName}.textContent = \`${content}\`;\n`;
+      }
+      
+      // Add attributes
+      if (typeof attributes === 'object') {
+        for (const [key, value] of Object.entries(attributes)) {
+          code += `${varName}.setAttribute('${key}', '${value}');\n`;
+        }
+      }
+      
+      // Safe container reference with incremental naming
+      const containerVarName = generateContainerVarName(itemType);
+      code += `const ${containerVarName} = document.getElementById('${container}');\n`;
+      code += `if (${containerVarName}) {\n`;
+      code += `  ${containerVarName}.appendChild(${varName});\n`;
+      code += `} else {\n`;
+      code += `  console.error('Container #${container} not found');\n`;
+      code += `}\n`;
+    } else {
+      // Create multiple items
+      const items = content.split(separator).map(item => item.trim()).filter(item => item);
+      
+      // Special handling for table rows with cells
+      if (itemType === 'tr' && items.length > 0) {
+        const trVarName = generateVarName('tr', id);
+        
+        code += `const ${trVarName} = document.createElement('tr');\n`;
+        
+        // Add ID if provided
+        if (id && id.trim() !== '') {
+          code += `${trVarName}.id = '${id}';\n`;
+        }
+        
+        // Add class if provided
+        if (className && className.trim() !== '') {
+          code += `${trVarName}.className = '${className}';\n`;
+        }
+        
+        // Create cell for each item
+        items.forEach((item, index) => {
+          const tdVarName = generateVarName('td');
+          
+          code += `const ${tdVarName} = document.createElement('td');\n`;
+          code += `${tdVarName}.textContent = \`${item}\`;\n`;
+          code += `${trVarName}.appendChild(${tdVarName});\n`;
+        });
+        
+        // Safe container reference with incremental naming
+        const containerVarName = generateContainerVarName('tr');
+        code += `const ${containerVarName} = document.getElementById('${container}');\n`;
+        code += `if (${containerVarName}) {\n`;
+        code += `  ${containerVarName}.appendChild(${trVarName});\n`;
+        code += `} else {\n`;
+        code += `  console.error('Container #${container} not found');\n`;
+        code += `}\n`;
+      } else {
+        // For other item types, create multiple separate items
+        items.forEach((item, index) => {
+          const varName = generateVarName(itemType);
+          
+          code += `const ${varName} = document.createElement('${itemType}');\n`;
+          
+          // Add ID with index for uniqueness if provided
+          if (id && id.trim() !== '') {
+            code += `${varName}.id = '${id}_${index}';\n`;
+          }
+          
+          // Add class if provided
+          if (className && className.trim() !== '') {
+            code += `${varName}.className = '${className}';\n`;
+          }
+          
+          // Add content
+          code += `${varName}.textContent = \`${item}\`;\n`;
+          
+          // Add attributes
+          if (typeof attributes === 'object') {
+            for (const [key, value] of Object.entries(attributes)) {
+              code += `${varName}.setAttribute('${key}', '${value}');\n`;
+            }
+          }
+          
+          // Safe container reference with incremental naming
+          const containerVarName = generateContainerVarName(itemType);
+          code += `const ${containerVarName} = document.getElementById('${container}');\n`;
+          code += `if (${containerVarName}) {\n`;
+          code += `  ${containerVarName}.appendChild(${varName});\n`;
+          code += `} else {\n`;
+          code += `  console.error('Container #${container} not found');\n`;
+          code += `}\n`;
+        });
+      }
+    }
+    
+    return code;
   }

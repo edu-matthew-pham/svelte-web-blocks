@@ -1,0 +1,380 @@
+import { createBlockDefinitions } from '$lib/utils/block-factory.js';
+import type { WebBlockConfigs } from '$lib/types.js';
+import { registerVisibilityExtension, initializeVisibilityExtensions } from '$lib/utils/blockly-extensions.js';
+import * as Blockly from 'blockly/core';
+
+// Define DOM creation block configurations
+const jsCreateBlockConfigs: WebBlockConfigs = {
+  // Container Elements (div, section, form, etc.)
+  js_create_container: {
+    type: 'js_create_container',
+    category: 'create',
+    color: 160,
+    tooltip: "Create a container element like div, section, or form",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element",
+    inputs: [
+      { type: "row", children: [
+        { type: "label", text: "Create Container" },
+        { type: "label", text: "ID (required)" },
+        { type: "field_text", name: "ID", default: "myContainer" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Class" },
+        { type: "field_text", name: "CLASS", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Type" },
+        { type: "field_dropdown", name: "TAG", options: [
+          ["div", "div"],
+          ["section", "section"],
+          ["article", "article"],
+          ["form", "form"],
+          ["header", "header"],
+          ["footer", "footer"],
+          ["main", "main"],
+          ["aside", "aside"],
+          ["nav", "nav"]
+        ]}
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Add to" },
+        { type: "field_text", name: "CONTAINER", default: "document-1" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Initial content" },
+        { type: "field_dropdown", name: "CONTENT_TYPE", options: [
+          ["HTML", "html"],
+          ["Text", "text"],
+          ["Empty", "empty"]
+        ]}
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Content" },
+        { type: "field_multiline", name: "CONTENT", default: "" }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Interactive Elements (button, input, img, etc.)
+  js_create_interactive: {
+    type: 'js_create_interactive',
+    category: 'create',
+    color: 160,
+    tooltip: "Create interactive elements like buttons, inputs, and images",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element",
+    inputs: [
+      { type: "row", children: [
+        { type: "label", text: "Create Interactive Element" },
+        { type: "label", text: "ID (optional)" },
+        { type: "field_text", name: "ID", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Class" },
+        { type: "field_text", name: "CLASS", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Type" },
+        { type: "field_dropdown", name: "TAG", options: [
+          ["Button", "button"],
+          ["Text Input", "input[text]"],
+          ["Checkbox", "input[checkbox]"],
+          ["Radio", "input[radio]"],
+          ["Image", "img"],
+          ["File Upload", "input[file]"],
+          ["Slider", "input[range]"]
+        ]}
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Label/Text" },
+        { type: "field_text", name: "LABEL", default: "Click me" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Add to" },
+        { type: "field_text", name: "CONTAINER", default: "document-1" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Attributes (JSON)" },
+        { type: "field_multiline", name: "ATTRIBUTES", default: '{"placeholder": "Enter text"}' }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Text Elements (headings, paragraphs, links, etc.)
+  js_create_text: {
+    type: 'js_create_text',
+    category: 'create',
+    color: 160,
+    tooltip: "Create text elements like headings, paragraphs, and links",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element",
+    inputs: [
+      { type: "row", children: [
+        { type: "label", text: "Create Text" },
+        { type: "label", text: "ID (optional)" },
+        { type: "field_text", name: "ID", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Class" },
+        { type: "field_text", name: "CLASS", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Type" },
+        { type: "field_dropdown", name: "TAG", options: [
+          ["Heading 1", "h1"],
+          ["Heading 2", "h2"],
+          ["Heading 3", "h3"],
+          ["Paragraph", "p"],
+          ["Link", "a"],
+          ["Span", "span"],
+          ["Strong/Bold", "strong"],
+          ["Emphasis/Italic", "em"]
+        ]}
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Content" },
+        { type: "field_multiline", name: "CONTENT", default: "Text content here" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Add to" },
+        { type: "field_text", name: "CONTAINER", default: "document-1" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Link URL (for links)" },
+        { type: "field_text", name: "HREF", default: "" }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Hierarchical/Data Elements (tables, lists, etc.)
+  js_create_structured: {
+    type: 'js_create_structured',
+    category: 'create',
+    color: 160,
+    tooltip: "Create structured elements like tables and lists",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element",
+    inputs: [
+      { type: "row", children: [
+        { type: "label", text: "Create Structure" },
+        { type: "label", text: "ID (required)" },
+        { type: "field_text", name: "ID", default: "myList" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Class" },
+        { type: "field_text", name: "CLASS", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Type" },
+        { type: "field_dropdown", name: "STRUCTURE_TYPE", options: [
+          ["Unordered List", "ul"],
+          ["Ordered List", "ol"],
+          ["Table", "table"],
+          ["Definition List", "dl"],
+          ["Select Dropdown", "select"]
+        ]}
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Add to" },
+        { type: "field_text", name: "CONTAINER", default: "document-1" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Data source (optional)" },
+        { type: "field_text", name: "DATA_SOURCE", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Item template" },
+        { type: "field_multiline", name: "ITEM_TEMPLATE", default: "<li>${item}</li>" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Manual items (CSV)" },
+        { type: "field_multiline", name: "ITEMS", default: "Item 1, Item 2, Item 3" }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Tree operation
+  js_tree_operation: {
+    type: 'js_tree_operation',
+    category: 'create',
+    color: 160,
+    tooltip: "Perform operations on the DOM tree",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/API/Node",
+    inputs: [
+      { type: "label", text: "DOM Tree Operation" },
+      { type: "row", children: [
+        { type: "field_dropdown", name: "ACTION", options: [
+          ["Append", "append"],
+          ["Prepend", "prepend"],
+          ["Insert before", "before"],
+          ["Replace", "replace"],
+          ["Remove", "remove"]
+        ]},
+        { type: "label", text: "element" }
+      ]},
+      { type: "row", children: [
+        { type: "field_text", name: "CHILD", default: "newElement" },
+        { type: "label", text: "to/from" },
+        { type: "field_text", name: "PARENT", default: "container" }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Iterative data manipulation
+  js_iterate_data: {
+    type: 'js_iterate_data',
+    category: 'create',
+    color: 160,
+    tooltip: "Create DOM elements from an array of data",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach",
+    inputs: [
+      { type: "label", text: "Create Elements from Data" },
+      { type: "row", children: [
+        { type: "label", text: "Data source" },
+        { type: "field_text", name: "DATA_SOURCE", default: "items" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Container" },
+        { type: "field_text", name: "CONTAINER", default: "#item-list" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Element type" },
+        { type: "field_dropdown", name: "ELEMENT_TYPE", options: [
+          ["List item (li)", "li"],
+          ["Div", "div"],
+          ["Paragraph (p)", "p"],
+          ["Table row (tr)", "tr"]
+        ]}
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Template" },
+        { type: "field_text", name: "TEMPLATE", default: "${item.name}" }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Table population
+  js_populate_table: {
+    type: 'js_populate_table',
+    category: 'create',
+    color: 160,
+    tooltip: "Populate a table with data from an array",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/API/HTMLTableElement",
+    inputs: [
+      { type: "label", text: "Populate Table" },
+      { type: "row", children: [
+        { type: "label", text: "Data source" },
+        { type: "field_text", name: "DATA_SOURCE", default: "users" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Table selector" },
+        { type: "field_text", name: "TABLE", default: "#data-table" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Columns (comma separated)" },
+        { type: "field_text", name: "COLUMNS", default: "name,email,role" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Include headers" },
+        { type: "field_checkbox", name: "HEADERS", checked: true }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Template-based element creation
+  js_create_from_template: {
+    type: 'js_create_from_template',
+    category: 'create',
+    color: 160,
+    tooltip: "Create elements from a template and data",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals",
+    inputs: [
+      { type: "label", text: "Create from Template" },
+      { type: "row", children: [
+        { type: "label", text: "Template" },
+        { type: "field_multiline", name: "TEMPLATE", default: "<div class=\"item\">${item.name}</div>" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Data source" },
+        { type: "field_text", name: "DATA_SOURCE", default: "items" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Container" },
+        { type: "field_text", name: "CONTAINER", default: "#container" }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  },
+  
+  // Structured Item Creation
+  js_create_structured_item: {
+    type: 'js_create_structured_item',
+    category: 'create',
+    color: 160,
+    tooltip: "Create items for structured elements like lists and tables",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element",
+    inputs: [
+      { type: "row", children: [
+        { type: "label", text: "Create Structured Item" },
+        { type: "label", text: "ID (optional)" },
+        { type: "field_text", name: "ID", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Class" },
+        { type: "field_text", name: "CLASS", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Type" },
+        { type: "field_dropdown", name: "ITEM_TYPE", options: [
+          ["List Item (li)", "li"],
+          ["Table Row (tr)", "tr"],
+          ["Table Cell (td)", "td"],
+          ["Table Header (th)", "th"],
+          ["Definition Term (dt)", "dt"],
+          ["Definition Description (dd)", "dd"],
+          ["Option (option)", "option"]
+        ]}
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Add to" },
+        { type: "field_text", name: "CONTAINER", default: "myList" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Content type" },
+        { type: "field_dropdown", name: "CONTENT_TYPE", options: [
+          ["Single item", "single"],
+          ["Multiple items", "multiple"]
+        ]}
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Content/Item" },
+        { type: "field_multiline", name: "CONTENT", default: "Item content" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Option values (for options)" },
+        { type: "field_multiline", name: "OPTION_VALUES", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Items separator" },
+        { type: "field_dropdown", name: "SEPARATOR", options: [
+          ["Comma (,)", ","],
+          ["New line", "\n"],
+          ["Semicolon (;)", ";"],
+          ["Tab", "\t"]
+        ]}
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Attributes (JSON)" },
+        { type: "field_multiline", name: "ATTRIBUTES", default: "{}" }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
+  }
+};
+
+// Create and export the DOM creation block definitions
+export const jsCreateDefinitions = createBlockDefinitions(jsCreateBlockConfigs);

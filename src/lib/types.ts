@@ -25,7 +25,7 @@ export interface BlockInputConfig {
   fields?: BlockInputConfig[];
 }
 
-export type BlockCategory = "component" | "item" | "document" | "javascript" | "reactive" | "dataObjects" | "expressions" | "lists" | "logic" | "loops" | "dom";
+export type BlockCategory = "component" | "item" | "document" | "javascript" | "reactive" | "dataObjects" | "expressions" | "lists" | "logic" | "loops" | "dom" | "create";
 
 export interface BlockConfig {
   type: string;

@@ -96,105 +96,64 @@ export const jsDomGenerators: WebBlockGeneratorFunctions = {
     }
   },
   
-  // Create element generator
-  js_create_element: {
+  js_modify_element: {
     html: function(block: Blockly.Block) {
-      const tag = block.getFieldValue('TAG');
-      const variable = block.getFieldValue('VARIABLE');
-      
-      return `const ${variable} = document.createElement('${tag}');`;
-    },
-    
-    highLevel: function(block: Blockly.Block) {
-      return {
-        type: 'dom_create',
-        tag: block.getFieldValue('TAG'),
-        variable: block.getFieldValue('VARIABLE')
-      };
-    }
-  },
-  
-  // Tree operation generator
-  js_tree_operation: {
-    html: function(block: Blockly.Block) {
+      const element = block.getFieldValue('ELEMENT');
+      const isVariable = block.getFieldValue('IS_VARIABLE') === 'TRUE';
       const action = block.getFieldValue('ACTION');
-      const child = block.getFieldValue('CHILD');
-      const parent = block.getFieldValue('PARENT');
+      const property = block.getFieldValue('PROPERTY');
+      const value = block.getFieldValue('VALUE');
       
-      return jsTemplates.treeOperation(action, parent, child);
+      return jsTemplates.modifyElement(element, isVariable, action, property, value);
     },
     
     highLevel: function(block: Blockly.Block) {
       return {
-        type: 'dom_tree',
+        type: 'dom_modify',
+        element: block.getFieldValue('ELEMENT'),
+        isVariable: block.getFieldValue('IS_VARIABLE') === 'TRUE',
         action: block.getFieldValue('ACTION'),
-        child: block.getFieldValue('CHILD'),
-        parent: block.getFieldValue('PARENT')
+        property: block.getFieldValue('PROPERTY'),
+        value: block.getFieldValue('VALUE')
       };
     }
   },
   
-  // Iterate data generator
-  js_iterate_data: {
+  js_delete_element: {
     html: function(block: Blockly.Block) {
-      const dataSource = block.getFieldValue('DATA_SOURCE');
-      const container = block.getFieldValue('CONTAINER');
-      const elementType = block.getFieldValue('ELEMENT_TYPE');
-      const template = block.getFieldValue('TEMPLATE');
+      const element = block.getFieldValue('ELEMENT');
+      const isVariable = block.getFieldValue('IS_VARIABLE') === 'TRUE';
       
-      return jsTemplates.iterateData(dataSource, container, elementType, template);
+      return jsTemplates.deleteElement(element, isVariable);
     },
     
     highLevel: function(block: Blockly.Block) {
       return {
-        type: 'dom_iterate',
-        dataSource: block.getFieldValue('DATA_SOURCE'),
-        container: block.getFieldValue('CONTAINER'),
-        elementType: block.getFieldValue('ELEMENT_TYPE'),
-        template: block.getFieldValue('TEMPLATE')
+        type: 'dom_delete',
+        element: block.getFieldValue('ELEMENT'),
+        isVariable: block.getFieldValue('IS_VARIABLE') === 'TRUE'
       };
     }
   },
   
-  // Populate table generator
-  js_populate_table: {
+  js_clone_element: {
     html: function(block: Blockly.Block) {
-      const dataSource = block.getFieldValue('DATA_SOURCE');
-      const table = block.getFieldValue('TABLE');
-      const columns = block.getFieldValue('COLUMNS');
-      const headers = block.getFieldValue('HEADERS') === true;
-      
-      return jsTemplates.populateTable(dataSource, table, columns.split(','), headers);
-    },
-    
-    highLevel: function(block: Blockly.Block) {
-      return {
-        type: 'dom_table',
-        dataSource: block.getFieldValue('DATA_SOURCE'),
-        table: block.getFieldValue('TABLE'),
-        columns: block.getFieldValue('COLUMNS').split(','),
-        headers: block.getFieldValue('HEADERS') === true
-      };
-    }
-  },
-  
-  // Template generator
-  js_create_from_template: {
-    html: function(block: Blockly.Block) {
-      const template = block.getFieldValue('TEMPLATE');
-      const dataSource = block.getFieldValue('DATA_SOURCE');
+      const source = block.getFieldValue('SOURCE');
+      const newId = block.getFieldValue('NEW_ID');
+      const deep = block.getFieldValue('DEEP') === 'TRUE';
       const container = block.getFieldValue('CONTAINER');
       
-      return jsTemplates.createFromTemplate(template, dataSource, container);
+      return jsTemplates.cloneElement(source, newId, deep, container);
     },
     
     highLevel: function(block: Blockly.Block) {
       return {
-        type: 'dom_template',
-        template: block.getFieldValue('TEMPLATE'),
-        dataSource: block.getFieldValue('DATA_SOURCE'),
+        type: 'dom_clone',
+        source: block.getFieldValue('SOURCE'),
+        newId: block.getFieldValue('NEW_ID'),
+        deep: block.getFieldValue('DEEP') === 'TRUE',
         container: block.getFieldValue('CONTAINER')
       };
     }
   }
-}; 
+}
