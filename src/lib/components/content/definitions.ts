@@ -10,20 +10,7 @@ const contentBlockConfigs: WebBlockConfigs = {
     tooltip: "Add a content section with headline and text",
     helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/section",
     inputs: [
-      { 
-        type: "combined_input", 
-        fields: [
-          { type: "label", text: "Content Section" },
-          { type: "label", text: "ID:" },
-          { type: "field_text", name: "ID", default: "" }
-        ]
-      },
-      { 
-        type: "field_text", 
-        name: "CLASS",
-        label: "Classes",
-        default: "" 
-      },
+      { type: "label", text: "Content Section" },
       { type: "row", children: [
         { type: "label", text: "Headline" },
         { type: "field_text", name: "HEADLINE", default: "Section Title" }
@@ -48,20 +35,7 @@ const contentBlockConfigs: WebBlockConfigs = {
     tooltip: "Add markdown-formatted content to a section",
     helpUrl: "https://www.markdownguide.org/basic-syntax/",
     inputs: [
-      { 
-        type: "combined_input", 
-        fields: [
-          { type: "label", text: "Content Block (Markdown supported)" },
-          { type: "label", text: "ID:" },
-          { type: "field_text", name: "ID", default: "" }
-        ]
-      },
-      { 
-        type: "field_text", 
-        name: "CLASS",
-        label: "Classes",
-        default: "" 
-      },
+      { type: "label", text: "Content Block (Markdown supported)" },
       { type: "row", children: [
         { type: "label", text: "Content" },
         { type: "field_multiline", name: "CONTENT", default: "# Heading\n\nAdd your **formatted** content here.\n\n- Bullet point\n- Another point\n\n[Link text](https://example.com)" }

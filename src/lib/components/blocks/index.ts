@@ -17,6 +17,7 @@ const componentModules = [
   import('../dynamic/index.js'),
   import('$lib/components/js/dom/index.js'),
   import('$lib/components/js/create/index.js'),
+  import('$lib/components/js/variables/index.js')
   // Add new components here
 ];
 

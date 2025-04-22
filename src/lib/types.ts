@@ -17,15 +17,23 @@ export interface BlockInputConfig {
   checked?: boolean;
   options?: [string, string][] | string;
   check?: string;
+  align?: number; // For input alignment (LEFT, RIGHT, CENTER)
   label?: string;
   children?: BlockInputConfig[];
   min?: number;
   max?: number;
   precision?: number;
   fields?: BlockInputConfig[];
+  variable?: string; // For specifying the default variable name
 }
 
-export type BlockCategory = "component" | "item" | "document" | "javascript" | "reactive" | "dataObjects" | "expressions" | "lists" | "logic" | "loops" | "dom" | "create";
+export type BlockCategory = "component" | "item" | "document" | "javascript" | "reactive" | "dataObjects" | "expressions" | "lists" | "logic" | "loops" | "dom" | "create" | "js" | "variables";
+
+export interface BlockConnections {
+  previous?: string | false;
+  next?: string | false;
+  output?: string | false;
+}
 
 export interface BlockConfig {
   type: string;
@@ -34,11 +42,7 @@ export interface BlockConfig {
   tooltip: string;
   helpUrl: string;
   inputs: BlockInputConfig[];
-  connections: {
-    previous: string | false;
-    next: string | false;
-    output?: string;
-  };
+  connections: BlockConnections;
   extensions?: string[];
 }
 
@@ -53,12 +57,6 @@ export interface WebBlockGenerator {
 
 export interface WebBlockGeneratorFunctions {
   [key: string]: WebBlockGenerator;
-}
-
-export interface BlockConnections {
-  previous: string | false;
-  next: string | false;
-  output?: string;
 }
 
 export interface DynamicCardItem {

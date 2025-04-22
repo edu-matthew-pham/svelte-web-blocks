@@ -20,7 +20,18 @@ function formatFieldName(name: string): string {
 
 /// Helper function to build inputs based on configuration
 function buildInput(block: Blockly.Block, input: BlockInputConfig) {
-    if (input.type === "label") {
+  if (input.type === "input_value") { 
+      console.log("Building input", input);
+  }
+  if (input.type === "input_value") {
+    if (!input.name) return block.appendDummyInput();
+    const valueInput = block.appendValueInput(input.name);
+    if (input.check) valueInput.setCheck(input.check);
+    if (input.label) valueInput.appendField(input.label);
+    if (input.align) valueInput.setAlign(input.align);
+    console.log("Creating input value", input.name, input.label, input.align);
+    return valueInput;
+  } else if (input.type === "label") {
       return block.appendDummyInput().appendField(input.text || "");
     } 
     else if (input.type === "field_text") {
@@ -71,12 +82,28 @@ function buildInput(block: Blockly.Block, input: BlockInputConfig) {
       if (input.label) statement.appendField(input.label);
       return statement;
     } 
+    else if (input.type === "field_variable") {
+      if (!input.name) return block.appendDummyInput();
+      return block.appendDummyInput()
+        .appendField(input.label || formatFieldName(input.name))
+        .appendField(new Blockly.FieldVariable(input.variable || "item"), input.name);
+    }
     else if (input.type === "row") {
       const dummyInput = block.appendDummyInput();
       if (!input.children) return dummyInput;
       
       input.children.forEach((child: BlockInputConfig) => {
-        if (child.type === "label") {
+        if (child.type === "field_text") { 
+          console.log("Building child field text", child);
+        } else if (child.type === "input_value") {
+          // Create a new value input instead of just logging
+          if (child.name) {
+            const valueInput = block.appendValueInput(child.name);
+            if (child.check) valueInput.setCheck(child.check);
+            if (child.label) valueInput.appendField(child.label);
+            if (child.align) valueInput.setAlign(child.align);
+          }
+        } else if (child.type === "label") {
           dummyInput.appendField(child.text || "");
         } else if (child.type === "field_text") {
           if (child.name) {
@@ -105,6 +132,10 @@ function buildInput(block: Blockly.Block, input: BlockInputConfig) {
           if (child.name) {
             dummyInput.appendField(new Blockly.FieldNumber(child.default || 0, child.min, child.max, child.precision || 0), child.name);
           }
+        } else if (child.type === "field_variable") {
+          if (child.name) {
+            dummyInput.appendField(new Blockly.FieldVariable(child.variable || "item"), child.name);
+          }
         }
       });
       return dummyInput;
@@ -114,7 +145,17 @@ function buildInput(block: Blockly.Block, input: BlockInputConfig) {
       if (!input.fields) return dummyInput;
       
       input.fields.forEach((field: BlockInputConfig) => {
-        if (field.type === "label") {
+        if (field.type === "field_text") { 
+          console.log("Building child field text", field);
+        } else if (field.type === "input_value") {
+          // Create a new value input instead of just logging
+          if (field.name) {
+            const valueInput = block.appendValueInput(field.name);
+            if (field.check) valueInput.setCheck(field.check);
+            if (field.label) valueInput.appendField(field.label);
+            if (field.align) valueInput.setAlign(field.align);
+          }
+        } else if (field.type === "label") {
           dummyInput.appendField(field.text || "");
         } else if (field.type === "field_text") {
           if (field.name) {
@@ -143,9 +184,22 @@ function buildInput(block: Blockly.Block, input: BlockInputConfig) {
           if (field.name) {
             dummyInput.appendField(new Blockly.FieldNumber(field.default || 0, field.min, field.max, field.precision || 0), field.name);
           }
+        } else if (field.type === "field_variable") {
+          if (field.name) {
+            dummyInput.appendField(new Blockly.FieldVariable(field.variable || "item"), field.name);
+          }
         }
       });
       return dummyInput;
+    }
+    else if (input.type === "input_value") {
+      if (!input.name) return block.appendDummyInput();
+      const valueInput = block.appendValueInput(input.name);
+      if (input.check) valueInput.setCheck(input.check);
+      if (input.label) valueInput.appendField(input.label);
+      if (input.align) valueInput.setAlign(input.align);
+      console.log("Creating input value", input.name, input.label, input.align);
+      return valueInput;
     }
     
     // Default case if none of the above match
@@ -172,6 +226,9 @@ function buildInput(block: Blockly.Block, input: BlockInputConfig) {
           }
           if (config.connections.next) {
             this.setNextStatement(true, config.connections.next);
+          }
+          if (config.connections.output) {
+            this.setOutput(true, config.connections.output);
           }
           
           // Special case for web_form_field to handle conditional options field

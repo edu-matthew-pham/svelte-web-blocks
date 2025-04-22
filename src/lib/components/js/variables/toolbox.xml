@@ -1,0 +1,25 @@
+<category name="Variables & Functions" colour="290">
+    <label text="Variables" web-class="toolboxLabel"></label>
+      <block type="variables_set">
+        <field name="VAR">myVariable</field>
+      </block>
+      <block type="variables_get">
+        <field name="VAR">myVariable</field>
+      </block>
+
+      <label text="Functions" web-class="toolboxLabel"></label>
+      <sep gap="8"></sep>
+      
+      <block type="procedures_defnoreturn">
+        <field name="NAME">myFunction</field>
+      </block>
+      <block type="procedures_defreturn">
+        <field name="NAME">myFunctionWithReturn</field>
+      </block>
+      <block type="procedures_callnoreturn">
+        <mutation name="myFunction"></mutation>
+      </block>
+      <block type="procedures_callreturn">
+        <mutation name="myFunctionWithReturn"></mutation>
+      </block>
+    </category>
