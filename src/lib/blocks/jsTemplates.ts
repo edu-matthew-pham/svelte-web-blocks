@@ -215,50 +215,88 @@ interface ObjectProperty {
   // --- DOM Manipulation ---
 
   /**
- * Create code for element property operations
- */
-export function elementProperty(
-  element: string,
-  action: string,
-  propertyType: string,
-  property: string,
-  value: string,
-  isExpression: boolean = false
-): string {
-  if (action === 'get') {
-    if (propertyType === 'text') {
-      return `${element}.textContent`;
-    } else if (propertyType === 'html') {
-      return `${element}.innerHTML`;
-    } else if (propertyType === 'attribute') {
-      return `${element}.getAttribute('${property}')`;
-    } else if (propertyType === 'style') {
-      const camel = property.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-      return `${element}.style.${camel}`;
-    } else if (propertyType === 'value') {
-      return `${element}.value`;
-    }
-  } else { // set
-    if (propertyType === 'text') {
-      return `${element}.textContent = ${isExpression ? value : JSON.stringify(value)};`;
-    } else if (propertyType === 'html') {
-      return `${element}.innerHTML = ${isExpression ? value : JSON.stringify(value)};`;
-    } else if (propertyType === 'attribute') {
-      return `${element}.setAttribute('${property}', ${isExpression ? value : JSON.stringify(value)});`;
-    } else if (propertyType === 'style') {
-      const camel = property.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-      if (isExpression) {
-        return `${element}.style.${camel} = ${value};`;
-      } else {
-        const raw = value.replace(/^['"]|['"]$/g, '');
-        return `${element}.style.${camel} = '${raw}';`;
+   * Create code for element property operations
+   */
+  export function elementProperty(
+    element: string,
+    action: string,
+    propertyType: string,
+    property: string,
+    value: string,
+    isExpression: boolean = false,
+    loggingLevel: string = 'none'
+  ): string {
+    let result = '';
+    
+    if (action === 'get') {
+      // Get operations
+      if (propertyType === 'text') {
+        result = `${element}.textContent`;
+      } else if (propertyType === 'html') {
+        result = `${element}.innerHTML`;
+      } else if (propertyType === 'attribute') {
+        result = `${element}.getAttribute('${property}')`;
+      } else if (propertyType === 'style') {
+        const camel = property.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+        result = `${element}.style.${camel}`;
+      } else if (propertyType === 'value') {
+        result = `${element}.value`;
       }
-    } else if (propertyType === 'value') {
-      return `${element}.value = ${isExpression ? value : JSON.stringify(value)};`;
+      
+      // Add logging for get operations based on level
+      if (loggingLevel === 'basic') {
+        return `(function() { const value = ${result}; console.log('GET: ${property} =', value); return value; })()`;
+      } else if (loggingLevel === 'detailed') {
+        return `(function() { const value = ${result}; console.log('GET: Element ${propertyType} "${property}" from', ${element}, '=', value); return value; })()`;
+      }
+      
+      return result;
+    } else { 
+      // Set operations
+      if (propertyType === 'text') {
+        result = `${element}.textContent = ${isExpression ? value : JSON.stringify(value)};`;
+      } else if (propertyType === 'html') {
+        result = `${element}.innerHTML = ${isExpression ? value : JSON.stringify(value)};`;
+      } else if (propertyType === 'attribute') {
+        result = `${element}.setAttribute('${property}', ${isExpression ? value : JSON.stringify(value)});`;
+      } else if (propertyType === 'style') {
+        const camel = property.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+        // Handle color properties with !important
+        const isColorProperty = /color|background/i.test(property);
+        
+        if (isColorProperty) {
+          // Convert camelCase back to kebab-case for setProperty
+          const kebabCase = property.replace(/([A-Z])/g, '-$1').toLowerCase();
+          if (isExpression) {
+            result = `${element}.style.setProperty('${kebabCase}', ${value}, 'important');`;
+          } else {
+            const raw = value.replace(/^['"]|['"]$/g, '');
+            result = `${element}.style.setProperty('${kebabCase}', '${raw}', 'important');`;
+          }
+        } else {
+          // Normal style properties
+          if (isExpression) {
+            result = `${element}.style.${camel} = ${value};`;
+          } else {
+            const raw = value.replace(/^['"]|['"]$/g, '');
+            result = `${element}.style.${camel} = '${raw}';`;
+          }
+        }
+      } else if (propertyType === 'value') {
+        result = `${element}.value = ${isExpression ? value : JSON.stringify(value)};`;
+      }
+      
+      // Add logging for set operations based on level
+      const logValue = isExpression ? value : JSON.stringify(value);
+      if (loggingLevel === 'basic') {
+        return `console.log('SET: ${property} =', ${logValue});\n${result}`;
+      } else if (loggingLevel === 'detailed') {
+        return `console.log('SET: Element ${propertyType} "${property}" on', ${element}, 'to', ${logValue});\n${result}`;
+      }
+      
+      return result;
     }
   }
-  return '';
-}
   
   /**
    * Create code for element class operations

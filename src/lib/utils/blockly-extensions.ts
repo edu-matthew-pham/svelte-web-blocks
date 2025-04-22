@@ -38,17 +38,15 @@ export function initializeVisibilityExtensions() {
       const update = () => {
         // Get the CURRENT value from the dropdown
         const value = this.getFieldValue(config.dropdownField);
-        console.log(`Extension ${name}: dropdown value = "${value}"`);
         
         for (const [fieldOrInput, allowedValues] of Object.entries(config.visibilityMap)) {
           const visible = allowedValues.includes(value);
-          console.log(`  Field/input "${fieldOrInput}": should be ${visible ? 'visible' : 'hidden'} for value "${value}"`);
-          console.log(`  Allowed values: ${JSON.stringify(allowedValues)}`);
+
           
           // Check if field exists
           const f = this.getField(fieldOrInput);
           const inp = this.getInput(fieldOrInput);
-          console.log(`  Found as field: ${!!f}, Found as input: ${!!inp}`);
+
           
           if (inp && typeof inp.setVisible === 'function') {
             inp.setVisible(visible);
@@ -65,7 +63,6 @@ export function initializeVisibilityExtensions() {
       
       // Check if the dropdown field exists
       const dropdown = this.getField(config.dropdownField);
-      console.log(`Extension ${name}: Dropdown field "${config.dropdownField}" exists: ${!!dropdown}`);
       
       if (!dropdown) {
         console.error(`Cannot find dropdown field "${config.dropdownField}" in block`);
@@ -78,7 +75,7 @@ export function initializeVisibilityExtensions() {
       // Set up the validator for FUTURE changes
       dropdown.setValidator((newValue) => {
         // Use the newValue directly from the event
-        console.log(`Dropdown changed to: ${newValue}`);
+
         
         // Schedule update for next tick to ensure field has updated
         setTimeout(update, 0);

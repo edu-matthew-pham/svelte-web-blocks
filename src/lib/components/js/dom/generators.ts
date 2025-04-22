@@ -34,10 +34,11 @@ export const jsDomGenerators: WebBlockGeneratorFunctions = {
       const property = block.getFieldValue('PROPERTY');
       const value = block.getFieldValue('VALUE');
       const isExpression = block.getFieldValue('IS_EXPRESSION') === 'TRUE';
+      const loggingLevel = block.getFieldValue('LOGGING_LEVEL');
       
       const elementCode = `document.getElementById('${element}')`;
       
-      return jsTemplates.elementProperty(elementCode, action, propertyType, property, value, isExpression);
+      return jsTemplates.elementProperty(elementCode, action, propertyType, property, value, isExpression, loggingLevel);
     },
     
     highLevel: function(block: Blockly.Block) {
@@ -47,7 +48,8 @@ export const jsDomGenerators: WebBlockGeneratorFunctions = {
         element: block.getFieldValue('ELEMENT'),
         propertyType: block.getFieldValue('PROPERTY_TYPE'),
         property: block.getFieldValue('PROPERTY'),
-        value: block.getFieldValue('VALUE')
+        value: block.getFieldValue('VALUE'),
+        loggingLevel: block.getFieldValue('LOGGING_LEVEL')
       };
     }
   },

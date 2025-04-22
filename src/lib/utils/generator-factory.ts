@@ -137,8 +137,7 @@ export function createGenerator(config: GeneratorConfig) {
             (block as any)._autoIdGenerated = true;
             block.setFieldValue(generatedId, 'ID');
             
-            // Debug
-            console.log(`Auto-generated ID: ${generatedId} for ${block.type}`);
+
           }
         }
       }

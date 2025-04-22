@@ -124,18 +124,20 @@ export function createDocumentHTML(
   
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  
+
   <!-- Regular scripts -->
   <script>
     ${scripts}
   </script>
-  
+
   <!-- OnLoad scripts -->
-  ${onloadScripts ? `<script>
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
-      ${onloadScripts}
-    });
-  </script>` : ''}
+    console.log('DOMContentLoaded');
+    ${onloadScripts}
+  });
+  </script>
+
 </body>
 </html>`;
 
@@ -147,8 +149,8 @@ export function createDocumentHTML(
     preserve_newlines: true,
     max_preserve_newlines: 1,
 
-    unformatted: ['script', 'style'],
-    content_unformatted: ['script', 'style']
+    //unformatted: ['script', 'style'],
+    //content_unformatted: ['script', 'style']
   });
 }
 
@@ -333,11 +335,20 @@ export function createFeatureCardHTML(icon: string, title: string, description: 
  * Creates HTML for content section
  * @param headline Section headline
  * @param contentBlocks HTML string for content blocks
+ * @param attributes Optional ID, class and data attributes
  * @returns HTML for content section
  */
-export function createContentSectionHTML(headline: string, contentBlocks: string): string {
+export function createContentSectionHTML(headline: string, contentBlocks: string, attributes: ComponentAttributes = {}): string {
+  // Build HTML class attribute combining default classes with any user-provided classes
+  const defaultClass = "py-5";
+  const className = attributes.className ? `${defaultClass} ${attributes.className}` : defaultClass;
+  
+  // Build HTML id and data attributes
+  const id = attributes.id ? ` id="${attributes.id}"` : '';
+  const dataAttributes = attributes.dataAttributes ? ` ${attributes.dataAttributes}` : '';
+
   return `<!-- @component: ContentSection -->
-<section class="py-5">
+<section${id} class="${className}"${dataAttributes}>
   <div class="container">
     <h2 class="mb-4">${headline}</h2>
     <div class="row g-4">
@@ -351,9 +362,10 @@ export function createContentSectionHTML(headline: string, contentBlocks: string
  * Creates HTML for a content block
  * @param htmlContent HTML content (converted from markdown)
  * @param columns Number of columns (1-3)
+ * @param attributes Optional ID, class and data attributes
  * @returns HTML for content block
  */
-export function createContentBlockHTML(htmlContent: string, columns: number): string {
+export function createContentBlockHTML(htmlContent: string, columns: number, attributes: ComponentAttributes = {}): string {
   // Determine the appropriate column class based on number of columns
   let columnClass;
   switch(columns) {
@@ -362,12 +374,20 @@ export function createContentBlockHTML(htmlContent: string, columns: number): st
     case 3: columnClass = 'col-md-4'; break;
     default: columnClass = 'col-12';
   }
+  
+  // Build HTML class attribute combining default classes with any user-provided classes
+  const defaultClass = columnClass;
+  const className = attributes.className ? `${defaultClass} ${attributes.className}` : defaultClass;
+  
+  // Build HTML id and data attributes
+  const id = attributes.id ? ` id="${attributes.id}"` : '';
+  const dataAttributes = attributes.dataAttributes ? ` ${attributes.dataAttributes}` : '';
 
   return `<!-- @item: ContentBlock -->
-<div class="${columnClass}">
+<div${id} class="${className}"${dataAttributes}>
   <div class="card h-100 border-0">
     <div class="card-body markdown-content">
-      ${htmlContent}
+${htmlContent}
     </div>
   </div>
 </div>\n`;

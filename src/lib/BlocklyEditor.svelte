@@ -258,6 +258,7 @@
           class="preview-iframe"
           srcdoc={generatedCode}
           sandbox="allow-scripts"
+          title="Component Preview"
         ></iframe>
       </div>
     {/if}

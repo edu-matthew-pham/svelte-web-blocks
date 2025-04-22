@@ -218,23 +218,92 @@
       if (tab === 'blocks') {
         // give the DOM a moment, then resize
         setTimeout(() => workspace && Blockly.svgResize(workspace), 0);
-      }
+      } else if (tab === 'preview') {
+        setTimeout(injectConsoleCapture, 100); // Inject after preview loads
+      } 
     }
 
     // Add a function to get the current DOM from the iframe
     function captureModifiedDom() {
       try {
         const iframe = document.querySelector('.preview-iframe') as HTMLIFrameElement;
-        console.log('Iframe found:', iframe);
         if (iframe?.contentDocument) {
           modifiedDomString = iframe.contentDocument.documentElement.outerHTML;
-          console.log('DOM captured:', modifiedDomString);
         }
       } catch (e) {
         console.error('Error capturing DOM:', e);
         modifiedDomString = '<!-- Error capturing DOM -->';
       }
     }
+
+    // Add this function to manually inject console capture
+    function injectConsoleCapture() {
+      try {
+        const iframe = document.querySelector('.preview-iframe') as HTMLIFrameElement;
+        if (!iframe?.contentWindow) return;
+        
+        // Create a script to override console methods
+        const script = iframe.contentDocument?.createElement('script');
+        if (!script) return;
+        
+        script.textContent = `
+          (function() {
+            const originalConsole = {
+              log: console.log,
+              error: console.error,
+              warn: console.warn,
+              info: console.info
+            };
+            
+            function captureConsole(type, args) {
+              // Convert args to string
+              const message = Array.from(args).map(arg => {
+                try {
+                  return typeof arg === 'object' ? JSON.stringify(arg) : String(arg);
+                } catch (e) {
+                  return String(arg);
+                }
+              }).join(' ');
+              
+              // Send to parent
+              window.parent.postMessage({
+                source: 'preview-console',
+                type: type,
+                message: message,
+                timestamp: Date.now()
+              }, '*');
+              
+              // Call original
+              return originalConsole[type].apply(console, args);
+            }
+            
+            // Override console methods
+            console.log = function() { return captureConsole('log', arguments); };
+            console.error = function() { return captureConsole('error', arguments); };
+            console.warn = function() { return captureConsole('warn', arguments); };
+            console.info = function() { return captureConsole('info', arguments); };
+          })();
+        `;
+        
+        iframe.contentDocument?.head.appendChild(script);
+      } catch (e) {
+        console.error('Error injecting console capture:', e);
+      }
+    }
+
+    // Handle messages from iframe
+    onMount(() => {
+      window.addEventListener('message', (event) => {
+        if (event.data?.source === 'preview-console') {
+          const { type, message, timestamp } = event.data;
+          console.log('Console captured:', type, message);
+        }
+      });
+      
+      return () => {
+        window.removeEventListener('message', () => {});
+      };
+    });
   </script>
   
   <div class="blockly-container">
@@ -276,6 +345,7 @@
           on:click={() => { activeTab = 'dom'; captureModifiedDom(); }}> 
           DOM
         </button>
+
       </div>
     {/if}
   
@@ -414,5 +484,19 @@
       padding: 5px;
       margin-bottom: 10px;
       border-bottom: 1px solid #eee;
+    }
+
+    /* Console styles */
+    .console-container {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-top: none;
+    }
+    .console-logs {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .console-log {
+      margin-bottom: 5px;
     }
   </style> 

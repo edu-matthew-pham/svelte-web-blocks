@@ -6,7 +6,7 @@
     <field name="ACTION">set</field>
     <field name="ELEMENT">document-1</field>
     <field name="PROPERTY_TYPE">style</field>
-    <field name="PROPERTY">backgroundColor</field>
+    <field name="PROPERTY">background-color</field>
     <field name="VALUE">lightblue</field>
   </block>
 

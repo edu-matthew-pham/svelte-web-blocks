@@ -36,17 +36,6 @@ export async function initializeBlocks(): Promise<BlocksBundle> {
   const parsers: Record<string, any> = {};
   const toolboxCategories: string[] = [];
   
-  // More detailed debug logging
-  console.log("Loaded modules details:");
-  modules.forEach((module, i) => {
-    console.log(`Module ${i}:`, {
-      keys: Object.keys(module),
-      hasDocumentParser: !!module.documentParser,
-      parserType: module.documentParsers ? typeof module.documentParsers : 'undefined',
-      parserKeys: module.documentParsers ? Object.keys(module.documentParsers) : []
-    });
-  });
-  
   // Combine all exports generically
   modules.forEach(module => {
     // Look for definitions
@@ -63,7 +52,7 @@ export async function initializeBlocks(): Promise<BlocksBundle> {
     });
   });
   
-  console.log("Available parsers:", Object.keys(parsers));
+
   
   const toolboxXml = `
 <xml id="toolbox" style="display: none">

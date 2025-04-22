@@ -80,6 +80,14 @@ const jsDomBlockConfigs: WebBlockConfigs = {
       { type: "row", children: [
         { type: "label", text: "Use as expression" },
         { type: "field_checkbox", name: "IS_EXPRESSION", checked: false }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Logging level" },
+        { type: "field_dropdown", name: "LOGGING_LEVEL", options: [
+          ["None", "none"],
+          ["Basic", "basic"],
+          ["Detailed", "detailed"]
+        ], default: "none"}
       ]}
     ],
     connections: { previous: "web_component", next: "web_component", output: "String" },
