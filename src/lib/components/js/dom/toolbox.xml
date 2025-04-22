@@ -8,10 +8,10 @@
   <!-- Unified Property Manipulation -->
   <block type="js_element_property">
     <field name="ACTION">set</field>
-    <field name="ELEMENT">element</field>
-    <field name="PROPERTY_TYPE">text</field>
-    <field name="PROPERTY">textContent</field>
-    <field name="VALUE">New content</field>
+    <field name="ELEMENT">document-1</field>
+    <field name="PROPERTY_TYPE">style</field>
+    <field name="PROPERTY">backgroundColor</field>
+    <field name="VALUE">lightblue</field>
   </block>
   
   <!-- Class Manipulation -->

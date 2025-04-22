@@ -222,6 +222,11 @@
       on:click={() => setActiveTab('code')}>
       HTML
     </button>
+    <button 
+      class="tab-button {activeTab === 'preview' ? 'active' : ''}" 
+      on:click={() => setActiveTab('preview')}>
+      Preview
+    </button>
   </div>
 
   <!-- Content area -->
@@ -243,6 +248,17 @@
     {#if activeTab === 'code'}
       <div class="code-container">
         <pre class="code-display"><code class="language-html">{generatedCode}</code></pre>
+      </div>
+    {/if}
+
+    <!-- Preview view -->
+    {#if activeTab === 'preview'}
+      <div class="preview-container">
+        <iframe
+          class="preview-iframe"
+          srcdoc={generatedCode}
+          sandbox="allow-scripts"
+        ></iframe>
       </div>
     {/if}
   </div>
@@ -310,5 +326,17 @@
     white-space: pre-wrap;
     font-family: monospace;
     font-size: 14px;
+  }
+
+  .preview-container {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+  }
+  .preview-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
   }
 </style> 

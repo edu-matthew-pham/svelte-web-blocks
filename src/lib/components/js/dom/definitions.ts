@@ -38,8 +38,8 @@ const jsDomBlockConfigs: WebBlockConfigs = {
           ["Set", "set"],
           ["Get", "get"]
         ]},
-        { type: "label", text: "on element" },
-        { type: "field_text", name: "ELEMENT", default: "element" }
+        { type: "label", text: "on element ID" },
+        { type: "field_text", name: "ELEMENT", default: "document-1" }
       ]},
       { type: "row", children: [
         { type: "label", text: "Property type" },
@@ -49,15 +49,15 @@ const jsDomBlockConfigs: WebBlockConfigs = {
           ["Attribute", "attribute"],
           ["Style", "style"],
           ["Value", "value"]
-        ]}
+        ], default: "style"}
       ]},
       { type: "row", children: [
         { type: "label", text: "Property name" },
-        { type: "field_text", name: "PROPERTY", default: "textContent" }
+        { type: "field_text", name: "PROPERTY", default: "background-color" }
       ]},
       { type: "row", children: [
         { type: "label", text: "Value (for set)" },
-        { type: "field_text", name: "VALUE", default: "New content" }
+        { type: "field_text", name: "VALUE", default: "lightblue" }
       ]}
     ],
     connections: { previous: "web_component", next: "web_component", output: "String" }

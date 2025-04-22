@@ -1,3 +1,5 @@
+import type { ComponentAttributes } from '../utils/generator-factory.js';
+
 import type { DynamicCardItem } from '../types.js';
 import pkg from 'js-beautify';
 const {html} = pkg;
@@ -82,6 +84,7 @@ export function createCarouselIndicatorsHTML(componentId: string, slideCount: nu
  * @param theme Theme name (Bootstrap standard or Bootswatch theme)
  * @param content Inner page content
  * @param scripts JavaScript code
+ * @param onloadScripts JavaScript code for onload functionality
  * @param attributes Optional ID, class and data attributes
  * @returns Complete HTML document
  */
@@ -90,7 +93,8 @@ export function createDocumentHTML(
   theme: string,
   content: string, 
   scripts: string,
-  attributes: { id?: string, className?: string, dataAttributes?: string } = {}
+  onloadScripts: string = '',
+  attributes: ComponentAttributes
 ): string {
   // Check if using Bootstrap standard theme (light/dark) or Bootswatch theme
   const isBootstrapTheme = theme === 'light' || theme === 'dark';
@@ -114,14 +118,24 @@ export function createDocumentHTML(
   <!-- Bootstrap CSS -->
   ${cssLink}
   ${isBootstrapTheme ? `<meta name="theme" content="${theme}">` : ''}
-  <script>
-    ${scripts}
-  </script>
 </head>
 <body${bodyId}${bodyClass}${bodyData} ${isBootstrapTheme ? `data-bs-theme="${theme}"` : ''}>
   ${content}
+  
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Regular scripts -->
+  <script>
+    ${scripts}
+  </script>
+  
+  <!-- OnLoad scripts -->
+  ${onloadScripts ? `<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      ${onloadScripts}
+    });
+  </script>` : ''}
 </body>
 </html>`;
 
@@ -131,7 +145,10 @@ export function createDocumentHTML(
     indent_inner_html: true,
     wrap_line_length: 0,
     preserve_newlines: true,
-    max_preserve_newlines: 1
+    max_preserve_newlines: 1,
+
+    unformatted: ['script', 'style'],
+    content_unformatted: ['script', 'style']
   });
 }
 

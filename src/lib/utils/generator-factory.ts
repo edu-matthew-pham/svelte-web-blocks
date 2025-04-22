@@ -35,6 +35,9 @@ export interface GeneratorConfig {
   
   // Custom JavaScript generator function
   jsRenderer?: (props: Record<string, any>, childrenJs: Record<string, string>, attributes: ComponentAttributes) => string;
+  
+  // OnLoad script input 
+  onloadInput?: string; // Name of the onload input in the block
 }
 
 // Add type for component attributes
@@ -84,6 +87,14 @@ export function createGenerator(config: GeneratorConfig) {
           scriptsCode += javascriptGenerator.statementToCode(block, input.inputName);
         });
         childrenHtml['scripts'] = scriptsCode;
+      }
+      
+      // Process onload script if configured
+      if (config.onloadInput) {
+        const onloadCode = javascriptGenerator.statementToCode(block, config.onloadInput);
+        if (onloadCode) {
+          childrenHtml['onloadScripts'] = onloadCode;
+        }
       }
       
       // Extract standard attributes (ID, Class, Data Attributes)
@@ -248,6 +259,17 @@ export function createGenerator(config: GeneratorConfig) {
         }
       });
       
+      // Process onload script if configured
+      const onloadScripts: any[] = [];
+      if (config.onloadInput) {
+        let onloadBlock = block.getInputTargetBlock(config.onloadInput);
+        while (onloadBlock) {
+          const script = javascriptGenerator.blockToHighLevel(onloadBlock);
+          if (script) onloadScripts.push(script);
+          onloadBlock = onloadBlock.getNextBlock();
+        }
+      }
+      
       // Determine block type from the block's type
       const type = block.type.replace('web_', '');
       
@@ -288,6 +310,7 @@ export function createGenerator(config: GeneratorConfig) {
         properties: props,
         children: children.length > 0 ? children : undefined,
         scripts: scripts.length > 0 ? scripts : undefined,
+        onloadScripts: onloadScripts.length > 0 ? onloadScripts : undefined,
         attributes: attributes
       };
     }

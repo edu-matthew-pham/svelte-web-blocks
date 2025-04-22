@@ -34,7 +34,12 @@ export const jsDomGenerators: WebBlockGeneratorFunctions = {
       const property = block.getFieldValue('PROPERTY');
       const value = block.getFieldValue('VALUE');
       
-      return jsTemplates.elementProperty(element, action, propertyType, property, value);
+
+      const elementCode = `document.getElementById('${element}')`;
+
+      
+      // Otherwise use the original template directly
+      return jsTemplates.elementProperty(elementCode, action, propertyType, property, value);
     },
     
     highLevel: function(block: Blockly.Block) {

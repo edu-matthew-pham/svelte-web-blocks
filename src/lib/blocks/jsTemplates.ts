@@ -217,34 +217,43 @@ interface ObjectProperty {
   /**
  * Create code for element property operations
  */
-export function elementProperty(element: string, action: string, propertyType: string, property: string, value: string): string {
-    if (action === 'get') {
-      if (propertyType === 'text') {
-        return `${element}.textContent`;
-      } else if (propertyType === 'html') {
-        return `${element}.innerHTML`;
-      } else if (propertyType === 'attribute') {
-        return `${element}.getAttribute('${property}')`;
-      } else if (propertyType === 'style') {
-        return `${element}.style.${property}`;
-      } else if (propertyType === 'value') {
-        return `${element}.value`;
-      }
-    } else { // set
-      if (propertyType === 'text') {
-        return `${element}.textContent = ${value};`;
-      } else if (propertyType === 'html') {
-        return `${element}.innerHTML = ${value};`;
-      } else if (propertyType === 'attribute') {
-        return `${element}.setAttribute('${property}', ${value});`;
-      } else if (propertyType === 'style') {
-        return `${element}.style.${property} = ${value};`;
-      } else if (propertyType === 'value') {
-        return `${element}.value = ${value};`;
-      }
+export function elementProperty(
+  element: string,
+  action: string,
+  propertyType: string,
+  property: string,
+  value: string
+): string {
+  if (action === 'get') {
+    if (propertyType === 'text') {
+      return `${element}.textContent`;
+    } else if (propertyType === 'html') {
+      return `${element}.innerHTML`;
+    } else if (propertyType === 'attribute') {
+      return `${element}.getAttribute('${property}')`;
+    } else if (propertyType === 'style') {
+      const camel = property.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+      return `${element}.style.${camel}`;
+    } else if (propertyType === 'value') {
+      return `${element}.value`;
     }
-    return '';
+  } else { // set
+    if (propertyType === 'text') {
+      return `${element}.textContent = ${value};`;
+    } else if (propertyType === 'html') {
+      return `${element}.innerHTML = ${value};`;
+    } else if (propertyType === 'attribute') {
+      return `${element}.setAttribute('${property}', ${value});`;
+    } else if (propertyType === 'style') {
+      const camel = property.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+      const raw = value.replace(/^['"]|['"]$/g, '');
+      return `${element}.style.${camel} = '${raw}';`;
+    } else if (propertyType === 'value') {
+      return `${element}.value = ${value};`;
+    }
   }
+  return '';
+}
   
   /**
    * Create code for element class operations

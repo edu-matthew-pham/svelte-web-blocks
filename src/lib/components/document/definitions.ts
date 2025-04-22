@@ -62,6 +62,12 @@ const documentBlocks: Record<string, BlockConfig> = {
         name: "SCRIPTS",
         label: "Scripts",
         check: "web_component"
+      },
+      {
+        type: "statement", 
+        name: "ONLOAD",
+        label: "On Page Load",
+        check: "web_component"
       }
     ],
     connections: {

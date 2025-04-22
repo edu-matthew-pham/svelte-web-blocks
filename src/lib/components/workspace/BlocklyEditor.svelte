@@ -12,7 +12,7 @@
     export let workspaceOptions = {}; 
     export let showCodeView = true;
     export let showJsonView = true;
-    export let initialTab = 'blocks'; // 'blocks', 'json', or 'code'
+    export let initialTab: 'blocks'|'json'|'code'|'preview' = 'blocks'; // 'blocks', 'json', or 'code' or 'preview'
   
     // Internal state
     let blocklyDiv: HTMLElement;
@@ -205,6 +205,15 @@
     export function resize() {
       if (workspace) Blockly.svgResize(workspace);
     }
+
+    /** helper to switch tabs (and auto-resize when going back to blocks) */
+    function setActiveTab(tab: typeof activeTab) {
+      activeTab = tab;
+      if (tab === 'blocks') {
+        // give the DOM a moment, then resize
+        setTimeout(() => workspace && Blockly.svgResize(workspace), 0);
+      }
+    }
   </script>
   
   <div class="blockly-container">
@@ -232,6 +241,13 @@
             HTML
           </button>
         {/if}
+
+        <!-- NEW: Preview tab -->
+        <button 
+          class="tab-button {activeTab === 'preview' ? 'active' : ''}" 
+          on:click={() => activeTab = 'preview'}>
+          Preview
+        </button>
       </div>
     {/if}
   
@@ -261,6 +277,17 @@
       {#if showCodeView && activeTab === 'code'}
         <div class="code-container">
           <pre class="code-display"><code class="language-html">{generatedCode}</code></pre>
+        </div>
+      {/if}
+
+      <!-- NEW: Preview view -->
+      {#if activeTab === 'preview'}
+        <div class="preview-container">
+          <iframe
+            class="preview-iframe"
+            srcdoc={generatedCode}
+            sandbox="allow-scripts"
+          ></iframe>
         </div>
       {/if}
     </div>
@@ -339,5 +366,18 @@
       position: absolute;
       background: rgba(255,255,255,0.7);
       z-index: 10;
+    }
+
+    /* Preview styles */
+    .preview-container {
+      width: 100%;
+      height: 100%;
+      border: 1px solid #ddd;
+      box-sizing: border-box;
+    }
+    .preview-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
     }
   </style> 
