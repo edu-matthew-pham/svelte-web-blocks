@@ -13,7 +13,20 @@ const heroBlockConfigs: WebBlockConfigs = {
     tooltip: "Add a hero section with headline and call-to-action",
     helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/section",
     inputs: [
-      { type: "label", text: "Hero Section" },
+      { 
+        type: "combined_input", 
+        fields: [
+          { type: "label", text: "Hero Section" },
+          { type: "label", text: "ID:" },
+          { type: "field_text", name: "ID", default: "" }
+        ]
+      },
+      { 
+        type: "field_text", 
+        name: "CLASS",
+        label: "Classes",
+        default: "" 
+      },
       { type: "row", children: [
         { type: "label", text: "Headline" },
         { type: "field_text", name: "HEADLINE", default: "Welcome to our website" }

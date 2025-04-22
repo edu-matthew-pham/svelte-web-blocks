@@ -12,7 +12,7 @@
     export let workspaceOptions = {}; 
     export let showCodeView = true;
     export let showJsonView = true;
-    export let initialTab: 'blocks'|'json'|'code'|'preview' = 'blocks'; // 'blocks', 'json', or 'code' or 'preview'
+    export let initialTab: 'blocks'|'json'|'code'|'preview'|'dom' = 'blocks'; // 'blocks', 'json', or 'code' or 'preview' or 'dom'
   
     // Internal state
     let blocklyDiv: HTMLElement;
@@ -23,6 +23,7 @@
     let jsonCode = '';
     let activeTab = initialTab;
     let componentsLoaded = false;
+    let modifiedDomString = '';
   
     // Add a type for the component
     type Component = {
@@ -219,6 +220,21 @@
         setTimeout(() => workspace && Blockly.svgResize(workspace), 0);
       }
     }
+
+    // Add a function to get the current DOM from the iframe
+    function captureModifiedDom() {
+      try {
+        const iframe = document.querySelector('.preview-iframe') as HTMLIFrameElement;
+        console.log('Iframe found:', iframe);
+        if (iframe?.contentDocument) {
+          modifiedDomString = iframe.contentDocument.documentElement.outerHTML;
+          console.log('DOM captured:', modifiedDomString);
+        }
+      } catch (e) {
+        console.error('Error capturing DOM:', e);
+        modifiedDomString = '<!-- Error capturing DOM -->';
+      }
+    }
   </script>
   
   <div class="blockly-container">
@@ -253,6 +269,13 @@
           on:click={() => activeTab = 'preview'}>
           Preview
         </button>
+
+        <!-- NEW: DOM tab -->
+        <button 
+          class="tab-button {activeTab === 'dom' ? 'active' : ''}" 
+          on:click={() => { activeTab = 'dom'; captureModifiedDom(); }}> 
+          DOM
+        </button>
       </div>
     {/if}
   
@@ -272,29 +295,29 @@
       </div>
       
       <!-- JSON view -->
-      {#if showJsonView && activeTab === 'json'}
-        <div class="code-container">
-          <pre class="code-display"><code class="language-json">{jsonCode}</code></pre>
-        </div>
-      {/if}
+      <div class="code-container" style="display: {activeTab === 'json' ? 'block' : 'none'}">
+        <pre class="code-display"><code class="language-json">{jsonCode}</code></pre>
+      </div>
       
       <!-- HTML view -->
-      {#if showCodeView && activeTab === 'code'}
-        <div class="code-container">
-          <pre class="code-display"><code class="language-html">{generatedCode}</code></pre>
-        </div>
-      {/if}
+      <div class="code-container" style="display: {activeTab === 'code' ? 'block' : 'none'}">
+        <pre class="code-display"><code class="language-html">{generatedCode}</code></pre>
+      </div>
 
-      <!-- NEW: Preview view -->
-      {#if activeTab === 'preview'}
-        <div class="preview-container">
-          <iframe
-            class="preview-iframe"
-            srcdoc={generatedCode}
-            sandbox="allow-scripts"
-          ></iframe>
-        </div>
-      {/if}
+      <!-- Preview view - always present but hidden when not active -->
+      <div class="preview-container" style="display: {activeTab === 'preview' ? 'block' : 'none'}">
+        <iframe
+          class="preview-iframe"
+          srcdoc={generatedCode}
+          sandbox="allow-scripts allow-same-origin"
+          title="Component Preview"
+        ></iframe>
+      </div>
+
+      <!-- DOM view without refresh button -->
+      <div class="code-container" style="display: {activeTab === 'dom' ? 'block' : 'none'}">
+        <pre class="code-display"><code class="language-html">{modifiedDomString}</code></pre>
+      </div>
     </div>
   </div>
   
@@ -384,5 +407,12 @@
       width: 100%;
       height: 100%;
       border: none;
+    }
+
+    /* Add to your style section */
+    .dom-controls {
+      padding: 5px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #eee;
     }
   </style> 

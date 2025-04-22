@@ -5,19 +5,20 @@ import { createHeroHTML } from '$lib/blocks/htmlTemplates.js';
 export const heroGenerators = {
   web_hero: createGenerator({
     propertyMappings: [
-      { componentProp: 'headline' },
-      { componentProp: 'subheadline' },
-      { componentProp: 'buttonText' },
-      { componentProp: 'buttonUrl' },
+      { componentProp: 'headline', blockField: 'HEADLINE' },
+      { componentProp: 'subheadline', blockField: 'SUBHEADLINE' },
+      { componentProp: 'buttonText', blockField: 'BUTTON_TEXT' },
+      { componentProp: 'buttonUrl', blockField: 'BUTTON_URL' },
       { 
         componentProp: 'hasImage', 
+        blockField: 'HAS_IMAGE',
         transform: (value: string) => value === 'TRUE' 
       },
-      { componentProp: 'imageUrl' }
+      { componentProp: 'imageUrl', blockField: 'IMAGE_URL' }
     ],
     
     // Custom HTML renderer that uses the existing template
-    htmlRenderer: (props, childrenHtml) => {
+    htmlRenderer: (props, childrenHtml, attributes) => {
       const { headline, subheadline, buttonText, buttonUrl, hasImage, imageUrl } = props;
       
       return createHeroHTML(
@@ -26,7 +27,8 @@ export const heroGenerators = {
         buttonText,
         buttonUrl,
         hasImage,
-        imageUrl
+        imageUrl,
+        attributes
       );
     }
   })

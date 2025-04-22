@@ -1,5 +1,7 @@
 <category name="Hero" colour="290">
   <block type="web_hero">
+    <field name="ID"></field>
+    <field name="CLASS"></field>
     <field name="HEADLINE">Welcome to Our Website</field>
     <field name="SUBHEADLINE">We provide the best solutions for your business</field>
     <field name="BUTTON_TEXT">Get Started</field>

@@ -204,6 +204,7 @@ export function createHeaderHTML(
  * @param buttonUrl Primary button URL
  * @param hasImage Whether to include an image
  * @param imageUrl URL of the image if hasImage is true
+ * @param attributes Optional ID, class and data attributes
  * @returns HTML for hero component
  */
 export function createHeroHTML(
@@ -212,10 +213,19 @@ export function createHeroHTML(
   buttonText: string,
   buttonUrl: string,
   hasImage: boolean,
-  imageUrl: string = ''
+  imageUrl: string = '',
+  attributes: ComponentAttributes = {}
 ): string {
+  // Build HTML class attribute combining default classes with any user-provided classes
+  const defaultClass = "py-5 bg-body-secondary border-bottom";
+  const className = attributes.className ? `${defaultClass} ${attributes.className}` : defaultClass;
+  
+  // Build HTML id and data attributes
+  const id = attributes.id ? ` id="${attributes.id}"` : '';
+  const dataAttributes = attributes.dataAttributes ? ` ${attributes.dataAttributes}` : '';
+
   return `<!-- @component: Hero -->
-<section class="py-5 bg-body-secondary border-bottom">
+<section${id} class="${className}"${dataAttributes}>
   <div class="container py-5">
     <div class="row align-items-center g-5">
       <div class="col-lg-${hasImage ? '6' : '8 mx-auto text-center'}">
