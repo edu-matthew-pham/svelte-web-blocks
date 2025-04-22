@@ -4,6 +4,7 @@ export interface ComponentNode {
     type: string;
     properties?: Record<string, any>;
     children?: ComponentNode[];
+    attributes?: Record<string, any>;
 }
 
 export function parseHighLevelCode(jsonString: string): ComponentNode[] {
@@ -48,6 +49,27 @@ function createComponentBlock(
         // Set properties
         if (component.properties) {
             setBlockFields(block, component.properties);
+        }
+        
+        // Set attributes (ID, className, etc.)
+        if (component.attributes) {
+            const fieldValues: Record<string, any> = {};
+            
+            // Only add fields that exist in the attributes object
+            if (component.attributes.id) {
+                fieldValues.ID = component.attributes.id;
+            }
+            
+            if (component.attributes.className) {
+                fieldValues.CLASS = component.attributes.className;
+            }
+            
+            // Add other attributes as needed
+            
+            // Only call setBlockFields if we have fields to set
+            if (Object.keys(fieldValues).length > 0) {
+                setBlockFields(block, fieldValues);
+            }
         }
         
         // Initialize the block SVG first
