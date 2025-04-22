@@ -1,5 +1,23 @@
 import { createBlockDefinitions } from '$lib/utils/block-factory.js';
 import type { WebBlockConfigs } from '$lib/types.js';
+import { registerVisibilityExtension, initializeVisibilityExtensions } from '$lib/utils/blockly-extensions.js';
+import * as Blockly from 'blockly/core';
+
+// Register your extensions
+registerVisibilityExtension(
+  'dom_property_visibility',            // the name you'll refer to below
+  {
+    dropdownField: 'PROPERTY_TYPE',     // which dropdown drives it
+    visibilityMap: {
+      // Show PROPERTY field for ALL property types
+      PROPERTY: ['attribute', 'style']
+    }
+  }
+);
+
+// Initialize extensions once Blockly is loaded
+// This should be called after Blockly is fully initialized
+
 
 // Define DOM manipulation block configurations
 const jsDomBlockConfigs: WebBlockConfigs = {
@@ -60,7 +78,8 @@ const jsDomBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "VALUE", default: "lightblue" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component", output: "String" }
+    connections: { previous: "web_component", next: "web_component", output: "String" },
+    extensions: ['dom_property_visibility']
   },
   
   // Class manipulation
@@ -274,6 +293,7 @@ const jsDomBlockConfigs: WebBlockConfigs = {
     connections: { previous: "web_component", next: "web_component" }
   }
 };
+
 
 // Create and export the DOM block definitions
 export const jsDomDefinitions = createBlockDefinitions(jsDomBlockConfigs);

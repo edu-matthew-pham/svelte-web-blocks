@@ -52,6 +52,11 @@
         Object.entries(definitions).forEach(([type, blockDef]) => {
           Blockly.Blocks[type] = blockDef;
         });
+        
+        // Initialize visibility extensions after blocks are registered
+        import('$lib/utils/blockly-extensions.js').then(({ initializeVisibilityExtensions }) => {
+          initializeVisibilityExtensions();
+        });
   
         // Register custom generators
         Object.entries(generators).forEach(([name, generator]) => {

@@ -158,7 +158,7 @@ function buildInput(block: Blockly.Block, input: BlockInputConfig) {
     
     Object.entries(blockConfigs).forEach(([type, config]) => {
       definitions[type] = {
-        init: function(this: Blockly.Block) {
+        init: function(this: Blockly.BlockSvg) {
           this.setColour(config.color);
           this.setTooltip(config.tooltip);
           this.setHelpUrl(config.helpUrl);
@@ -260,6 +260,13 @@ function buildInput(block: Blockly.Block, input: BlockInputConfig) {
             } else {
               this.setOutput(true, null);
             }
+          }
+
+          //  ── new: apply any extensions listed in the config ──
+          if (Array.isArray((config as any).extensions)) {
+            (config as any).extensions.forEach((extName: string) => {
+              Blockly.Extensions.apply(extName, this, false);
+            });
           }
         }
       };

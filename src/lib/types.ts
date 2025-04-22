@@ -39,6 +39,7 @@ export interface BlockConfig {
     next: string | false;
     output?: string;
   };
+  extensions?: string[];
 }
 
 export interface WebBlockConfigs {
