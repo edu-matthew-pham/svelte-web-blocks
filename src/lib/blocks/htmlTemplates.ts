@@ -690,15 +690,29 @@ export function createFooterLinkHTML(text: string, url: string, attributes: Comp
 <a href="${url}"${id} class="${className} text-decoration-none" style="color: inherit;"${dataAttributes}>${text}</a>\n`;
 }
 
+
 /**
  * Creates HTML for dynamic cards component
  * @param title Section title
  * @param wrapperHtml Wrapper HTML containing cards
+ * @param attributes Optional ID, class and data attributes
  * @returns HTML for dynamic cards section
  */
-export function createDynamicCardsHTML(title: string, wrapperHtml: string): string {
+export function createDynamicCardsHTML(
+  title: string, 
+  wrapperHtml: string, 
+  attributes: ComponentAttributes = {}
+): string {
+  // Build HTML class attribute combining default classes with any user-provided classes
+  const defaultClass = "py-5";
+  const className = attributes.className ? `${defaultClass} ${attributes.className}` : defaultClass;
+  
+  // Build HTML id and data attributes
+  const id = attributes.id ? ` id="${attributes.id}"` : '';
+  const dataAttributes = attributes.dataAttributes ? ` ${attributes.dataAttributes}` : '';
+
   return `<!-- @component: DynamicCards -->
-<section class="py-5">
+<section${id} class="${className} py-5"${dataAttributes}>
   <div class="container">
     <h2 class="text-center mb-5">${title}</h2>
     ${wrapperHtml}
@@ -831,14 +845,24 @@ export function createLightboxModalHTML(images: any[], galleryId: string): strin
  * @param thumbnailSize Size option for thumbnails ('small', 'medium', 'large')
  * @param enableLightbox Whether lightbox functionality is enabled
  * @param images Array of image objects with url, alt, and caption properties
+ * @param attributes Optional ID, class and data attributes
  * @returns HTML for image gallery component
  */
 export function createImageGalleryHTML(
   title: string,
   thumbnailSize: string,
   enableLightbox: boolean,
-  images: any[]
+  images: any[],
+  attributes: ComponentAttributes = {}
 ): string {
+  // Build HTML class attribute combining default classes with any user-provided classes
+  const defaultClass = "py-5";
+  const className = attributes.className ? `${defaultClass} ${attributes.className}` : defaultClass;
+  
+  // Build HTML id and data attributes
+  const id = attributes.id ? ` id="${attributes.id}"` : '';
+  const dataAttributes = attributes.dataAttributes ? ` ${attributes.dataAttributes}` : '';
+  
   // Determine thumbnail size class
   let sizeClass;
   switch(thumbnailSize) {
@@ -862,7 +886,7 @@ export function createImageGalleryHTML(
   }
 
   return `<!-- @component: ImageGallery -->
-<section class="py-5">
+<section${id} class="${className} py-5"${dataAttributes}>
   <div class="container">
     <h2 class="text-center mb-5">${title}</h2>
     <div class="row" id="${galleryId}">
@@ -916,13 +940,23 @@ export function createAccordionItemHTML(
  * @param title Accordion title
  * @param allowMultiple Whether multiple items can be open simultaneously
  * @param items Array of accordion items with title and content
+ * @param attributes Optional ID, class and data attributes
  * @returns HTML for accordion component
  */
 export function createAccordionHTML(
   title: string,
   allowMultiple: boolean,
-  items: any[]
+  items: any[],
+  attributes: ComponentAttributes = {}
 ): string {
+  // Build HTML class attribute combining default classes with any user-provided classes
+  const defaultClass = "py-5";
+  const className = attributes.className ? `${defaultClass} ${attributes.className}` : defaultClass;
+  
+  // Build HTML id and data attributes
+  const id = attributes.id ? ` id="${attributes.id}"` : '';
+  const dataAttributes = attributes.dataAttributes ? ` ${attributes.dataAttributes}` : '';
+  
   // Generate a unique ID for this accordion
   const accordionId = 'accordion-' + Math.floor(Math.random() * 10000);
   
@@ -933,7 +967,7 @@ export function createAccordionHTML(
   }).join('\n');
 
   return `<!-- @component: Accordion -->
-<section class="py-5">
+<section${id} class="${className} py-5"${dataAttributes}>
   <div class="container">
     <h2 class="text-center mb-5">${title}</h2>
     <div class="accordion" id="${accordionId}">

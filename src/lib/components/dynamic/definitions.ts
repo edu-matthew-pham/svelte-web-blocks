@@ -10,7 +10,16 @@ const dynamicBlockConfigs: WebBlockConfigs = {
     tooltip: "Display dynamic cards from JSON data",
     helpUrl: "https://getbootstrap.com/docs/5.3/components/card/",
     inputs: [
-      { type: "label", text: "Dynamic Cards" },
+
+      { type: "row", children: [
+        { type: "label", text: "Dynamic Cards" },
+        { type: "label", text: "ID" },
+        { type: "field_text", name: "ID", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Class" },
+        { type: "field_text", name: "CLASS", default: "" }
+      ]},
       { type: "row", children: [
         { type: "label", text: "Title" },
         { type: "field_text", name: "TITLE", default: "Features" }
@@ -47,7 +56,15 @@ const dynamicBlockConfigs: WebBlockConfigs = {
     tooltip: "Display images in a gallery format",
     helpUrl: "https://getbootstrap.com/docs/5.3/components/carousel/",
     inputs: [
-      { type: "label", text: "Image Gallery" },
+      { type: "row", children: [
+        { type: "label", text: "Image Gallery" },
+        { type: "label", text: "ID" },
+        { type: "field_text", name: "ID", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Class" },
+        { type: "field_text", name: "CLASS", default: "" }
+      ]},
       { type: "row", children: [
         { type: "label", text: "Title" },
         { type: "field_text", name: "TITLE", default: "Gallery" }
@@ -79,7 +96,15 @@ const dynamicBlockConfigs: WebBlockConfigs = {
     tooltip: "Create an accordion component for FAQs or collapsible content",
     helpUrl: "https://getbootstrap.com/docs/5.3/components/accordion/",
     inputs: [
-      { type: "label", text: "Accordion" },
+      { type: "row", children: [
+        { type: "label", text: "Accordion" },
+        { type: "label", text: "ID" },
+        { type: "field_text", name: "ID", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Class" },
+        { type: "field_text", name: "CLASS", default: "" }
+      ]},
       { type: "row", children: [
         { type: "label", text: "Title" },
         { type: "field_text", name: "TITLE", default: "Frequently Asked Questions" }

@@ -14,6 +14,16 @@ export const dynamicGenerators = {
       const columns = parseInt(block.getFieldValue('COLUMNS'));
       const dataJson = block.getFieldValue('DATA');
       
+      // Extract ID and CLASS values
+      const id = block.getFieldValue('ID') || '';
+      const className = block.getFieldValue('CLASS') || '';
+      
+      // Create attributes object
+      const attributes = {
+        id: id,
+        className: className
+      };
+      
       // Parse the JSON data safely
       let dataItems = [];
       try {
@@ -45,7 +55,7 @@ export const dynamicGenerators = {
         wrapperHtml = createGridWrapperHTML(cardsHtml);
       }
       
-      return createDynamicCardsHTML(title, wrapperHtml);
+      return createDynamicCardsHTML(title, wrapperHtml, attributes);
     },
     
     highLevel: function(block: Blockly.Block): any {
@@ -62,7 +72,9 @@ export const dynamicGenerators = {
           title: block.getFieldValue('TITLE'),
           layout: block.getFieldValue('LAYOUT'),
           columns: block.getFieldValue('COLUMNS'),
-          data: dataItems
+          data: dataItems,
+          id: block.getFieldValue('ID'),
+          className: block.getFieldValue('CLASS')
         }
       };
     }
@@ -76,6 +88,16 @@ export const dynamicGenerators = {
       const enableLightbox = block.getFieldValue('LIGHTBOX') === 'TRUE';
       const dataJson = block.getFieldValue('DATA');
       
+      // Extract ID and CLASS values
+      const id = block.getFieldValue('ID') || '';
+      const className = block.getFieldValue('CLASS') || '';
+      
+      // Create attributes object
+      const attributes = {
+        id: id,
+        className: className
+      };
+      
       // Parse the JSON data safely
       let images = [];
       try {
@@ -84,7 +106,7 @@ export const dynamicGenerators = {
         console.error('Error parsing JSON data for image gallery:', e);
       }
       
-      return createImageGalleryHTML(title, thumbnailSize, enableLightbox, images);
+      return createImageGalleryHTML(title, thumbnailSize, enableLightbox, images, attributes);
     },
     
     highLevel: function(block: Blockly.Block): any {
@@ -101,7 +123,9 @@ export const dynamicGenerators = {
           title: block.getFieldValue('TITLE'),
           thumbnailSize: block.getFieldValue('THUMBNAIL_SIZE'),
           enableLightbox: block.getFieldValue('LIGHTBOX') === 'TRUE',
-          images: images
+          images: images,
+          id: block.getFieldValue('ID'),
+          className: block.getFieldValue('CLASS')
         }
       };
     }
@@ -114,6 +138,16 @@ export const dynamicGenerators = {
       const allowMultiple = block.getFieldValue('ALLOW_MULTIPLE') === 'TRUE';
       const dataJson = block.getFieldValue('DATA');
       
+      // Extract ID and CLASS values
+      const id = block.getFieldValue('ID') || '';
+      const className = block.getFieldValue('CLASS') || '';
+      
+      // Create attributes object
+      const attributes = {
+        id: id,
+        className: className
+      };
+      
       // Parse the JSON data safely
       let items = [];
       try {
@@ -122,7 +156,7 @@ export const dynamicGenerators = {
         console.error('Error parsing JSON data for accordion:', e);
       }
       
-      return createAccordionHTML(title, allowMultiple, items);
+      return createAccordionHTML(title, allowMultiple, items, attributes);
     },
     
     highLevel: function(block: Blockly.Block): any {
@@ -138,7 +172,9 @@ export const dynamicGenerators = {
         properties: {
           title: block.getFieldValue('TITLE'),
           allowMultiple: block.getFieldValue('ALLOW_MULTIPLE') === 'TRUE',
-          items: items
+          items: items,
+          id: block.getFieldValue('ID'),
+          className: block.getFieldValue('CLASS')
         }
       };
     }
