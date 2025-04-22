@@ -10,7 +10,20 @@ const footerBlockConfigs: WebBlockConfigs = {
     tooltip: "Add a page footer with links and copyright",
     helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/footer",
     inputs: [
-      { type: "label", text: "Footer" },
+      { 
+        type: "combined_input", 
+        fields: [
+          { type: "label", text: "Footer" },
+          { type: "label", text: "ID:" },
+          { type: "field_text", name: "ID", default: "" }
+        ]
+      },
+      { 
+        type: "field_text", 
+        name: "CLASS",
+        label: "Classes",
+        default: "" 
+      },
       { type: "row", children: [
         { type: "label", text: "Copyright" },
         { type: "field_text", name: "COPYRIGHT", default: "© 2023 My Company" }
@@ -27,7 +40,20 @@ const footerBlockConfigs: WebBlockConfigs = {
     tooltip: "Add a link to the footer",
     helpUrl: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a",
     inputs: [
-      { type: "label", text: "Footer Link" },
+      { 
+        type: "combined_input", 
+        fields: [
+          { type: "label", text: "Footer Link" },
+          { type: "label", text: "ID:" },
+          { type: "field_text", name: "ID", default: "" }
+        ]
+      },
+      { 
+        type: "field_text", 
+        name: "CLASS",
+        label: "Classes",
+        default: "" 
+      },
       { type: "row", children: [
         { type: "label", text: "Text" },
         { type: "field_text", name: "TEXT", default: "Privacy Policy" }

@@ -7,6 +7,8 @@ import { javascriptGenerator } from 'blockly/javascript';
 export const footerGenerators = {
   web_footer: createGenerator({
     propertyMappings: [
+      { componentProp: 'id',  },
+      { componentProp: 'class', },
       { componentProp: 'copyright' }
     ],
     childInputs: [
@@ -14,12 +16,13 @@ export const footerGenerators = {
     ],
     
     // Custom HTML renderer that uses the existing template
-    htmlRenderer: (props, childrenHtml) => {
+    htmlRenderer: (props, children, attributes) => {
       const { copyright } = props;
       
       return createFooterHTML(
         copyright,
-        childrenHtml.links || ''
+        children.links || '',
+        attributes
       );
     }
   }),
@@ -31,7 +34,7 @@ export const footerGenerators = {
     ],
     
     // Custom HTML renderer that uses the existing template
-    htmlRenderer: (props, childrenHtml) => {
+    htmlRenderer: (props) => {
       const { text, url } = props;
       
       return createFooterLinkHTML(text, url);

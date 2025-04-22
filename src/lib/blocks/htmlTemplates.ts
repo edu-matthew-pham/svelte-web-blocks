@@ -340,15 +340,8 @@ export function createFeatureCardHTML(
     default: columnClass = 'col-md-4';
   }
 
-  // Build HTML class attribute combining column class with any user-provided classes
-  const className = attributes.className ? `${columnClass} ${attributes.className}` : columnClass;
-  
-  // Build HTML id and data attributes
-  const id = attributes.id ? ` id="${attributes.id}"` : '';
-  const dataAttributes = attributes.dataAttributes ? ` ${attributes.dataAttributes}` : '';
-
   return `<!-- @item: FeatureCard -->
-<div${id} class="${className}"${dataAttributes}>
+<div class="${columnClass}">
   <div class="card h-100 border-0 shadow-sm">
     <div class="card-body p-4 text-center">
       <div class="display-5 mb-3">${icon}</div>
@@ -535,11 +528,20 @@ export function createRadioGroupHTML(label: string, inputHtml: string, required:
  * Creates HTML for footer component
  * @param copyright Copyright text
  * @param links HTML string for footer links
+ * @param attributes Optional ID, class and data attributes
  * @returns HTML for footer component
  */
-export function createFooterHTML(copyright: string, links: string): string {
+export function createFooterHTML(copyright: string, links: string, attributes: ComponentAttributes = {}): string {
+  // Build HTML class attribute from both the default class and any user-provided classes
+  const defaultClass = "py-5 bg-body-tertiary";
+  const className = attributes.className ? `${defaultClass} ${attributes.className}` : defaultClass;
+  
+  // Build HTML id and data attributes
+  const id = attributes.id ? ` id="${attributes.id}"` : '';
+  const dataAttributes = attributes.dataAttributes ? ` ${attributes.dataAttributes}` : '';
+
   return `<!-- @component: Footer -->
-<footer class="py-5 bg-body-tertiary">
+<footer${id} class="${className} py-5 bg-body-tertiary"${dataAttributes}>
   <div class="container">
     <div class="row gy-4 justify-content-between">
       <div class="col-lg-4">
@@ -559,11 +561,20 @@ export function createFooterHTML(copyright: string, links: string): string {
  * Creates HTML for a footer link
  * @param text Link text
  * @param url Link URL
+ * @param attributes Optional ID, class and data attributes
  * @returns HTML for footer link
  */
-export function createFooterLinkHTML(text: string, url: string): string {
+export function createFooterLinkHTML(text: string, url: string, attributes: ComponentAttributes = {}): string {
+  // Build HTML class attribute
+  const defaultClass = "text-decoration-none";
+  const className = attributes.className ? `${defaultClass} ${attributes.className}` : defaultClass;
+  
+  // Build HTML id and data attributes
+  const id = attributes.id ? ` id="${attributes.id}"` : '';
+  const dataAttributes = attributes.dataAttributes ? ` ${attributes.dataAttributes}` : '';
+
   return `<!-- @item: FooterLink -->
-<a href="${url}" class="text-decoration-none" style="color: inherit;">${text}</a>\n`;
+<a href="${url}"${id} class="${className} text-decoration-none" style="color: inherit;"${dataAttributes}>${text}</a>\n`;
 }
 
 /**
