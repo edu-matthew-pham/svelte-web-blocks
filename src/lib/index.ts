@@ -19,7 +19,7 @@ export * from './components/content/index.js';
 export * from './components/features/index.js';
 export * from './components/forms/index.js';
 export * from './components/dynamic/index.js';
-export * from './blocks/js/dom/index.js';
+export * from './components/js/dom/index.js';
 
 import BlocklyWorkspace from './BlocklyWorkspace.svelte';
 import BlocklyWorkspaceWithPreview from './BlocklyWorkspaceWithPreview.svelte';

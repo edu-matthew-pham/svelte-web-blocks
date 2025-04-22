@@ -1,0 +1,67 @@
+<category name="Interactive Elements" colour="330">
+  <!-- Button -->
+  <block type="web_interactive_item">
+    <field name="TYPE">button</field>
+    <field name="LABEL">Click Me</field>
+    <field name="STYLE">primary</field>
+    <field name="ACTION">function</field>
+    <field name="ACTION_TARGET">handleClick</field>
+  </block>
+  
+  <!-- Toggle Switch -->
+  <block type="web_interactive_item">
+    <field name="TYPE">toggle</field>
+    <field name="LABEL">Enable Feature</field>
+    <field name="STYLE">primary</field>
+    <field name="ACTION">function</field>
+    <field name="ACTION_TARGET">toggleFeature</field>
+  </block>
+  
+  <!-- Slider -->
+  <block type="web_interactive_item">
+    <field name="TYPE">slider</field>
+    <field name="LABEL">Adjust Value</field>
+    <field name="MIN_VALUE">0</field>
+    <field name="MAX_VALUE">100</field>
+    <field name="STEP">1</field>
+    <field name="INITIAL_VALUE">50</field>
+    <field name="ACTION">function</field>
+    <field name="ACTION_TARGET">updateValue</field>
+  </block>
+  
+  <!-- Input Field -->
+  <block type="web_interactive_item">
+    <field name="TYPE">input</field>
+    <field name="LABEL">Your Name</field>
+    <field name="INPUT_TYPE">text</field>
+    <field name="PLACEHOLDER">Enter your name...</field>
+    <field name="ACTION">function</field>
+    <field name="ACTION_TARGET">saveInput</field>
+  </block>
+  
+  <!-- Dropdown -->
+  <block type="web_interactive_item">
+    <field name="TYPE">dropdown</field>
+    <field name="LABEL">Select Option</field>
+    <field name="OPTIONS">Option 1, Option 2, Option 3</field>
+    <field name="ACTION">function</field>
+    <field name="ACTION_TARGET">handleSelection</field>
+  </block>
+  
+  <!-- Composite Interactive Component -->
+  <block type="web_component_with_interaction">
+    <field name="COMPONENT_TYPE">card</field>
+    <field name="TITLE">Product Card</field>
+    <field name="CONTENT">Product description goes here</field>
+    <field name="HAS_INTERACTION">TRUE</field>
+    <value name="INTERACTION">
+      <block type="web_interactive_item">
+        <field name="TYPE">button</field>
+        <field name="LABEL">Add to Cart</field>
+        <field name="STYLE">primary</field>
+        <field name="ACTION">function</field>
+        <field name="ACTION_TARGET">addToCart</field>
+      </block>
+    </value>
+  </block>
+</category>

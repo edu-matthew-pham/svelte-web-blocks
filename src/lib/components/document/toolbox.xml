@@ -1,5 +1,7 @@
 <category name="Document" colour="290">
 <block type="web_document">
+    <field name="ID"></field>
+    <field name="CLASS"></field>
     <field name="TITLE">My Web Page</field>
     <field name="THEME">light</field>
 </block>

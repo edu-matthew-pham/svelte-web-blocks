@@ -63,4 +63,6 @@
     <field name="DATA_SOURCE">products</field>
     <field name="CONTAINER">#product-container</field>
   </block>
+  
+  
 </category> 

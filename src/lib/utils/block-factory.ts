@@ -10,6 +10,13 @@ const FieldColour = ColourField.FieldColour || ColourField;
 // Import BlockConfig and other needed types from types.ts
 import type { BlockConfig, BlockInputConfig, WebBlockDefinitions } from '$lib/types.js';
 
+/// Helper function to capitalize field names nicely
+function formatFieldName(name: string): string {
+  // Convert names like "BACKGROUND_COLOR" to "Background Color"
+  return name.split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
 
 /// Helper function to build inputs based on configuration
 function buildInput(block: Blockly.Block, input: BlockInputConfig) {
@@ -19,25 +26,25 @@ function buildInput(block: Blockly.Block, input: BlockInputConfig) {
     else if (input.type === "field_text") {
       if (!input.name) return block.appendDummyInput();
       return block.appendDummyInput()
-        .appendField(input.name.toLowerCase())
+        .appendField(input.label || formatFieldName(input.name))
         .appendField(new Blockly.FieldTextInput(input.default || ""), input.name);
     } 
     else if (input.type === "field_checkbox") {
       if (!input.name) return block.appendDummyInput();
       return block.appendDummyInput()
-        .appendField(input.name.toLowerCase())
+        .appendField(input.label || formatFieldName(input.name))
         .appendField(new Blockly.FieldCheckbox(input.checked ? "TRUE" : "FALSE"), input.name);
     }
     else if (input.type === "field_multiline") {
       if (!input.name) return block.appendDummyInput();
       return block.appendDummyInput()
-        .appendField(input.name.toLowerCase())
+        .appendField(input.label || formatFieldName(input.name))
         .appendField(new FieldMultilineInput(input.default || ""), input.name);
     } 
     else if (input.type === "field_color") {
       if (!input.name) return block.appendDummyInput();
       return block.appendDummyInput()
-        .appendField(input.name.toLowerCase())
+        .appendField(input.label || formatFieldName(input.name))
         .appendField(new FieldColour(input.default || "#000000"), input.name);
     } 
     else if (input.type === "field_dropdown") {
@@ -48,13 +55,13 @@ function buildInput(block: Blockly.Block, input: BlockInputConfig) {
         eval(input.options) : input.options;
         
       return block.appendDummyInput()
-        .appendField(input.name.toLowerCase())
+        .appendField(input.label || formatFieldName(input.name))
         .appendField(new Blockly.FieldDropdown(dropdownOptions), input.name);
     } 
     else if (input.type === "field_number") {
       if (!input.name) return block.appendDummyInput();
       return block.appendDummyInput()
-        .appendField(input.name.toLowerCase())
+        .appendField(input.label || formatFieldName(input.name))
         .appendField(new Blockly.FieldNumber(input.default || 0, input.min, input.max, input.precision || 0), input.name);
     }
     else if (input.type === "statement") {
@@ -97,6 +104,44 @@ function buildInput(block: Blockly.Block, input: BlockInputConfig) {
         } else if (child.type === "field_number") {
           if (child.name) {
             dummyInput.appendField(new Blockly.FieldNumber(child.default || 0, child.min, child.max, child.precision || 0), child.name);
+          }
+        }
+      });
+      return dummyInput;
+    }
+    else if (input.type === "combined_input") {
+      const dummyInput = block.appendDummyInput();
+      if (!input.fields) return dummyInput;
+      
+      input.fields.forEach((field: BlockInputConfig) => {
+        if (field.type === "label") {
+          dummyInput.appendField(field.text || "");
+        } else if (field.type === "field_text") {
+          if (field.name) {
+            dummyInput.appendField(new Blockly.FieldTextInput(field.default || ""), field.name);
+          }
+        } else if (field.type === "field_checkbox") {
+          if (field.name) {
+            dummyInput.appendField(new Blockly.FieldCheckbox(field.checked ? "TRUE" : "FALSE"), field.name);
+          }
+        } else if (field.type === "field_multiline") {
+          if (field.name) {
+            dummyInput.appendField(new FieldMultilineInput(field.default || ""), field.name);
+          }
+        } else if (field.type === "field_color") {
+          if (field.name) {
+            dummyInput.appendField(new FieldColour(field.default || "#000000"), field.name);
+          }
+        } else if (field.type === "field_dropdown") {
+          if (field.name && field.options) {
+            // Handle string reference to options array
+            const dropdownOptions = typeof field.options === 'string' ? 
+              eval(field.options) : field.options;
+            dummyInput.appendField(new Blockly.FieldDropdown(dropdownOptions), field.name);
+          }
+        } else if (field.type === "field_number") {
+          if (field.name) {
+            dummyInput.appendField(new Blockly.FieldNumber(field.default || 0, field.min, field.max, field.precision || 0), field.name);
           }
         }
       });
@@ -242,5 +287,5 @@ export const COMMON_ICONS: [string, string][] = [
     ["📝 Document", "📝"],
     ["🔄 Sync", "🔄"],
     ["👥 Users", "👥"],
-    ["💬 Chat", "💬"]
+    ["�� Chat", "💬"]
   ];

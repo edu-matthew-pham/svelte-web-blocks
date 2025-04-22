@@ -10,7 +10,20 @@ const documentBlocks: Record<string, BlockConfig> = {
     tooltip: "Create a complete webpage with Bootstrap included",
     helpUrl: "https://getbootstrap.com/",
     inputs: [
-      { type: "label", text: "Web Document" },
+      { 
+        type: "combined_input", 
+        fields: [
+          { type: "label", text: "Web Document" },
+          { type: "label", text: "ID:" },
+          { type: "field_text", name: "ID", default: "" }
+        ]
+      },
+      { 
+        type: "field_text", 
+        name: "CLASS",
+        label: "Classes",
+        default: "" 
+      },
       { 
         type: "field_text", 
         name: "TITLE", 

@@ -1,6 +1,9 @@
 import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript';
 
+// Component ID counters to track usage
+const componentCounters: Record<string, number> = {};
+
 // Types for generator configuration
 export interface GeneratorConfig {
   // Property mappings from block field names to component properties
@@ -28,10 +31,17 @@ export interface GeneratorConfig {
   }[];
   
   // Custom HTML generator function
-  htmlRenderer?: (props: Record<string, any>, childrenHtml: Record<string, string>) => string;
+  htmlRenderer?: (props: Record<string, any>, childrenHtml: Record<string, string>, attributes: ComponentAttributes) => string;
   
   // Custom JavaScript generator function
-  jsRenderer?: (props: Record<string, any>, childrenJs: Record<string, string>) => string;
+  jsRenderer?: (props: Record<string, any>, childrenJs: Record<string, string>, attributes: ComponentAttributes) => string;
+}
+
+// Add type for component attributes
+export interface ComponentAttributes {
+  id?: string;
+  className?: string;
+  dataAttributes?: string;
 }
 
 /**
@@ -76,12 +86,59 @@ export function createGenerator(config: GeneratorConfig) {
         childrenHtml['scripts'] = scriptsCode;
       }
       
-      // Use custom renderer if provided
-      if (config.htmlRenderer) {
-        return config.htmlRenderer(props, childrenHtml);
+      // Extract standard attributes (ID, Class, Data Attributes)
+      const attributes: ComponentAttributes = {};
+      
+      // Extract class and data attributes as provided
+      if (block.getField('CLASS')) {
+        attributes.className = block.getFieldValue('CLASS');
+      }
+      if (block.getField('DATA_ATTRIBUTES')) {
+        attributes.dataAttributes = block.getFieldValue('DATA_ATTRIBUTES');
       }
       
-      // Default rendering just concatenates children
+      // For ID, auto-generate if not provided
+      if (block.getField('ID')) {
+        const providedId = block.getFieldValue('ID');
+        if (providedId && providedId.trim() !== '') {
+          // Use the manually specified ID
+          attributes.id = providedId;
+        } else {
+          // Auto-generate an ID based on component type
+          const componentType = block.type.replace('web_', '');
+          
+          // Initialize counter if not exists
+          if (!componentCounters[componentType]) {
+            componentCounters[componentType] = 1;
+          } else {
+            componentCounters[componentType]++;
+          }
+          
+          // Create the ID
+          const generatedId = `${componentType}-${componentCounters[componentType]}`;
+          
+          // Update both the attributes and the block field
+          attributes.id = generatedId;
+          
+          // Only update the block field if this is during render
+          // Use custom property to track ID generation, using type assertion
+          if (!(block as any)._autoIdGenerated) {
+            (block as any)._autoIdGenerated = true;
+            block.setFieldValue(generatedId, 'ID');
+            
+            // Debug
+            console.log(`Auto-generated ID: ${generatedId} for ${block.type}`);
+          }
+        }
+      }
+      
+      // Use custom renderer if provided
+      if (config.htmlRenderer) {
+        return config.htmlRenderer(props, childrenHtml, attributes);
+      }
+      
+      // Default rendering just concatenates children, not applying attributes
+      // (Attributes are expected to be handled by the custom renderer)
       return Object.values(childrenHtml).join('\n');
     },
     
@@ -112,9 +169,41 @@ export function createGenerator(config: GeneratorConfig) {
         }
       });
       
+      // Extract standard attributes (ID, Class, Data Attributes)
+      const attributes: ComponentAttributes = {};
+      
+      // Extract class and data attributes as provided
+      if (block.getField('CLASS')) {
+        attributes.className = block.getFieldValue('CLASS');
+      }
+      if (block.getField('DATA_ATTRIBUTES')) {
+        attributes.dataAttributes = block.getFieldValue('DATA_ATTRIBUTES');
+      }
+      
+      // For ID, auto-generate if not provided
+      if (block.getField('ID')) {
+        const providedId = block.getFieldValue('ID');
+        if (providedId && providedId.trim() !== '') {
+          // Use the manually specified ID
+          attributes.id = providedId;
+        } else {
+          // Auto-generate an ID based on component type
+          const componentType = block.type.replace('web_', '');
+          
+          // Initialize counter if not exists
+          if (!componentCounters[componentType]) {
+            componentCounters[componentType] = 1;
+          } else {
+            componentCounters[componentType]++;
+          }
+          
+          attributes.id = `${componentType}-${componentCounters[componentType]}`;
+        }
+      }
+      
       // Use custom JS renderer if provided
       if (config.jsRenderer) {
-        return config.jsRenderer(props, childrenJs);
+        return config.jsRenderer(props, childrenJs, attributes);
       }
       
       // Default rendering just concatenates children with appropriate JS syntax
@@ -162,11 +251,44 @@ export function createGenerator(config: GeneratorConfig) {
       // Determine block type from the block's type
       const type = block.type.replace('web_', '');
       
+      // Extract standard attributes
+      const attributes: ComponentAttributes = {};
+      
+      // Extract class and data attributes as provided
+      if (block.getField('CLASS')) {
+        attributes.className = block.getFieldValue('CLASS');
+      }
+      if (block.getField('DATA_ATTRIBUTES')) {
+        attributes.dataAttributes = block.getFieldValue('DATA_ATTRIBUTES');
+      }
+      
+      // For ID, auto-generate if not provided
+      if (block.getField('ID')) {
+        const providedId = block.getFieldValue('ID');
+        if (providedId && providedId.trim() !== '') {
+          // Use the manually specified ID
+          attributes.id = providedId;
+        } else {
+          // Auto-generate an ID based on component type
+          const componentType = block.type.replace('web_', '');
+          
+          // Initialize counter if not exists
+          if (!componentCounters[componentType]) {
+            componentCounters[componentType] = 1;
+          } else {
+            componentCounters[componentType]++;
+          }
+          
+          attributes.id = `${componentType}-${componentCounters[componentType]}`;
+        }
+      }
+      
       return {
         type,
         properties: props,
         children: children.length > 0 ? children : undefined,
-        scripts: scripts.length > 0 ? scripts : undefined
+        scripts: scripts.length > 0 ? scripts : undefined,
+        attributes: attributes
       };
     }
   };

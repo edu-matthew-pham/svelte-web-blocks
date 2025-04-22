@@ -1,9 +1,0 @@
-// Document component toolbox definition
-export const documentToolbox = `
-  <category name="Document" colour="290">
-    <block type="web_document">
-      <field name="TITLE">My Web Page</field>
-      <field name="THEME">light</field>
-    </block>
-  </category>
-`; 

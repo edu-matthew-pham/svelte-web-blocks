@@ -22,6 +22,7 @@ export interface BlockInputConfig {
   min?: number;
   max?: number;
   precision?: number;
+  fields?: BlockInputConfig[];
 }
 
 export type BlockCategory = "component" | "item" | "document" | "javascript" | "reactive" | "dataObjects" | "expressions" | "lists" | "logic" | "loops" | "dom";

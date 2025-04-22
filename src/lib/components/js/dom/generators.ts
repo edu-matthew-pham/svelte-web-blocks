@@ -1,6 +1,6 @@
 import * as Blockly from 'blockly/core';
 import { javascriptGenerator } from 'blockly/javascript';
-import * as jsTemplates from '../../jsTemplates.js';
+import * as jsTemplates from '$lib/blocks/jsTemplates.js';
 import type { WebBlockGeneratorFunctions } from '$lib/types.js';
 
 /**

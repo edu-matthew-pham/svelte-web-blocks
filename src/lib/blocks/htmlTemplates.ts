@@ -81,13 +81,16 @@ export function createCarouselIndicatorsHTML(componentId: string, slideCount: nu
  * @param title Document title
  * @param theme Theme name (Bootstrap standard or Bootswatch theme)
  * @param content Inner page content
+ * @param scripts JavaScript code
+ * @param attributes Optional ID, class and data attributes
  * @returns Complete HTML document
  */
 export function createDocumentHTML(
   title: string,
   theme: string,
   content: string, 
-  scripts: string
+  scripts: string,
+  attributes: { id?: string, className?: string, dataAttributes?: string } = {}
 ): string {
   // Check if using Bootstrap standard theme (light/dark) or Bootswatch theme
   const isBootstrapTheme = theme === 'light' || theme === 'dark';
@@ -95,6 +98,13 @@ export function createDocumentHTML(
     ? `<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">`
     : `<link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/${theme}/bootstrap.min.css" rel="stylesheet">`;
 
+  // Build HTML class attribute from both the theme class and any user-provided classes
+  const bodyClass = attributes.className ? ` class="${attributes.className}"` : '';
+  
+  // Build HTML id and data attributes
+  const bodyId = attributes.id ? ` id="${attributes.id}"` : '';
+  const bodyData = attributes.dataAttributes ? ` ${attributes.dataAttributes}` : '';
+  
   const htmlString = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -108,7 +118,7 @@ export function createDocumentHTML(
     ${scripts}
   </script>
 </head>
-<body ${isBootstrapTheme ? `data-bs-theme="${theme}"` : ''}>
+<body${bodyId}${bodyClass}${bodyData} ${isBootstrapTheme ? `data-bs-theme="${theme}"` : ''}>
   ${content}
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

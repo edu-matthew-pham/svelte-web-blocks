@@ -60,7 +60,7 @@ const jsDomBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "VALUE", default: "New content" }
       ]}
     ],
-    connections: { previous: false, next: false, output: "String" }
+    connections: { previous: "web_component", next: "web_component", output: "String" }
   },
   
   // Class manipulation
@@ -87,7 +87,7 @@ const jsDomBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "ELEMENT", default: "element" }
       ]}
     ],
-    connections: { previous: false, next: false, output: "Strings" }
+    connections: { previous: "web_component", next: "web_component", output: "Strings" }
   },
   
   // Event handling
