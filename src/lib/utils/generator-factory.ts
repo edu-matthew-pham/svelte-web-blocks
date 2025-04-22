@@ -68,10 +68,29 @@ export function createGenerator(config: GeneratorConfig) {
         props[mapping.componentProp] = value;
       });
       
+      // Auto-generate ID for this block if not provided
+      const currentBlockId = ensureBlockHasId(block);
+      
       // Process children
       const childrenHtml: Record<string, string> = {};
       
       (config.childInputs || []).forEach(input => {
+        // For statement inputs, process each child block
+        if (block.getInputTargetBlock(input.inputName)) {
+          // Get the first block in the statement
+          let childBlock = block.getInputTargetBlock(input.inputName);
+          
+          // Process each block in the chain
+          while (childBlock) {
+            // Auto-generate ID for child blocks
+            ensureBlockHasId(childBlock);
+            
+            // Move to next block in the chain
+            childBlock = childBlock.getNextBlock();
+          }
+        }
+        
+        // Get the generated HTML from the Javascript generator 
         const childHtml = javascriptGenerator.statementToCode(block, input.inputName);
         if (input.childrenProp) {
           childrenHtml[input.childrenProp] = childHtml;
@@ -108,39 +127,8 @@ export function createGenerator(config: GeneratorConfig) {
         attributes.dataAttributes = block.getFieldValue('DATA_ATTRIBUTES');
       }
       
-      // For ID, auto-generate if not provided
-      if (block.getField('ID')) {
-        const providedId = block.getFieldValue('ID');
-        if (providedId && providedId.trim() !== '') {
-          // Use the manually specified ID
-          attributes.id = providedId;
-        } else {
-          // Auto-generate an ID based on component type
-          const componentType = block.type.replace('web_', '');
-          
-          // Initialize counter if not exists
-          if (!componentCounters[componentType]) {
-            componentCounters[componentType] = 1;
-          } else {
-            componentCounters[componentType]++;
-          }
-          
-          // Create the ID
-          const generatedId = `${componentType}-${componentCounters[componentType]}`;
-          
-          // Update both the attributes and the block field
-          attributes.id = generatedId;
-          
-          // Only update the block field if this is during render
-          // Use custom property to track ID generation, using type assertion
-          if (!(block as any)._autoIdGenerated) {
-            (block as any)._autoIdGenerated = true;
-            block.setFieldValue(generatedId, 'ID');
-            
-
-          }
-        }
-      }
+      // Use the already generated/retrieved ID
+      attributes.id = currentBlockId;
       
       // Use custom renderer if provided
       if (config.htmlRenderer) {
@@ -168,9 +156,21 @@ export function createGenerator(config: GeneratorConfig) {
         props[mapping.componentProp] = value;
       });
       
+      // Auto-generate ID for this block if not provided
+      const currentBlockId = ensureBlockHasId(block);
+      
       // Get all children from configured inputs
       const childrenJs: Record<string, string> = {};
       (config.childInputs || []).forEach(input => {
+        // Auto-generate IDs for children
+        if (block.getInputTargetBlock(input.inputName)) {
+          let childBlock = block.getInputTargetBlock(input.inputName);
+          while (childBlock) {
+            ensureBlockHasId(childBlock);
+            childBlock = childBlock.getNextBlock();
+          }
+        }
+        
         const childJs = javascriptGenerator.statementToCode(block, input.inputName);
         if (input.childrenProp) {
           childrenJs[input.childrenProp] = childJs;
@@ -190,26 +190,8 @@ export function createGenerator(config: GeneratorConfig) {
         attributes.dataAttributes = block.getFieldValue('DATA_ATTRIBUTES');
       }
       
-      // For ID, auto-generate if not provided
-      if (block.getField('ID')) {
-        const providedId = block.getFieldValue('ID');
-        if (providedId && providedId.trim() !== '') {
-          // Use the manually specified ID
-          attributes.id = providedId;
-        } else {
-          // Auto-generate an ID based on component type
-          const componentType = block.type.replace('web_', '');
-          
-          // Initialize counter if not exists
-          if (!componentCounters[componentType]) {
-            componentCounters[componentType] = 1;
-          } else {
-            componentCounters[componentType]++;
-          }
-          
-          attributes.id = `${componentType}-${componentCounters[componentType]}`;
-        }
-      }
+      // Use the already generated ID
+      attributes.id = currentBlockId;
       
       // Use custom JS renderer if provided
       if (config.jsRenderer) {
@@ -236,11 +218,17 @@ export function createGenerator(config: GeneratorConfig) {
         props[mapping.componentProp] = value;
       });
       
+      // Auto-generate ID for this block if not provided
+      const currentBlockId = ensureBlockHasId(block);
+      
       // Process regular children
       const children: any[] = [];
       (config.childInputs || []).forEach(input => {
         let contentBlock = block.getInputTargetBlock(input.inputName);
         while (contentBlock) {
+          // Ensure child has ID
+          ensureBlockHasId(contentBlock);
+          
           const content = javascriptGenerator.blockToHighLevel(contentBlock);
           if (content) children.push(content);
           contentBlock = contentBlock.getNextBlock();
@@ -283,35 +271,56 @@ export function createGenerator(config: GeneratorConfig) {
         attributes.dataAttributes = block.getFieldValue('DATA_ATTRIBUTES');
       }
       
-      // For ID, auto-generate if not provided
-      if (block.getField('ID')) {
-        const providedId = block.getFieldValue('ID');
-        if (providedId && providedId.trim() !== '') {
-          // Use the manually specified ID
-          attributes.id = providedId;
-        } else {
-          // Auto-generate an ID based on component type
-          const componentType = block.type.replace('web_', '');
-          
-          // Initialize counter if not exists
-          if (!componentCounters[componentType]) {
-            componentCounters[componentType] = 1;
-          } else {
-            componentCounters[componentType]++;
-          }
-          
-          attributes.id = `${componentType}-${componentCounters[componentType]}`;
-        }
-      }
+      // Use the already generated ID
+      attributes.id = currentBlockId;
       
       return {
         type,
         properties: props,
         children: children.length > 0 ? children : undefined,
         scripts: scripts.length > 0 ? scripts : undefined,
-        onloadScripts: onloadScripts.length > 0 ? onloadScripts : undefined,
         attributes: attributes
       };
     }
   };
+}
+
+/**
+ * Ensures a block has an ID, auto-generating one if needed.
+ * Returns the ID (either existing or newly generated).
+ */
+function ensureBlockHasId(block: Blockly.Block): string {
+  // Check if block has an ID field
+  if (!block.getField('ID')) {
+    return ''; // No ID field, nothing to do
+  }
+  
+  // Get current ID value
+  const providedId = block.getFieldValue('ID');
+  
+  // If ID already exists and is not empty, use it
+  if (providedId && providedId.trim() !== '') {
+    return providedId;
+  }
+  
+  // Auto-generate an ID based on component type
+  const componentType = block.type.replace('web_', '');
+  
+  // Initialize counter if not exists
+  if (!componentCounters[componentType]) {
+    componentCounters[componentType] = 1;
+  } else {
+    componentCounters[componentType]++;
+  }
+  
+  // Create the ID
+  const generatedId = `${componentType}-${componentCounters[componentType]}`;
+  
+  // Update the block field with the generated ID
+  if (!(block as any)._autoIdGenerated) {
+    (block as any)._autoIdGenerated = true;
+    block.setFieldValue(generatedId, 'ID');
+  }
+  
+  return generatedId;
 } 

@@ -11,7 +11,15 @@ const featuresBlockConfigs: WebBlockConfigs = {
     tooltip: "Add feature cards section",
     helpUrl: "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout",
     inputs: [
-      { type: "label", text: "Feature Cards" },
+      { type: "row", children: [
+        { type: "label", text: "Feature Cards" },
+        { type: "label", text: "ID" },
+        { type: "field_text", name: "ID", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Class" },
+        { type: "field_text", name: "CLASS", default: "" }
+      ]},
       { type: "row", children: [
         { type: "label", text: "Title" },
         { type: "field_text", name: "TITLE", default: "Our Features" }
@@ -35,14 +43,22 @@ const featuresBlockConfigs: WebBlockConfigs = {
     tooltip: "Add a feature card",
     helpUrl: "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout",
     inputs: [
-      { type: "label", text: "Feature Card" },
       { type: "row", children: [
-        { type: "label", text: "Icon" },
-        { type: "field_dropdown", name: "ICON", options: COMMON_ICONS }
+        { type: "label", text: "Feature Card" },
+        { type: "label", text: "ID" },
+        { type: "field_text", name: "ID", default: "" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Class" },
+        { type: "field_text", name: "CLASS", default: "" }
       ]},
       { type: "row", children: [
         { type: "label", text: "Title" },
         { type: "field_text", name: "TITLE", default: "Feature Title" }
+      ]},
+      { type: "row", children: [
+        { type: "label", text: "Icon" },
+        { type: "field_dropdown", name: "ICON", options: COMMON_ICONS }
       ]},
       { type: "row", children: [
         { type: "label", text: "Description" },

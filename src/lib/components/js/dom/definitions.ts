@@ -66,7 +66,7 @@ const jsDomBlockConfigs: WebBlockConfigs = {
           ["HTML", "html"],
           ["Attribute", "attribute"],
           ["Style", "style"],
-          ["Value", "value"]
+          ["Value (markdown or inputs)", "value"]
         ], default: "style"}
       ]},
       { type: "row", children: [

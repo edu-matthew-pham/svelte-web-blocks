@@ -17,57 +17,57 @@ export const featuresGenerators = {
     ],
     
     // Custom HTML renderer that uses the existing template
-    htmlRenderer: (props, childrenHtml) => {
+    htmlRenderer: (props, childrenHtml, attributes) => {
       const { title, columns } = props;
       const backgroundColor = props.backgroundColor || '#ffffff';
       
       return createFeatureCardsHTML(
         title,
         backgroundColor,
-        childrenHtml.cards || ''
+        childrenHtml.cards || '',
+        attributes
       );
     }
   }),
   
-  web_feature_card: createGenerator({
-    propertyMappings: [
-      { componentProp: 'icon' },
-      { componentProp: 'title' },
-      { componentProp: 'description' }
-    ],
-    
-    // Custom HTML renderer that uses the existing template
-    htmlRenderer: (props, childrenHtml) => {
-      const { icon, title, description } = props;
+  // For feature_card, we need custom implementation to handle column settings from parent
+  web_feature_card: {
+    html: function(block: Blockly.Block): string {
+      const icon = block.getFieldValue('ICON');
+      const title = block.getFieldValue('TITLE');
+      const description = block.getFieldValue('DESCRIPTION');
       
       // Get parent block's column setting
       let columns = 3; // Default to 3 columns
+      const parent = block.getSurroundParent();
+      if (parent && parent.type === 'web_feature_cards') {
+        columns = parseInt(parent.getFieldValue('COLUMNS'));
+      }
       
-      // Note: This requires access to the block, which isn't available in the factory
-      // We'll need to implement a different approach or use a block reference
+      // Extract ID and CLASS values
+      const id = block.getFieldValue('ID') || '';
+      const className = block.getFieldValue('CLASS') || '';
       
-      return createFeatureCardHTML(
-        icon,
-        title,
-        description,
-        columns
-      );
+      // Create attributes object
+      const attributes = {
+        id: id,
+        className: className
+      };
+      
+      return createFeatureCardHTML(icon, title, description, columns, attributes);
+    },
+    
+    highLevel: function(block: Blockly.Block): any {
+      return {
+        type: "featureCard",
+        properties: {
+          icon: block.getFieldValue('ICON'),
+          title: block.getFieldValue('TITLE'),
+          description: block.getFieldValue('DESCRIPTION'),
+          id: block.getFieldValue('ID'),
+          className: block.getFieldValue('CLASS')
+        }
+      };
     }
-  })
-};
-
-// Override the HTML generator for feature card to access parent block
-featuresGenerators.web_feature_card.html = function(block: Blockly.Block): string {
-  const icon = block.getFieldValue('ICON');
-  const title = block.getFieldValue('TITLE');
-  const description = block.getFieldValue('DESCRIPTION');
-  
-  // Get parent block's column setting
-  let columns = 3; // Default to 3 columns
-  const parent = block.getSurroundParent();
-  if (parent && parent.type === 'web_feature_cards') {
-    columns = parseInt(parent.getFieldValue('COLUMNS'));
   }
-  
-  return createFeatureCardHTML(icon, title, description, columns);
 }; 

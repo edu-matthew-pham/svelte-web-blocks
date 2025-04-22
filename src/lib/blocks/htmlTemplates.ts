@@ -284,11 +284,25 @@ export function createNavItemHTML(
  * @param title Section title
  * @param backgroundColor Background color value
  * @param features HTML string for feature cards
+ * @param attributes Optional ID, class and data attributes
  * @returns HTML for feature cards section
  */
-export function createFeatureCardsHTML(title: string, backgroundColor: string, features: string): string {
+export function createFeatureCardsHTML(
+  title: string, 
+  backgroundColor: string, 
+  features: string,
+  attributes: ComponentAttributes = {}
+): string {
+  // Build HTML class attribute combining default classes with any user-provided classes
+  const defaultClass = "py-5";
+  const className = attributes.className ? `${defaultClass} ${attributes.className}` : defaultClass;
+  
+  // Build HTML id and data attributes
+  const id = attributes.id ? ` id="${attributes.id}"` : '';
+  const dataAttributes = attributes.dataAttributes ? ` ${attributes.dataAttributes}` : '';
+
   return `<!-- @component: FeatureCards -->
-<section class="py-5" style="background-color: ${backgroundColor};">
+<section${id} class="${className}"${dataAttributes} style="background-color: ${backgroundColor};">
   <div class="container">
     <h2 class="text-center mb-5">${title}</h2>
     <div class="row g-4">
@@ -304,9 +318,16 @@ export function createFeatureCardsHTML(title: string, backgroundColor: string, f
  * @param title Card title
  * @param description Card description
  * @param columns Number of columns in the grid (1-6)
+ * @param attributes Optional ID, class and data attributes
  * @returns HTML for feature card
  */
-export function createFeatureCardHTML(icon: string, title: string, description: string, columns: number): string {
+export function createFeatureCardHTML(
+  icon: string, 
+  title: string, 
+  description: string, 
+  columns: number,
+  attributes: ComponentAttributes = {}
+): string {
   // Determine the appropriate column class based on number of columns
   let columnClass;
   switch(columns) {
@@ -319,8 +340,15 @@ export function createFeatureCardHTML(icon: string, title: string, description: 
     default: columnClass = 'col-md-4';
   }
 
+  // Build HTML class attribute combining column class with any user-provided classes
+  const className = attributes.className ? `${columnClass} ${attributes.className}` : columnClass;
+  
+  // Build HTML id and data attributes
+  const id = attributes.id ? ` id="${attributes.id}"` : '';
+  const dataAttributes = attributes.dataAttributes ? ` ${attributes.dataAttributes}` : '';
+
   return `<!-- @item: FeatureCard -->
-<div class="${columnClass}">
+<div${id} class="${className}"${dataAttributes}>
   <div class="card h-100 border-0 shadow-sm">
     <div class="card-body p-4 text-center">
       <div class="display-5 mb-3">${icon}</div>
