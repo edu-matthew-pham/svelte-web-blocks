@@ -1,10 +1,6 @@
-<category name="DOM Manipulation" colour="180">
+<category name="DOM Manipulation" colour="180"  disabled="true">
   <!-- Element Selection -->
-  <block type="js_select_element">
-    <field name="SELECTOR">#element-id</field>
-    <field name="VARIABLE">element</field>
-  </block>
-  
+
   <!-- Unified Property Manipulation -->
   <block type="js_element_property">
     <field name="ACTION">set</field>
@@ -13,36 +9,41 @@
     <field name="PROPERTY">backgroundColor</field>
     <field name="VALUE">lightblue</field>
   </block>
+
+    <block type="js_select_element"  disabled="true">
+    <field name="SELECTOR">#element-id</field>
+    <field name="VARIABLE">element</field>
+  </block>
   
   <!-- Class Manipulation -->
-  <block type="js_element_class">
+  <block type="js_element_class"  disabled="true">
     <field name="ACTION">add</field>
     <field name="ELEMENT">element</field>
     <field name="CLASS">active</field>
   </block>
   
   <!-- Event Handling -->
-  <block type="js_event_handler">
+  <block type="js_event_handler"  disabled="true">
     <field name="ELEMENT">element</field>
     <field name="EVENT">click</field>
     <field name="PREVENT_DEFAULT">FALSE</field>
   </block>
   
   <!-- Element Creation -->
-  <block type="js_create_element">
+  <block type="js_create_element"  disabled="true">
     <field name="TAG">div</field>
     <field name="VARIABLE">newElement</field>
   </block>
   
   <!-- DOM Tree Manipulation -->
-  <block type="js_tree_operation">
+  <block type="js_tree_operation"  disabled="true">
     <field name="ACTION">append</field>
     <field name="PARENT">container</field>
     <field name="CHILD">newElement</field>
   </block>
 
   <!-- Iterative DOM Manipulation -->
-  <block type="js_iterate_data">
+  <block type="js_iterate_data"  disabled="true">
     <field name="DATA_SOURCE">items</field>
     <field name="CONTAINER">#item-list</field>
     <field name="ELEMENT_TYPE">li</field>
@@ -50,7 +51,7 @@
   </block>
   
   <!-- Table-Specific Data Population -->
-  <block type="js_populate_table">
+  <block type="js_populate_table"  disabled="true">
     <field name="DATA_SOURCE">users</field>
     <field name="TABLE">#data-table</field>
     <field name="COLUMNS">name,email,role</field>
@@ -58,7 +59,7 @@
   </block>
   
   <!-- Data-Bound Elements -->
-  <block type="js_create_from_template">
+  <block type="js_create_from_template"  disabled="true">
     <field name="TEMPLATE"><div class="card">${item.title}<p>${item.description}</p></div></field>
     <field name="DATA_SOURCE">products</field>
     <field name="CONTAINER">#product-container</field>
