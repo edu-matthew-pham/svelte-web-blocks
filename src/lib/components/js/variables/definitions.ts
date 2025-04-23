@@ -9,20 +9,7 @@ import type { WebBlockConfigs } from '$lib/types.js';
 // Define variable block configurations
 const variableBlockConfigs: WebBlockConfigs = {
 
-  variables_init: {
-    type: 'variables_init',
-    category: 'variables',
-    color: 290,
-    tooltip: "Create a variable",
-    helpUrl: "https://developers.google.com/blockly/guides/create-custom-blocks/variables",
-    inputs: [
-      { type: "row", children: [
-        { type: "label", text: "Create variable" },
-        { type: "field_variable", name: "VAR", variable: "myVariable" }
-      ]}
-    ],
-    connections: { output: "false" }
-  },
+
   text_multiline_js: {
     type: 'text_multiline_js',
     category: 'item',
@@ -38,52 +25,6 @@ const variableBlockConfigs: WebBlockConfigs = {
       ]}
     ],
     connections: { output: "js_value" }
-  },
-  
-  variables_set_sequence: {
-    type: 'variables_set_sequence',
-    category: 'variables',
-    color: 290,
-    tooltip: "Create a variable and set its value twice",
-    helpUrl: "https://developers.google.com/blockly/guides/create-custom-blocks/variables",
-    inputs: [
-      { type: "row", children: [
-        { type: "label", text: "Create variable" },
-        { type: "field_variable", name: "VAR", variable: "myVariable" }
-      ]},
-      { type: "row", children: [
-        { type: "label", text: "Initial value" }
-      ]},
-      { type: "input_value", name: "INITIAL", check: "String" },
-      { type: "row", children: [
-        { type: "label", text: "New value" }
-      ]},
-      { type: "input_value", name: "NEW_VALUE", check: "String" }
-    ],
-    connections: { previous: "web_component", next: "web_component" },
-    // This is important - tells Blockly to use the built-in variables_set block
-    blockBuilderFn: function(block) {
-      // This function will generate the actual blocks when this custom block is used
-      // It creates two variables_set blocks connected with 'next'
-      return {
-        type: 'variables_set',
-        fields: {
-          VAR: block.getFieldValue('VAR')
-        },
-        inputs: {
-          VALUE: block.getInputTargetBlock('INITIAL')
-        },
-        next: {
-          type: 'variables_set',
-          fields: {
-            VAR: block.getFieldValue('VAR')
-          },
-          inputs: {
-            VALUE: block.getInputTargetBlock('NEW_VALUE')
-          }
-        }
-      };
-    }
   },
   
   console_log: {
