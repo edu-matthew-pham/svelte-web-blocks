@@ -1,4 +1,13 @@
 <category name="Variables & Functions" colour="290">
+
+    <block type="console_log">
+      <value name="TEXT">
+        <shadow type="text">
+          <field name="TEXT">Hello world</field>
+        </shadow>
+      </value>
+    </block>
+
     <label text="Variables" web-class="toolboxLabel"></label>
 
     
@@ -29,10 +38,10 @@
 
     
     <block type="variables_set">
-        <field name="VAR">myVariable</field>
+        <field name="VAR">item</field>
     </block>
     <block type="variables_get">
-        <field name="VAR">myVariable</field>
+        <field name="VAR">item</field>
     </block>
 
       <label text="Text & Numbers" web-class="toolboxLabel"></label>

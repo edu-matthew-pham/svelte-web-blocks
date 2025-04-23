@@ -84,6 +84,22 @@ const variableBlockConfigs: WebBlockConfigs = {
         }
       };
     }
+  },
+  
+  console_log: {
+    type: 'console_log',
+    category: 'variables',
+    color: 290,
+    tooltip: "Log a message to the console",
+    helpUrl: "https://developer.mozilla.org/en-US/docs/Web/API/console/log",
+    inputs: [
+      { type: "row", children: [
+        { type: "label", text: "console.log(" },
+        { type: "input_value", name: "TEXT" },
+        { type: "label", text: ")" }
+      ]}
+    ],
+    connections: { previous: "web_component", next: "web_component" }
   }
 };
 
