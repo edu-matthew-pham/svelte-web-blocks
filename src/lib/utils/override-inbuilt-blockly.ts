@@ -1,47 +1,59 @@
 import * as Blockly from 'blockly/core';
 import { javascriptGenerator } from 'blockly/javascript';
 
+// Create a dedicated module for variable tracking
+export const VariableTracker = {
+  declaredIds: new Set<string>(),
+  
+  isDeclared(id: string): boolean {
+    return this.declaredIds.has(id);
+  },
+  
+  markAsDeclared(id: string): void {
+    this.declaredIds.add(id);
+  },
+  
+  reset(): void {
+    this.declaredIds.clear();
+  }
+};
+
 export const overrideBlocklyGenerators = (workspace: Blockly.Workspace) => {
 
     try {
-        // First initialize the generator with the workspace
-        //console.log("Initializing generator");
-        //javascriptGenerator.init(workspace);
 
-        console.log("Generator initialized: ", javascriptGenerator);
-        
-        // Now override after initialization is complete
-        console.log("Overriding variables_set generator");
-
-        console.log("Variables set generator: ", javascriptGenerator.forBlock['variables_set']);
-        
         // Override the variables_set generator correctly using the forBlock property
         javascriptGenerator.forBlock['variables_set'] = function(block: Blockly.Block) {
+            const variableId = block.getFieldValue('VAR');
             const variableName = javascriptGenerator.nameDB_!.getName(
-                block.getFieldValue('VAR'),
+                variableId,
                 Blockly.Names.NameType.VARIABLE
             );
+            
             const value = javascriptGenerator.valueToCode(
                 block, 'VALUE', (javascriptGenerator as any).ORDER_ASSIGNMENT
             ) || '0';
             
-            // Generate code with var declaration inline
-            return `var ${variableName} = ${value};\n`;
+            // Use your dedicated tracker
+            if (VariableTracker.isDeclared(variableId)) {
+                return `${variableName} = ${value};\n`;
+            } else {
+                VariableTracker.markAsDeclared(variableId);
+                return `var ${variableName} = ${value};\n`;
+            }
         };
 
         console.log("Variables set generator (after override): ", javascriptGenerator.forBlock['variables_set']);
-
         
-        
-        // Tell the generator not to create any variable declarations at the top level
+        // Reset tracker when starting generation
         const originalInit = javascriptGenerator.init;
         javascriptGenerator.init = function(ws: Blockly.Workspace) {
-            // Call original init
             originalInit.call(this, ws);
-            
-            // Clear declarations so they don't appear at the top level
             (this as any).definitions_ = Object.create(null);
             (this as any).functionNames_ = Object.create(null);
+            
+            // Reset your tracker
+            VariableTracker.reset();
         };
         
     } catch (error) {
