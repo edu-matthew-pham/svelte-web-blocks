@@ -5,8 +5,7 @@
     import { javascriptGenerator } from 'blockly/javascript';
     import { initializeBlocks } from '../blocks/index.js';
     import { createBlocksFromJson } from '$lib/blocks/parser.js';
-    import { applyWebCompatibilityToProcedureBlocks } from '$lib/utils/web-procedure-extensions.js';
-    import { overrideBlocklyGenerators } from '$lib/utils/override-inbuilt-blockly.js';
+    import { initializeBlocklyOverrides } from '$lib/utils/blockly-overrides.js';
   
     // Props with defaults
     export let initialXml = '';
@@ -60,8 +59,6 @@
         import('$lib/utils/blockly-extensions.js').then(({ initializeVisibilityExtensions }) => {
           initializeVisibilityExtensions();
         });
-
-        applyWebCompatibilityToProcedureBlocks();
   
         // Register custom generators
         Object.entries(generators).forEach(([name, generator]) => {
@@ -123,7 +120,7 @@
         componentsLoaded = true;
       })();
 
-      overrideBlocklyGenerators();
+      initializeBlocklyOverrides(workspace);
       
       // Return the cleanup function directly (not in the Promise chain)
       return () => {
@@ -221,17 +218,6 @@
       if (workspace) Blockly.svgResize(workspace);
     }
 
-    /** helper to switch tabs (and auto-resize when going back to blocks) */
-    function setActiveTab(tab: typeof activeTab) {
-      activeTab = tab;
-      if (tab === 'blocks') {
-        // give the DOM a moment, then resize
-        setTimeout(() => workspace && Blockly.svgResize(workspace), 0);
-      } else if (tab === 'preview') {
-        setTimeout(injectConsoleCapture, 100); // Inject after preview loads
-      } 
-    }
-
     // Add a function to get the current DOM from the iframe
     function captureModifiedDom() {
       try {
@@ -242,61 +228,6 @@
       } catch (e) {
         console.error('Error capturing DOM:', e);
         modifiedDomString = '<!-- Error capturing DOM -->';
-      }
-    }
-
-    // Add this function to manually inject console capture
-    function injectConsoleCapture() {
-      try {
-        const iframe = document.querySelector('.preview-iframe') as HTMLIFrameElement;
-        if (!iframe?.contentWindow) return;
-        
-        // Create a script to override console methods
-        const script = iframe.contentDocument?.createElement('script');
-        if (!script) return;
-        
-        script.textContent = `
-          (function() {
-            const originalConsole = {
-              log: console.log,
-              error: console.error,
-              warn: console.warn,
-              info: console.info
-            };
-            
-            function captureConsole(type, args) {
-              // Convert args to string
-              const message = Array.from(args).map(arg => {
-                try {
-                  return typeof arg === 'object' ? JSON.stringify(arg) : String(arg);
-                } catch (e) {
-                  return String(arg);
-                }
-              }).join(' ');
-              
-              // Send to parent
-              window.parent.postMessage({
-                source: 'preview-console',
-                type: type,
-                message: message,
-                timestamp: Date.now()
-              }, '*');
-              
-              // Call original
-              return originalConsole[type].apply(console, args);
-            }
-            
-            // Override console methods
-            console.log = function() { return captureConsole('log', arguments); };
-            console.error = function() { return captureConsole('error', arguments); };
-            console.warn = function() { return captureConsole('warn', arguments); };
-            console.info = function() { return captureConsole('info', arguments); };
-          })();
-        `;
-        
-        iframe.contentDocument?.head.appendChild(script);
-      } catch (e) {
-        console.error('Error injecting console capture:', e);
       }
     }
 
@@ -313,51 +244,6 @@
         window.removeEventListener('message', () => {});
       };
     });
-
-    // Add this function to initialize web procedure compatibility
-    export function initializeWebProcedureExtensions() {
-      // Register an extension that makes blocks compatible with web content blocks
-      Blockly.Extensions.register('web_content_compatible', function() {
-        // Modify the connections to be compatible with web_content_block
-        this.setPreviousStatement(true, "web_content_block");
-        this.setNextStatement(true, "web_content_block");
-      });
-
-      // Register an extension for procedure_defreturn blocks
-      Blockly.Extensions.register('web_content_compatible_with_return', function() {
-        this.setOutput(false); // Remove any output connection
-        this.setPreviousStatement(true, "web_content_block");
-        this.setNextStatement(true, "web_content_block");
-      });
-
-      // Get original init functions
-      const defNoReturnInit = Blockly.Blocks['procedures_defnoreturn'].init;
-      const defReturnInit = Blockly.Blocks['procedures_defreturn'].init;
-      const callNoReturnInit = Blockly.Blocks['procedures_callnoreturn'].init;
-      const callReturnInit = Blockly.Blocks['procedures_callreturn'].init;
-
-      // Override init functions to apply our extensions
-      Blockly.Blocks['procedures_defnoreturn'].init = function() {
-        defNoReturnInit.call(this);
-        Blockly.Extensions.apply('web_content_compatible', this, false);
-      };
-
-      Blockly.Blocks['procedures_defreturn'].init = function() {
-        defReturnInit.call(this);
-        Blockly.Extensions.apply('web_content_compatible_with_return', this, false);
-      };
-
-      Blockly.Blocks['procedures_callnoreturn'].init = function() {
-        callNoReturnInit.call(this);
-        Blockly.Extensions.apply('web_content_compatible', this, false);
-      };
-
-      // For callreturn, we keep its output connection behavior
-      Blockly.Blocks['procedures_callreturn'].init = function() {
-        callReturnInit.call(this);
-        // No changes to the connection types as this is an output block
-      };
-    }
   </script>
   
   <div class="blockly-container">
@@ -533,24 +419,4 @@
       border: none;
     }
 
-    /* Add to your style section */
-    .dom-controls {
-      padding: 5px;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #eee;
-    }
-
-    /* Console styles */
-    .console-container {
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-top: none;
-    }
-    .console-logs {
-      max-height: 300px;
-      overflow-y: auto;
-    }
-    .console-log {
-      margin-bottom: 5px;
-    }
   </style> 
