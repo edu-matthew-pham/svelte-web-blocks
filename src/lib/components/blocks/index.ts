@@ -15,9 +15,10 @@ const componentModules = [
   import('../footer/index.js'),
   import('../forms/index.js'),
   import('../dynamic/index.js'),
-  import('$lib/components/js/dom/index.js'),
   import('$lib/components/js/create/index.js'),
-  import('$lib/components/js/variables/index.js')
+  import('$lib/components/js/dom/index.js'),
+  import('$lib/components/js/variables/index.js'),
+  import('$lib/components/js/default/index.js'),
   // Add new components here
 ];
 
@@ -36,10 +37,11 @@ export async function initializeBlocks(): Promise<BlocksBundle> {
   const definitions: WebBlockDefinitions = {};
   const generators: WebBlockGeneratorFunctions = {};
   const parsers: Record<string, any> = {};
-  const toolboxCategories: string[] = [];
+  const htmlToolboxCategories: string[] = [];
+  const jsToolboxCategories: string[] = [];
   
   // Combine all exports generically
-  modules.forEach(module => {
+  modules.forEach((module, index) => {
     // Look for definitions
     Object.keys(module).forEach(key => {
       if (key.endsWith('Definitions')) {
@@ -49,16 +51,29 @@ export async function initializeBlocks(): Promise<BlocksBundle> {
       } else if (key.includes('Parser')) { // Handles both 'Parser' and 'Parsers'
         Object.assign(parsers, module[key]);
       } else if (key.endsWith('Toolbox')) {
-        toolboxCategories.push(module[key]);
+        // Separate HTML and JS toolbox categories
+        // The first 8 imports are HTML-related components
+        if (index < 8) {
+          htmlToolboxCategories.push(module[key]);
+        } else {
+          jsToolboxCategories.push(module[key]);
+        }
       }
     });
   });
   
-
-  
+  // Combine toolbox categories with a separator
   const toolboxXml = `
 <xml id="toolbox" style="display: none">
-  ${toolboxCategories.join('\n')}
+  <category name="HTML Components" expanded="true" colour="#5b80a5">
+    ${htmlToolboxCategories.join('\n')}
+  </category>
+  
+  <sep></sep>
+  
+  <category name="JavaScript" expanded="true" colour="#9fa55b">
+    ${jsToolboxCategories.join('\n')}
+  </category>
 </xml>
   `;
   

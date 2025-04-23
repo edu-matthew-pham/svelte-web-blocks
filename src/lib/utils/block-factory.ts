@@ -20,9 +20,6 @@ function formatFieldName(name: string): string {
 
 /// Helper function to build inputs based on configuration
 function buildInput(block: Blockly.Block, input: BlockInputConfig) {
-  if (input.type === "input_value") { 
-      console.log("Building input", input);
-  }
   if (input.type === "input_value") {
     if (!input.name) return block.appendDummyInput();
     const valueInput = block.appendValueInput(input.name);
@@ -93,9 +90,7 @@ function buildInput(block: Blockly.Block, input: BlockInputConfig) {
       if (!input.children) return dummyInput;
       
       input.children.forEach((child: BlockInputConfig) => {
-        if (child.type === "field_text") { 
-          console.log("Building child field text", child);
-        } else if (child.type === "input_value") {
+        if (child.type === "input_value") {
           // Create a new value input instead of just logging
           if (child.name) {
             const valueInput = block.appendValueInput(child.name);
@@ -145,9 +140,7 @@ function buildInput(block: Blockly.Block, input: BlockInputConfig) {
       if (!input.fields) return dummyInput;
       
       input.fields.forEach((field: BlockInputConfig) => {
-        if (field.type === "field_text") { 
-          console.log("Building child field text", field);
-        } else if (field.type === "input_value") {
+        if (field.type === "input_value") {
           // Create a new value input instead of just logging
           if (field.name) {
             const valueInput = block.appendValueInput(field.name);

@@ -1,0 +1,1 @@
+export { default as variablesToolbox } from './toolbox.xml?raw';

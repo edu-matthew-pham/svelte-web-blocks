@@ -20,7 +20,7 @@ const jsCreateBlockConfigs: WebBlockConfigs = {
       ]},
       { type: "row", children: [
         { type: "label", text: "Class" },
-        { type: "input_value", name: "CLASS", default: "" }
+        { type: "field_text", name: "CLASS", default: "" }
       ]},
       { type: "row", children: [
         { type: "label", text: "Type" },
