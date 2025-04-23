@@ -1,5 +1,6 @@
 import * as Blockly from 'blockly/core';
 import { javascriptGenerator } from 'blockly/javascript';
+import { safeProcedureGeneration } from './procedure-generators.js';
 
 // ======== Variable Tracking ========
 export const VariableTracker = {
@@ -85,144 +86,12 @@ function overrideProcedureGenerators() {
 
   // Override with web-component versions with error handling
   javascriptGenerator.forBlock['procedures_defnoreturn'] = function(block: Blockly.Block): string | [string, number] | null {
-    // Prevent recursive calls
-    if (inProcedureGeneration) {
-      return null; // Return null to break recursion
-    }
-    
-    inProcedureGeneration = true;
-    
-    try {
-      // Extract function name and parameters
-      let functionName = 'unnamed_procedure';
-      let params = [];
-      
-      // Get function name
-      if (block && block.getFieldValue) {
-        const nameFromField = block.getFieldValue('NAME');
-        if (nameFromField) functionName = nameFromField;
-      }
-      
-      // Get parameters from mutation
-      if (block && block.mutationToDom) {
-        try {
-          const mutation = block.mutationToDom();
-          if (mutation) {
-            // Extract parameters from arg elements
-            for (let i = 0; i < mutation.childNodes.length; i++) {
-              const child = mutation.childNodes[i];
-              if (child.nodeName.toLowerCase() === 'arg') {
-                // Type assertion to Element
-                const argElement = child as Element;
-                const paramName = argElement.getAttribute('name');
-                if (paramName) params.push(paramName);
-              }
-            }
-            console.log(`Extracted ${params.length} parameters for function ${functionName}:`, params);
-          }
-        } catch (e) {
-          console.warn("Error extracting parameters from mutation:", e);
-        }
-      }
-      
-      // Try original generator
-      try {
-        const code = originalDefNoReturnGenerator.call(this, block);
-        
-        // Only return the original code if it's not empty
-        if (code) {
-          if (typeof code === 'string') {
-            if (code.trim()) {
-              inProcedureGeneration = false;
-              return code;
-            }
-          } else if (Array.isArray(code) && typeof code[0] === 'string' && code[0].trim()) {
-            inProcedureGeneration = false;
-            return code;
-          }
-        }
-        // If we get here, code exists but is empty or invalid
-        throw new Error('Original generator returned empty code');
-      } catch (originalError) {
-        console.warn("Original generator failed, using fallback", originalError);
-        
-        // Create parameter list for function declaration
-        const paramList = params.join(', ');
-        
-        // Get direct child blocks manually to avoid recursion
-        let stackCode = '';
-        if (block.getInput && block.getInput('STACK')) {
-          const stackInput = block.getInput('STACK');
-          if (stackInput && stackInput.connection && stackInput.connection.targetBlock()) {
-            // Temporarily disable our generator to avoid recursion
-            const tempGenerator = javascriptGenerator.forBlock['procedures_defnoreturn'];
-            (javascriptGenerator as any).forBlock['procedures_defnoreturn'] = null;
-            
-            try {
-              stackCode = javascriptGenerator.statementToCode(block, 'STACK');
-            } catch (e) {
-              console.warn("Error generating STACK code:", e);
-            }
-            
-            // Restore our generator
-            javascriptGenerator.forBlock['procedures_defnoreturn'] = tempGenerator;
-          }
-        }
-        
-        // If stackCode is empty, add a placeholder comment
-        if (!stackCode || !stackCode.trim()) {
-          stackCode = '  // Procedure body is empty\n';
-        }
-        
-        inProcedureGeneration = false;
-        return `// Fallback procedure definition
-function ${functionName}(${paramList}) {
-${stackCode}}`;
-      }
-      
-      // Default fallback if all else fails
-      inProcedureGeneration = false;
-      return `function ${functionName}() {}\n`;
-    } catch (e) {
-      console.error('Error in procedures_defnoreturn generator:', e);
-      inProcedureGeneration = false;
-      return 'function unnamed_procedure() {}\n';
-    }
+    return safeProcedureGeneration(block, originalDefNoReturnGenerator, false);
   };
   
-  // Similar improvements for procedures_defreturn
-  javascriptGenerator.forBlock['procedures_defreturn'] = function(block) {
-    try {
-      // Check if block is valid before proceeding
-      if (!block || typeof (block as any).getProcedureDef !== 'function') {
-        console.warn('Invalid procedure block encountered');
-        
-        // Create a better fallback - a simple function declaration with return
-        let functionName = 'unnamed_procedure';
-        try {
-          // Try to get the name from the field directly
-          if (block && block.getFieldValue) {
-            const nameFromField = block.getFieldValue('NAME');
-            if (nameFromField) functionName = nameFromField;
-          }
-        } catch (fieldError) {
-          console.warn('Could not extract procedure name from field:', fieldError);
-        }
-        
-        return `// Fallback for procedure definition with return
-function ${functionName}() {
-  // Procedure body would go here
-  return null;
-}
-`;
-      }
-      
-      const code = originalDefReturnGenerator.call(this, block);
-      return `<!-- Web Component Function with Return -->\n${code}\n<!-- End Web Component Function -->`;
-    } catch (e) {
-      console.error('Error in procedures_defreturn generator:', e);
-      return '// Error generating procedure code\nfunction unnamed_procedure() { return null; }\n';
-    }
+  // Override procedures_defreturn similarly
+  javascriptGenerator.forBlock['procedures_defreturn'] = function(block: Blockly.Block): string | [string, number] | null {
+    return safeProcedureGeneration(block, originalDefReturnGenerator, true);
   };
   
   // Improve the procedures_callnoreturn generator as well
