@@ -8,6 +8,7 @@ export interface ProcedureInfo {
   functionName: string;
   params: string[];
   stackCode: string;
+  returnValue?: string;
 }
 
 /**
@@ -75,21 +76,34 @@ export function extractProcedureInfo(block: Blockly.Block): ProcedureInfo {
     stackCode = '  // Procedure body is empty\n';
   }
   
-  return { functionName, params, stackCode };
+  // Extract return value for functions with return
+  let returnValue = '';
+  if (block.getInput && block.getInput('RETURN')) {
+    try {
+      returnValue = javascriptGenerator.valueToCode(
+        block, 'RETURN', javascriptGenerator.ORDER_NONE
+      ) || 'null';
+    } catch (e) {
+      console.warn("Error extracting return value:", e);
+      returnValue = 'null';
+    }
+  }
+  
+  return { functionName, params, stackCode, returnValue };
 }
 
 /**
  * Generate fallback procedure code 
  */
 export function generateProcedureCode(info: ProcedureInfo, hasReturn: boolean): string {
-  const { functionName, params, stackCode } = info;
+  const { functionName, params, stackCode, returnValue } = info;
   const paramList = params.join(', ');
   
   if (hasReturn) {
     // For procedures with return values
     return `// Fallback procedure definition with return
 function ${functionName}(${paramList}) {
-${stackCode}  return null; // Default return
+${stackCode}  return ${returnValue || 'null'}; // Return value
 }`;
   } else {
     // For procedures without return values

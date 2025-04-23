@@ -11,7 +11,7 @@
     <field name="TITLE">My Web Page</field>
     <field name="THEME">light</field>
     <statement name="SCRIPTS">
-        <block type="procedures_defnoreturn">
+        <block type="procedures_defreturn">
             <field name="NAME">myFunction</field>
             <statement name="STACK">
                 <block type="variables_set">
@@ -31,6 +31,11 @@
                     </next>
                 </block>
             </statement>
+            <value name="RETURN">
+                <block type="text">
+                    <field name="TEXT">return value</field>
+                </block>
+            </value>
         </block>
     </statement>
 </block>
