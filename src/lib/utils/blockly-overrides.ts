@@ -122,7 +122,7 @@ function overrideProcedureGenerators() {
         code = `${procName}(); // Fallback call`;
       }
       
-      return `<!-- Calling Web Function -->\n${code}\n<!-- End Call -->`;
+      return `${code}\n`;
     } catch (e) {
       console.error('Error in procedures_callnoreturn generator:', e);
       return '// Error generating procedure call code\n';

@@ -354,7 +354,12 @@ interface ObjectProperty {
    * Create code for event handling
    */
   export function eventHandler(element: string, event: string, handler: string, options: any = {}): string {
-    let code = `${element}.addEventListener('${event}', function(event) {\n`;
+    // Check if the element is already a variable reference or needs to be retrieved by ID
+    const elementRef = element.startsWith('document.') || element.includes('.') ? 
+      element : 
+      `document.getElementById('${element}')`;
+      
+    let code = `${elementRef}.addEventListener('${event}', function(event) {\n`;
     if (options.preventDefault) {
       code += '  event.preventDefault();\n';
     }
@@ -474,7 +479,12 @@ interface ObjectProperty {
     const preventDefault = options?.preventDefault ? 'event.preventDefault();' : '';
     const capture = options?.useCapture ? ', true' : '';
     
-    return `document.querySelector('${selector}').addEventListener('${eventType}', function(event) {
+    // Check if selector starts with # which suggests it's an ID
+    const elementRef = selector.startsWith('#') ? 
+      `document.getElementById('${selector.substring(1)}')` : 
+      `document.querySelector('${selector}')`;
+    
+    return `${elementRef}.addEventListener('${eventType}', function(event) {
     ${preventDefault}
     ${handler}
   }${capture});`;
