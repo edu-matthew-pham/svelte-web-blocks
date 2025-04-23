@@ -5,4 +5,33 @@
     <field name="TITLE">My Web Page</field>
     <field name="THEME">light</field>
 </block>
+<block type="web_document">
+    <field name="ID"></field>
+    <field name="CLASS"></field>
+    <field name="TITLE">My Web Page</field>
+    <field name="THEME">light</field>
+    <statement name="SCRIPTS">
+        <block type="procedures_defnoreturn">
+            <field name="NAME">myFunction</field>
+            <statement name="STACK">
+                <block type="variables_set">
+                    <value name="VALUE">
+                        <block type="text">
+                            <field name="TEXT">abc</field>
+                        </block>
+                    </value>
+                    <next>
+                        <block type="console_log">
+                            <value name="TEXT">
+                                <shadow type="text">
+                                    <field name="TEXT">Hello world</field>
+                                </shadow>
+                            </value>
+                        </block>
+                    </next>
+                </block>
+            </statement>
+        </block>
+    </statement>
+</block>
 </category>
