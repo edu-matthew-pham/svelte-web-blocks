@@ -1,37 +1,68 @@
 <category name="Variables & Functions" colour="290">
     <label text="Variables" web-class="toolboxLabel"></label>
-      <block type="variables_set">
+
+    
+    <block type="variables_set">
+      <value name="VALUE">
+        <block type="text">
+          <field name="TEXT">abc</field>
+        </block>
+      </value>
+      <next>
+        <block type="variables_set">
+            <value name="VALUE">
+            <block type="text">
+              <field name="TEXT">xyz</field>
+            </block>
+          </value>
+        </block>
+      </next>
+    </block>
+
+    <block type="variables_set">
+      <value name="VALUE">
+        <block type="text">
+          <field name="TEXT">abc</field>
+        </block>
+      </value>
+    </block>
+
+    
+    <block type="variables_set">
         <field name="VAR">myVariable</field>
-      </block>
-      <block type="variables_get">
+    </block>
+    <block type="variables_get">
         <field name="VAR">myVariable</field>
-      </block>
+    </block>
 
       <label text="Text & Numbers" web-class="toolboxLabel"></label>
       <sep gap="8"></sep>
       <block type="text">
         <field name="TEXT">abc</field>
-      </block>
-      <block type="text_multiline_js">
+    </block>
+    <block type="text_multiline_js">
         <field name="NAME">line 1&#10;line 2&#10;line 3</field>
-      </block>
-      <block type="math_number">
+    </block>
+    <block type="math_number">
         <field name="NUM">123</field>
-      </block>
+    </block>
 
-      <label text="Functions" web-class="toolboxLabel"></label>
-      <sep gap="8"></sep>
-      
-      <block type="procedures_defnoreturn">
+    <label text="Functions" web-class="toolboxLabel"></label>
+    <sep gap="8"></sep>
+    
+    <block type="procedures_defnoreturn">
         <field name="NAME">myFunction</field>
-      </block>
-      <block type="procedures_defreturn">
+    </block>
+    <block type="procedures_defreturn">
         <field name="NAME">myFunctionWithReturn</field>
-      </block>
-      <block type="procedures_callnoreturn">
-        <mutation name="myFunction"></mutation>
-      </block>
-      <block type="procedures_callreturn">
-        <mutation name="myFunctionWithReturn"></mutation>
-      </block>
-    </category>
+    </block>
+    <block type="procedures_callnoreturn">
+        <field name="NAME">myFunction</field>
+    </block>
+    <block type="procedures_callreturn">
+        <field name="NAME">myFunctionWithReturn</field>
+    </block>
+
+    <block type="procedures_ifreturn">
+    </block>
+</category>

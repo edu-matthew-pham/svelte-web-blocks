@@ -5,6 +5,8 @@
     import { javascriptGenerator } from 'blockly/javascript';
     import { initializeBlocks } from '../blocks/index.js';
     import { createBlocksFromJson } from '$lib/blocks/parser.js';
+    import { applyWebCompatibilityToProcedureBlocks } from '$lib/utils/web-procedure-extensions.js';
+    import { overrideBlocklyGenerators } from '$lib/utils/override-inbuilt-blockly.js';
   
     // Props with defaults
     export let initialXml = '';
@@ -58,6 +60,8 @@
         import('$lib/utils/blockly-extensions.js').then(({ initializeVisibilityExtensions }) => {
           initializeVisibilityExtensions();
         });
+
+        applyWebCompatibilityToProcedureBlocks();
   
         // Register custom generators
         Object.entries(generators).forEach(([name, generator]) => {
@@ -118,6 +122,8 @@
         
         componentsLoaded = true;
       })();
+
+      overrideBlocklyGenerators();
       
       // Return the cleanup function directly (not in the Promise chain)
       return () => {
@@ -129,6 +135,9 @@
           resizeObserver.disconnect();
         }
       };
+
+ 
+
     });
   
     // Function to generate JSON representation of the workspace
@@ -304,6 +313,51 @@
         window.removeEventListener('message', () => {});
       };
     });
+
+    // Add this function to initialize web procedure compatibility
+    export function initializeWebProcedureExtensions() {
+      // Register an extension that makes blocks compatible with web content blocks
+      Blockly.Extensions.register('web_content_compatible', function() {
+        // Modify the connections to be compatible with web_content_block
+        this.setPreviousStatement(true, "web_content_block");
+        this.setNextStatement(true, "web_content_block");
+      });
+
+      // Register an extension for procedure_defreturn blocks
+      Blockly.Extensions.register('web_content_compatible_with_return', function() {
+        this.setOutput(false); // Remove any output connection
+        this.setPreviousStatement(true, "web_content_block");
+        this.setNextStatement(true, "web_content_block");
+      });
+
+      // Get original init functions
+      const defNoReturnInit = Blockly.Blocks['procedures_defnoreturn'].init;
+      const defReturnInit = Blockly.Blocks['procedures_defreturn'].init;
+      const callNoReturnInit = Blockly.Blocks['procedures_callnoreturn'].init;
+      const callReturnInit = Blockly.Blocks['procedures_callreturn'].init;
+
+      // Override init functions to apply our extensions
+      Blockly.Blocks['procedures_defnoreturn'].init = function() {
+        defNoReturnInit.call(this);
+        Blockly.Extensions.apply('web_content_compatible', this, false);
+      };
+
+      Blockly.Blocks['procedures_defreturn'].init = function() {
+        defReturnInit.call(this);
+        Blockly.Extensions.apply('web_content_compatible_with_return', this, false);
+      };
+
+      Blockly.Blocks['procedures_callnoreturn'].init = function() {
+        callNoReturnInit.call(this);
+        Blockly.Extensions.apply('web_content_compatible', this, false);
+      };
+
+      // For callreturn, we keep its output connection behavior
+      Blockly.Blocks['procedures_callreturn'].init = function() {
+        callReturnInit.call(this);
+        // No changes to the connection types as this is an output block
+      };
+    }
   </script>
   
   <div class="blockly-container">
