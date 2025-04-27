@@ -25,7 +25,7 @@ export const styleGenerators = {
       const declarations = children.declarations || '';
       
       // Optional: Log values for debugging
-      console.log('CSS Selector values:', { selectorType, selector, id, className, pseudo });
+      //console.log('CSS Selector values:', { selectorType, selector, id, className, pseudo });
       
       return CSS.createCssSelector(selectorType, selector, id, className, pseudo, declarations);
     }

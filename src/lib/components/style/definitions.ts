@@ -45,7 +45,8 @@ const styleBlockConfigs: WebBlockConfigs = {
           ["header", "header"],
           ["footer", "footer"],
           ["nav", "nav"],
-          ["table", "table"]
+          ["table", "table"],
+          ["body", "body"]
         ]}
       ]},
       { type: "row", children: [
