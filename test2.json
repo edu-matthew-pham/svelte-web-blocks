@@ -1,0 +1,319 @@
+[
+    {
+      "type": "document",
+      "properties": {
+        "TITLE": "Riverside High School Badminton",
+        "THEME": "flatly"
+      },
+      "attributes": {
+        "id": "document-1"
+      }
+    },
+    {
+      "type": "header",
+      "properties": {
+        "LOGO_TEXT": "RHS Badminton",
+        "INCLUDE_SIGNUP": false,
+        "LINKS": [
+          {
+            "type": "nav_item",
+            "properties": {
+              "TEXT": "Home",
+              "URL": "#"
+            }
+          },
+          {
+            "type": "nav_item",
+            "properties": {
+              "TEXT": "Team",
+              "URL": "#team-section"
+            }
+          },
+          {
+            "type": "nav_item",
+            "properties": {
+              "TEXT": "Schedule",
+              "URL": "#schedule-section"
+            }
+          },
+          {
+            "type": "nav_item",
+            "properties": {
+              "TEXT": "Gallery",
+              "URL": "#gallery-section"
+            }
+          },
+          {
+            "type": "nav_item",
+            "properties": {
+              "TEXT": "Contact",
+              "URL": "#contact-section"
+            }
+          }
+        ]
+      },
+      "attributes": {
+        "id": "main-header"
+      }
+    },
+    {
+      "type": "hero",
+      "properties": {
+        "HEADLINE": "Riverside High School Badminton Team",
+        "SUBHEADLINE": "Excellence in every serve, smash, and volley",
+        "BUTTON_TEXT": "Join Our Team",
+        "BUTTON_URL": "#contact-section",
+        "HAS_IMAGE": true,
+        "IMAGE_URL": "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+      },
+      "attributes": {
+        "id": "hero-section"
+      }
+    },
+    {
+      "type": "content_section",
+      "properties": {
+        "HEADLINE": "About Our Team",
+        "COLUMNS": "1",
+        "CONTENT_BLOCKS": [
+          {
+            "type": "content_block",
+            "properties": {
+              "CONTENT": "# Welcome to Riverside High School Badminton!\n\nEstablished in 2005, our badminton program has grown to become one of the most competitive in the district. We pride ourselves on developing skilled players while emphasizing sportsmanship, teamwork, and academic excellence.\n\nOur dedicated coaching staff brings years of experience and passion to every practice and competition. Whether you're a seasoned player or just picking up a racquet for the first time, there's a place for you on our team."
+            },
+            "attributes": {
+              "id": "about-content"
+            }
+          }
+        ]
+      },
+      "attributes": {
+        "id": "team-section",
+        "class": "bg-light py-5"
+      }
+    },
+    {
+      "type": "feature_cards",
+      "properties": {
+        "TITLE": "Team Highlights",
+        "COLUMNS": 3,
+        "CARDS": [
+          {
+            "type": "feature_card",
+            "properties": {
+              "TITLE": "District Champions",
+              "ICON": "🏆",
+              "DESCRIPTION": "Our team has won the district championship three years in a row, showcasing our dedication to excellence."
+            }
+          },
+          {
+            "type": "feature_card",
+            "properties": {
+              "TITLE": "College Scholarships",
+              "ICON": "🎓",
+              "DESCRIPTION": "Over 15 of our players have received college scholarships for badminton in the past five years."
+            }
+          },
+          {
+            "type": "feature_card",
+            "properties": {
+              "TITLE": "Community Service",
+              "ICON": "❤️",
+              "DESCRIPTION": "Our team contributes over 500 hours of community service annually through youth clinics and charity events."
+            }
+          }
+        ]
+      },
+      "attributes": {
+        "id": "highlights-section"
+      }
+    },
+    {
+      "type": "content_section",
+      "properties": {
+        "HEADLINE": "Upcoming Schedule",
+        "COLUMNS": "1",
+        "CONTENT_BLOCKS": [
+          {
+            "type": "content_block",
+            "properties": {
+              "CONTENT": "## Spring 2023 Season\n\n- **April 15** - Home vs. Lakeside High School (3:30 PM)\n- **April 22** - Away vs. Westview Academy (4:00 PM)\n- **April 29** - Home vs. Central High School (3:30 PM)\n- **May 6** - Away vs. Oakridge Prep (4:15 PM)\n- **May 13** - Home vs. Mountain View High (3:30 PM)\n- **May 20-21** - District Championships at Riverside High School\n\n*All home games are played in the main gymnasium. Admission is free for students with ID.*"
+            }
+          }
+        ]
+      },
+      "attributes": {
+        "id": "schedule-section",
+        "class": "py-5"
+      }
+    },
+    {
+      "type": "image_gallery",
+      "properties": {
+        "TITLE": "Team Gallery",
+        "THUMBNAIL_SIZE": "medium",
+        "LIGHTBOX": "TRUE",
+        "DATA": "[\n  {\"url\": \"https://images.unsplash.com/photo-1521537634581-0dced2fee2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80\", \"caption\": \"Team Practice\", \"thumbnail\": \"https://images.unsplash.com/photo-1521537634581-0dced2fee2ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80\"},\n  {\"url\": \"https://images.unsplash.com/photo-1534158914592-062992fbe900?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80\", \"caption\": \"District Tournament\", \"thumbnail\": \"https://images.unsplash.com/photo-1534158914592-062992fbe900?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80\"},\n  {\"url\": \"https://images.unsplash.com/photo-1521138054413-5a47d349b7af?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80\", \"caption\": \"Team Building Day\", \"thumbnail\": \"https://images.unsplash.com/photo-1521138054413-5a47d349b7af?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80\"},\n  {\"url\": \"https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80\", \"caption\": \"Championship Match\", \"thumbnail\": \"https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80\"}\n]"
+      },
+      "attributes": {
+        "id": "gallery-section",
+        "class": "bg-light py-5"
+      }
+    },
+    {
+      "type": "basic_form",
+      "properties": {
+        "TITLE": "Join Our Team",
+        "SUBMIT_TEXT": "Submit Application",
+        "FIELDS": [
+          {
+            "type": "form_field",
+            "properties": {
+              "LABEL": "Full Name",
+              "TYPE": "text",
+              "REQUIRED": "TRUE"
+            }
+          },
+          {
+            "type": "form_field",
+            "properties": {
+              "LABEL": "Email Address",
+              "TYPE": "email",
+              "REQUIRED": "TRUE"
+            }
+          },
+          {
+            "type": "form_field",
+            "properties": {
+              "LABEL": "Grade Level",
+              "TYPE": "select",
+              "REQUIRED": "TRUE",
+              "OPTIONS": "9th Grade, 10th Grade, 11th Grade, 12th Grade"
+            }
+          },
+          {
+            "type": "form_field",
+            "properties": {
+              "LABEL": "Experience Level",
+              "TYPE": "select",
+              "REQUIRED": "TRUE",
+              "OPTIONS": "Beginner, Intermediate, Advanced, Competitive"
+            }
+          },
+          {
+            "type": "form_field",
+            "properties": {
+              "LABEL": "Message",
+              "TYPE": "textarea",
+              "REQUIRED": "FALSE"
+            }
+          }
+        ]
+      },
+      "attributes": {
+        "id": "contact-section",
+        "class": "py-5"
+      }
+    },
+    {
+      "type": "accordion",
+      "properties": {
+        "TITLE": "Frequently Asked Questions",
+        "ALLOW_MULTIPLE": "FALSE",
+        "DATA": "[\n  {\"title\": \"When are tryouts held?\", \"content\": \"Tryouts are held during the first two weeks of each semester. Specific dates will be announced in the school bulletin and on our website.\"},\n  {\"title\": \"Do I need my own equipment?\", \"content\": \"While the school provides racquets and shuttlecocks for practices, we recommend players have their own racquets. Team uniforms are provided for competitions.\"},\n  {\"title\": \"How much time commitment is required?\", \"content\": \"We practice three days a week (Monday, Wednesday, Friday) from 3:30 to 5:30 PM. Matches are typically held on Saturdays, with occasional weekday matches.\"},\n  {\"title\": \"Is prior experience required?\", \"content\": \"No! We welcome players of all skill levels. Our coaching staff works with beginners to develop fundamental skills while challenging our more experienced players.\"}\n]"
+      },
+      "attributes": {
+        "id": "faq-section",
+        "class": "bg-light py-5"
+      }
+    },
+    {
+      "type": "footer",
+      "properties": {
+        "COPYRIGHT": "© 2023 Riverside High School Badminton Team",
+        "LINKS": [
+          {
+            "type": "footer_link",
+            "properties": {
+              "TEXT": "Privacy Policy",
+              "URL": "#"
+            }
+          },
+          {
+            "type": "footer_link",
+            "properties": {
+              "TEXT": "Terms of Use",
+              "URL": "#"
+            }
+          },
+          {
+            "type": "footer_link",
+            "properties": {
+              "TEXT": "School Website",
+              "URL": "https://www.riversidehigh.edu"
+            }
+          }
+        ]
+      },
+      "attributes": {
+        "id": "main-footer"
+      }
+    },
+    {
+      "type": "css_selector",
+      "properties": {
+        "SELECTOR_TYPE": "element",
+        "SELECTOR": "body"
+      },
+      "children": [
+        {
+          "type": "css_typography",
+          "properties": {
+            "FONT_SIZE": "16",
+            "FONT_SIZE_UNIT": "px",
+            "FONT_WEIGHT": "",
+            "COLOR": "#333333",
+            "TEXT_ALIGN": "",
+            "LINE_HEIGHT": "1.6"
+          }
+        },
+        {
+          "type": "css_spacing",
+          "properties": {
+            "PROPERTY": "margin",
+            "TOP": "0",
+            "RIGHT": "0",
+            "BOTTOM": "0",
+            "LEFT": "0",
+            "UNIT": "px"
+          }
+        }
+      ]
+    },
+    {
+      "type": "css_selector",
+      "properties": {
+        "SELECTOR_TYPE": "id",
+        "ID": "hero-section"
+      },
+      "children": [
+        {
+          "type": "css_background",
+          "properties": {
+            "COLOR": "#f8f9fa"
+          }
+        },
+        {
+          "type": "css_spacing",
+          "properties": {
+            "PROPERTY": "padding",
+            "TOP": "80",
+            "RIGHT": "0",
+            "BOTTOM": "80",
+            "LEFT": "0",
+            "UNIT": "px"
+          }
+        }
+      ]
+    }
+  ]

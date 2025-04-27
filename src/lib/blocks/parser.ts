@@ -5,6 +5,9 @@ export interface ComponentNode {
     properties?: Record<string, any>;
     children?: ComponentNode[];
     attributes?: Record<string, any>;
+    styles?: ComponentNode[];
+    scripts?: ComponentNode[];
+    value?: string;
 }
 
 export function parseHighLevelCode(jsonString: string): ComponentNode[] {
@@ -49,6 +52,16 @@ function createComponentBlock(
         // Set properties
         if (component.properties) {
             setBlockFields(block, component.properties);
+        }
+        
+        // Set value for script blocks
+        if (component.value !== undefined) {
+            try {
+                block.setFieldValue(component.value, 'VALUE');
+                console.log(`Set script VALUE field to: ${component.value}`);
+            } catch (e) {
+                console.warn(`Could not set VALUE field for script:`, e);
+            }
         }
         
         // Set attributes (ID, className, etc.)
@@ -112,6 +125,56 @@ function createComponentBlock(
             }
         }
         
+        // Process styles - similar to children but using a different input name
+        if (component.styles && component.styles.length > 0) {
+            // Find appropriate statement input for styles
+            const stylesInput = block.getInput('STYLES') ? 'STYLES' : findStatementInput(block);
+            
+            if (stylesInput) {
+                let previousStyleBlock: any = null;
+                
+                component.styles.forEach(styleComponent => {
+                    const styleBlock = createComponentBlock(
+                        workspace, 
+                        styleComponent,
+                        previousStyleBlock || block,
+                        previousStyleBlock ? 'NEXT' : stylesInput
+                    );
+                    
+                    if (styleBlock) {
+                        previousStyleBlock = styleBlock;
+                    }
+                });
+            } else {
+                console.warn(`No styles input found for block ${blockType} styles`);
+            }
+        }
+        
+        // Process scripts - similar to styles
+        if (component.scripts && component.scripts.length > 0) {
+            // Find appropriate statement input for scripts
+            const scriptsInput = block.getInput('SCRIPTS') ? 'SCRIPTS' : findStatementInput(block);
+            
+            if (scriptsInput) {
+                let previousScriptBlock: any = null;
+                
+                component.scripts.forEach(scriptComponent => {
+                    const scriptBlock = createComponentBlock(
+                        workspace, 
+                        scriptComponent,
+                        previousScriptBlock || block,
+                        previousScriptBlock ? 'NEXT' : scriptsInput
+                    );
+                    
+                    if (scriptBlock) {
+                        previousScriptBlock = scriptBlock;
+                    }
+                });
+            } else {
+                console.warn(`No scripts input found for block ${blockType} scripts`);
+            }
+        }
+        
         // Force a workspace render after all children are added
         if (!parentBlock) {
             workspace.render();
@@ -125,7 +188,7 @@ function createComponentBlock(
 }
 
 function mapComponentTypeToBlockType(componentType: string): string {
-    // Define mappings for component types to block types
+    // Define mappings only for types that need transformation
     const typeMap: Record<string, string> = {
         'header': 'web_header',
         'navItem': 'web_nav_item',
@@ -139,14 +202,19 @@ function mapComponentTypeToBlockType(componentType: string): string {
         'formField': 'web_form_field',
         'footer': 'web_footer',
         'footerLink': 'web_footer_link',
-        // Add mappings for dynamic components
         'dynamicCards': 'web_dynamic_cards',
         'imageGallery': 'web_image_gallery',
         'accordion': 'web_accordion'
-        // Add more mappings as needed
     };
     
-    // Return mapped type or use web_ prefix
+    // No transformation needed for CSS and script components
+    if (componentType.startsWith('css_') || 
+        componentType.startsWith('js_') ||
+        ['console_log', 'alert', 'fetch_data'].includes(componentType)) {
+        return componentType;
+    }
+    
+    // Return mapped type or use web_ prefix as fallback
     return typeMap[componentType] || `web_${componentType}`;
 }
 
@@ -227,12 +295,49 @@ function setBlockFields(block: any, properties: Record<string, any>): void {
 }
 
 function findStatementInput(block: any): string | null {
-    // Log all inputs to debug
+    // Log all inputs to debug with more details
     console.log(`Block ${block.type} inputs:`, block.inputList.map((i: any) => ({
         name: i.name,
         type: i.type,
         connection: !!i.connection
     })));
+    
+    // Special case for CSS blocks
+    if (block.type === 'css_selector') {
+        // CSS selectors typically have DECLARATIONS or PROPERTIES input for their CSS properties
+        const cssInputs = ['DECLARATIONS', 'PROPERTIES', 'RULES', 'STYLES', 'CONTENT'];
+        
+        for (const inputName of cssInputs) {
+            if (block.getInput(inputName)) {
+                console.log(`Found CSS input ${inputName} on block ${block.type}`);
+                return inputName;
+            }
+        }
+        
+        // If no named input found, look for any statement input
+        const statementInputs = block.inputList.filter((input: any) => 
+            input.type === 1 && input.connection);
+            
+        if (statementInputs.length > 0) {
+            console.log(`Found statement input ${statementInputs[0].name} for CSS rules`);
+            return statementInputs[0].name;
+        }
+    }
+    
+    // Special case for script blocks
+    if (block.type.startsWith('js_') || 
+       ['console_log', 'alert', 'fetch_data'].includes(block.type)) {
+        
+        // Script blocks might use DO, THEN, ELSE for code statements
+        const scriptInputs = ['DO', 'THEN', 'ELSE', 'BODY', 'CODE'];
+        
+        for (const inputName of scriptInputs) {
+            if (block.getInput(inputName)) {
+                console.log(`Found script input ${inputName} on block ${block.type}`);
+                return inputName;
+            }
+        }
+    }
     
     // Special case for forms - they should use FIELDS for form fields
     if (block.type === 'web_basic_form') {
