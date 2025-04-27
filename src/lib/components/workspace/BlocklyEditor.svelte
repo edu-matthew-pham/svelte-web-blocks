@@ -6,6 +6,12 @@
     import { initializeBlocks } from '../blocks/index.js';
     import { createBlocksFromJson } from '$lib/blocks/parser.js';
     import { initializeBlocklyOverrides } from '$lib/utils/blockly-overrides.js';
+    // Import Prism and language support
+    import Prism from 'prismjs';
+    import 'prismjs/components/prism-json';
+    import 'prismjs/components/prism-markup';  // This is the correct import for HTML
+    // Import Prism CSS themes in your main app or add the CSS link in app.html
+    import 'prismjs/themes/prism.css';
   
     // Props with defaults
     export let initialXml = '';
@@ -25,6 +31,11 @@
     let activeTab = initialTab;
     let componentsLoaded = false;
     let modifiedDomString = '';
+    
+    // Refs for code containers
+    let jsonContainer: HTMLElement;
+    let htmlContainer: HTMLElement;
+    let domContainer: HTMLElement;
   
     // Add a type for the component
     type Component = {
@@ -297,7 +308,28 @@
       // Trigger file selection dialog
       fileInput.click();
     }
-  </script>
+
+    // Apply syntax highlighting
+    function applyHighlighting() {
+      if (jsonContainer && jsonCode) {
+        jsonContainer.innerHTML = Prism.highlight(jsonCode, Prism.languages.json, 'json');
+      }
+      
+      if (htmlContainer && generatedCode) {
+        htmlContainer.innerHTML = Prism.highlight(generatedCode, Prism.languages.markup, 'markup');
+      }
+      
+      if (domContainer && modifiedDomString) {
+        domContainer.innerHTML = Prism.highlight(modifiedDomString, Prism.languages.markup, 'markup');
+      }
+    }
+    
+    // Update highlighting after the component updates
+    afterUpdate(() => {
+      applyHighlighting();
+    });
+
+</script>
   
   <div class="blockly-container">
     {#if showCodeView || showJsonView}
@@ -364,7 +396,7 @@
           <button on:click={() => downloadFile(jsonCode, 'component.json')}>Download JSON File</button>
           <button on:click={importJsonFile}>Import JSON File</button>
         </div>
-        <pre class="code-display"><code class="language-json">{jsonCode}</code></pre>
+        <pre class="code-display"><code bind:this={jsonContainer} class="language-json"></code></pre>
       </div>
       
       <!-- HTML view -->
@@ -373,7 +405,7 @@
           <button on:click={() => copyToClipboard(generatedCode)}>Copy HTML Code</button>
           <button on:click={() => downloadFile(generatedCode, 'component.html')}>Download HTML File</button>
         </div>
-        <pre class="code-display"><code class="language-html">{generatedCode}</code></pre>
+        <pre class="code-display"><code bind:this={htmlContainer} class="language-markup"></code></pre>
       </div>
 
       <!-- Preview view - always present but hidden when not active -->
@@ -388,7 +420,7 @@
 
       <!-- DOM view without refresh button -->
       <div class="code-container" style="display: {activeTab === 'dom' ? 'block' : 'none'}">
-        <pre class="code-display"><code class="language-html">{modifiedDomString}</code></pre>
+        <pre class="code-display"><code bind:this={domContainer} class="language-markup"></code></pre>
       </div>
     </div>
   </div>
@@ -497,6 +529,16 @@
     
     .action-buttons button:hover {
       background: #e0e0e0;
+    }
+
+    .code-display code {
+      display: block;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      white-space: pre-wrap;
+      font-family: monospace;
+      font-size: 14px;
     }
 
   </style> 
