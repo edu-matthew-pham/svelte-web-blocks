@@ -9,8 +9,12 @@
     // Import Prism and language support
     import Prism from 'prismjs';
     import 'prismjs/components/prism-json';
-    import 'prismjs/components/prism-markup';  // This is the correct import for HTML
-    // Import Prism CSS themes in your main app or add the CSS link in app.html
+    import 'prismjs/components/prism-markup';  // For HTML
+    import 'prismjs/components/prism-javascript';  // For JavaScript
+    import 'prismjs/components/prism-css';  // For CSS in style tags
+    // Enable language embedding in markup
+    import 'prismjs/plugins/normalize-whitespace/prism-normalize-whitespace';
+    // Import Prism CSS themes
     import 'prismjs/themes/prism.css';
   
     // Props with defaults
@@ -316,11 +320,23 @@
       }
       
       if (htmlContainer && generatedCode) {
-        htmlContainer.innerHTML = Prism.highlight(generatedCode, Prism.languages.markup, 'markup');
+        // Pre-process the HTML to ensure embedded languages are highlighted
+        Prism.hooks.add('before-highlight', function(env) {
+          env.element.innerHTML = env.code;
+        });
+        
+        // First highlight as markup
+        const highlighted = Prism.highlight(generatedCode, Prism.languages.markup, 'markup');
+        htmlContainer.innerHTML = highlighted;
+        
+        // Let Prism highlight any script and style elements inside the container
+        Prism.highlightAllUnder(htmlContainer);
       }
       
       if (domContainer && modifiedDomString) {
-        domContainer.innerHTML = Prism.highlight(modifiedDomString, Prism.languages.markup, 'markup');
+        const highlighted = Prism.highlight(modifiedDomString, Prism.languages.markup, 'markup');
+        domContainer.innerHTML = highlighted;
+        Prism.highlightAllUnder(domContainer);
       }
     }
     
@@ -405,7 +421,7 @@
           <button on:click={() => copyToClipboard(generatedCode)}>Copy HTML Code</button>
           <button on:click={() => downloadFile(generatedCode, 'component.html')}>Download HTML File</button>
         </div>
-        <pre class="code-display"><code bind:this={htmlContainer} class="language-markup"></code></pre>
+        <pre class="code-display"><code bind:this={htmlContainer} class="language-html"></code></pre>
       </div>
 
       <!-- Preview view - always present but hidden when not active -->
@@ -420,7 +436,7 @@
 
       <!-- DOM view without refresh button -->
       <div class="code-container" style="display: {activeTab === 'dom' ? 'block' : 'none'}">
-        <pre class="code-display"><code bind:this={domContainer} class="language-markup"></code></pre>
+        <pre class="code-display"><code bind:this={domContainer} class="language-html"></code></pre>
       </div>
     </div>
   </div>
