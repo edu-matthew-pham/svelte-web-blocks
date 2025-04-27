@@ -5,6 +5,7 @@ import type { JavascriptGenerator as BlocklyJsGenerator } from 'blockly/javascri
 export interface WebBlockDefinitions {
   [key: string]: {
     init: () => void;
+    schema?: any;
     [key: string]: any;
   };
 }
@@ -44,6 +45,7 @@ export interface BlockConfig {
   inputs: BlockInputConfig[];
   connections: BlockConnections;
   extensions?: string[];
+  schema?: any;
   // Add support for custom JavaScript generator function
   javascriptGenerator?: (block: Blockly.Block) => string;
   // Add support for block builder function

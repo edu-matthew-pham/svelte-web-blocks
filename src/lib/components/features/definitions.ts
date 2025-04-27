@@ -33,7 +33,43 @@ const featuresBlockConfigs: WebBlockConfigs = {
       ]},
       { type: "statement", name: "CARDS", check: "web_feature_card", label: "Features" }
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Feature Cards",
+      description: "A section displaying feature cards in a grid layout",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Component identifier"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        TITLE: {
+          type: "string",
+          description: "Section title",
+          default: "Our Features"
+        },
+        COLUMNS: {
+          type: "number",
+          description: "Number of columns in the grid",
+          default: 3,
+          minimum: 1,
+          maximum: 6
+        },
+        CARDS: {
+          type: "array",
+          description: "Feature cards contained in this section",
+          items: {
+            type: "object",
+            $ref: "#/definitions/web_feature_card"
+          }
+        }
+      },
+      required: ["TITLE", "COLUMNS"]
+    }
   },
   
   web_feature_card: {
@@ -65,7 +101,37 @@ const featuresBlockConfigs: WebBlockConfigs = {
         { type: "field_multiline", name: "DESCRIPTION", default: "Description of this amazing feature." }
       ]}
     ],
-    connections: { previous: "web_feature_card", next: "web_feature_card" }
+    connections: { previous: "web_feature_card", next: "web_feature_card" },
+    schema: {
+      type: "object",
+      title: "Feature Card",
+      description: "A card highlighting a specific feature with icon and description",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Card identifier"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        TITLE: {
+          type: "string",
+          description: "Feature title",
+          default: "Feature Title"
+        },
+        ICON: {
+          type: "string",
+          description: "Icon representing the feature"
+        },
+        DESCRIPTION: {
+          type: "string",
+          description: "Feature description text",
+          default: "Description of this amazing feature."
+        }
+      },
+      required: ["TITLE", "DESCRIPTION"]
+    }
   }
 };
 

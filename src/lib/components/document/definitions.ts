@@ -79,6 +79,34 @@ const documentBlocks: Record<string, BlockConfig> = {
     connections: {
       previous: false,
       next: false
+    },
+    schema: {
+      type: "object",
+      title: "Web Document",
+      description: "Create a complete webpage with Bootstrap included",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Document identifier"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        TITLE: {
+          type: "string",
+          description: "Page title",
+          default: "My Web Page"
+        },
+        THEME: {
+          type: "string",
+          description: "Bootstrap theme",
+          enum: ["light", "dark", "cerulean", "cosmo", "flatly", "journal", "litera", 
+                 "lumen", "minty", "pulse", "sandstone", "simplex", "sketchy", 
+                 "spacelab", "united", "zephyr"]
+        }
+      },
+      required: ["TITLE", "THEME"]
     }
   }
 };

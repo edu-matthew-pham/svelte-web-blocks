@@ -39,7 +39,25 @@ const jsDomBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "VARIABLE", default: "element" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Select Element",
+      description: "Select a DOM element and store it as a variable",
+      properties: {
+        SELECTOR: {
+          type: "string",
+          description: "CSS selector to find the element",
+          default: "#element-id"
+        },
+        VARIABLE: {
+          type: "string",
+          description: "Variable name to store the element",
+          default: "element"
+        }
+      },
+      required: ["SELECTOR", "VARIABLE"]
+    }
   },
   
   // Unified property manipulation
@@ -91,7 +109,53 @@ const jsDomBlockConfigs: WebBlockConfigs = {
       ]}
     ],
     connections: { previous: "web_component", next: "web_component", output: "String" },
-    extensions: ['dom_property_visibility']
+    extensions: ['dom_property_visibility'],
+    schema: {
+      type: "object",
+      title: "Element Property",
+      description: "Get or set an element's property, attribute, or style",
+      properties: {
+        ACTION: {
+          type: "string",
+          description: "Whether to get or set the property",
+          enum: ["set", "get"],
+          default: "set"
+        },
+        ELEMENT: {
+          type: "string",
+          description: "Element ID or variable name",
+          default: "document-1"
+        },
+        PROPERTY_TYPE: {
+          type: "string",
+          description: "Type of property to manipulate",
+          enum: ["text", "html", "attribute", "style", "value"],
+          default: "style"
+        },
+        PROPERTY: {
+          type: "string",
+          description: "Name of the property or attribute",
+          default: "background-color"
+        },
+        VALUE: {
+          type: "string",
+          description: "Value to set (for set action)",
+          default: "lightblue"
+        },
+        IS_EXPRESSION: {
+          type: "boolean",
+          description: "Whether to evaluate the value as an expression",
+          default: false
+        },
+        LOGGING_LEVEL: {
+          type: "string",
+          description: "Level of logging for this operation",
+          enum: ["none", "basic", "detailed"],
+          default: "none"
+        }
+      },
+      required: ["ACTION", "ELEMENT", "PROPERTY_TYPE"]
+    }
   },
   
   // Class manipulation
@@ -118,7 +182,31 @@ const jsDomBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "ELEMENT", default: "element" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component", output: "Strings" }
+    connections: { previous: "web_component", next: "web_component", output: "Strings" },
+    schema: {
+      type: "object",
+      title: "Element Class",
+      description: "Add, remove, or toggle a class on an element",
+      properties: {
+        ACTION: {
+          type: "string",
+          description: "Action to perform on the class",
+          enum: ["add", "remove", "toggle", "contains"],
+          default: "add"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS class name",
+          default: "active"
+        },
+        ELEMENT: {
+          type: "string",
+          description: "Element ID or variable name",
+          default: "element"
+        }
+      },
+      required: ["ACTION", "CLASS", "ELEMENT"]
+    }
   },
   
   // Event handling
@@ -153,7 +241,38 @@ const jsDomBlockConfigs: WebBlockConfigs = {
       ]},
       { type: "statement", name: "HANDLER", check: "web_component", label: "Do" }
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Event Handler",
+      description: "Create an event handler for a DOM element",
+      properties: {
+        ELEMENT: {
+          type: "string",
+          description: "Element ID or variable name",
+          default: "element"
+        },
+        EVENT: {
+          type: "string",
+          description: "Type of event to listen for",
+          enum: ["click", "change", "submit", "keyup", "focus", "blur", "mouseenter", "mouseleave"],
+          default: "click"
+        },
+        PREVENT_DEFAULT: {
+          type: "boolean",
+          description: "Whether to prevent the default action",
+          default: false
+        },
+        HANDLER: {
+          type: "array",
+          description: "Blocks to execute when the event occurs",
+          items: {
+            type: "object"
+          }
+        }
+      },
+      required: ["ELEMENT", "EVENT"]
+    }
   },
   
   // DOM tree manipulation
@@ -181,7 +300,31 @@ const jsDomBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "PARENT", default: "container" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "DOM Tree Operation",
+      description: "Perform operations on the DOM tree",
+      properties: {
+        ACTION: {
+          type: "string",
+          description: "Type of tree operation to perform",
+          enum: ["append", "prepend", "before", "replace", "remove"],
+          default: "append"
+        },
+        CHILD: {
+          type: "string",
+          description: "Element to be operated on",
+          default: "newElement"
+        },
+        PARENT: {
+          type: "string",
+          description: "Target element for the operation",
+          default: "container"
+        }
+      },
+      required: ["ACTION", "CHILD", "PARENT"]
+    }
   },
   
   // Iterative data manipulation
@@ -215,7 +358,36 @@ const jsDomBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "TEMPLATE", default: "${item.name}" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Create Elements from Data",
+      description: "Create DOM elements from an array of data",
+      properties: {
+        DATA_SOURCE: {
+          type: "string",
+          description: "Variable name containing the data array",
+          default: "items"
+        },
+        CONTAINER: {
+          type: "string",
+          description: "Selector for the container element",
+          default: "#item-list"
+        },
+        ELEMENT_TYPE: {
+          type: "string",
+          description: "Type of element to create for each data item",
+          enum: ["li", "div", "p", "tr"],
+          default: "li"
+        },
+        TEMPLATE: {
+          type: "string",
+          description: "Template for element content with ${item} placeholders",
+          default: "${item.name}"
+        }
+      },
+      required: ["DATA_SOURCE", "CONTAINER", "ELEMENT_TYPE"]
+    }
   },
   
   // Table population
@@ -244,7 +416,35 @@ const jsDomBlockConfigs: WebBlockConfigs = {
         { type: "field_checkbox", name: "HEADERS", checked: true }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Populate Table",
+      description: "Populate a table with data from an array",
+      properties: {
+        DATA_SOURCE: {
+          type: "string",
+          description: "Variable name containing the data array",
+          default: "users"
+        },
+        TABLE: {
+          type: "string",
+          description: "Selector for the table element",
+          default: "#data-table"
+        },
+        COLUMNS: {
+          type: "string",
+          description: "Comma-separated list of data columns to display",
+          default: "name,email,role"
+        },
+        HEADERS: {
+          type: "boolean",
+          description: "Whether to include column headers",
+          default: true
+        }
+      },
+      required: ["DATA_SOURCE", "TABLE", "COLUMNS"]
+    }
   },
   
   // Template-based element creation
@@ -269,7 +469,30 @@ const jsDomBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "CONTAINER", default: "#container" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Create from Template",
+      description: "Create elements from a template and data",
+      properties: {
+        TEMPLATE: {
+          type: "string",
+          description: "HTML template with ${item} placeholders",
+          default: "<div class=\"item\">${item.name}</div>"
+        },
+        DATA_SOURCE: {
+          type: "string",
+          description: "Variable name containing the data",
+          default: "items"
+        },
+        CONTAINER: {
+          type: "string",
+          description: "Selector for the container element",
+          default: "#container"
+        }
+      },
+      required: ["TEMPLATE", "DATA_SOURCE", "CONTAINER"]
+    }
   },
   
   // Element modification block
@@ -307,7 +530,41 @@ const jsDomBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "VALUE", default: "New content" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Modify Element",
+      description: "Modify an existing DOM element",
+      properties: {
+        ELEMENT: {
+          type: "string",
+          description: "Element ID or variable name",
+          default: "myElement"
+        },
+        IS_VARIABLE: {
+          type: "boolean",
+          description: "Whether the element is a variable reference",
+          default: false
+        },
+        ACTION: {
+          type: "string",
+          description: "Type of modification to perform",
+          enum: ["content", "attribute", "style", "clear"],
+          default: "content"
+        },
+        PROPERTY: {
+          type: "string",
+          description: "Property or attribute name to modify",
+          default: "innerHTML"
+        },
+        VALUE: {
+          type: "string",
+          description: "Value to set",
+          default: "New content"
+        }
+      },
+      required: ["ELEMENT", "ACTION"]
+    }
   },
   
   // Delete element block
@@ -328,7 +585,25 @@ const jsDomBlockConfigs: WebBlockConfigs = {
         { type: "field_checkbox", name: "IS_VARIABLE", checked: false }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Delete Element",
+      description: "Remove an element from the DOM",
+      properties: {
+        ELEMENT: {
+          type: "string",
+          description: "Element ID or variable name to delete",
+          default: "elementToDelete"
+        },
+        IS_VARIABLE: {
+          type: "boolean",
+          description: "Whether the element is a variable reference",
+          default: false
+        }
+      },
+      required: ["ELEMENT"]
+    }
   },
   
   // Clone element block
@@ -357,7 +632,35 @@ const jsDomBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "CONTAINER", default: "parentElement" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Clone Element",
+      description: "Clone an existing DOM element",
+      properties: {
+        SOURCE: {
+          type: "string",
+          description: "Element ID or variable name to clone",
+          default: "sourceElement"
+        },
+        NEW_ID: {
+          type: "string",
+          description: "ID for the cloned element",
+          default: "clonedElement"
+        },
+        DEEP: {
+          type: "boolean",
+          description: "Whether to clone child elements",
+          default: true
+        },
+        CONTAINER: {
+          type: "string",
+          description: "Container to add the cloned element to",
+          default: "parentElement"
+        }
+      },
+      required: ["SOURCE", "NEW_ID", "CONTAINER"]
+    }
   }
 };
 

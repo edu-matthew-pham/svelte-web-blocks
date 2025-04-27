@@ -29,7 +29,41 @@ const formsBlockConfigs: WebBlockConfigs = {
       ]},
       { type: "statement", name: "FIELDS", check: "web_form_field", label: "Form Fields" }
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Basic Form",
+      description: "A form for collecting user input",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Form identifier"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        TITLE: {
+          type: "string",
+          description: "Form title",
+          default: "Contact Us"
+        },
+        SUBMIT_TEXT: {
+          type: "string",
+          description: "Text for the submit button",
+          default: "Send"
+        },
+        FIELDS: {
+          type: "array",
+          description: "Form fields contained in this form",
+          items: {
+            type: "object",
+            $ref: "#/definitions/web_form_field"
+          }
+        }
+      },
+      required: ["TITLE", "SUBMIT_TEXT"]
+    }
   },
   
   web_form_field: {
@@ -76,7 +110,45 @@ const formsBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "OPTIONS", default: "Option 1, Option 2, Option 3" }
       ]}
     ],
-    connections: { previous: "web_form_field", next: "web_form_field" }
+    connections: { previous: "web_form_field", next: "web_form_field" },
+    schema: {
+      type: "object",
+      title: "Form Field",
+      description: "An input field within a form",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Field identifier"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        LABEL: {
+          type: "string",
+          description: "Field label text",
+          default: "Email"
+        },
+        TYPE: {
+          type: "string",
+          description: "Type of input field",
+          enum: ["text", "email", "number", "tel", "textarea", "checkbox", "radio", "select", "date", "time"],
+          default: "text"
+        },
+        REQUIRED: {
+          type: "string",
+          description: "Whether the field is required",
+          enum: ["TRUE", "FALSE"],
+          default: "FALSE"
+        },
+        OPTIONS: {
+          type: "string",
+          description: "Comma-separated options for select/radio fields",
+          default: "Option 1, Option 2, Option 3"
+        }
+      },
+      required: ["LABEL", "TYPE"]
+    }
   }
 };
 

@@ -31,7 +31,41 @@ const navigationBlockConfigs: WebBlockConfigs = {
       ]},
       { type: "statement", name: "LINKS", check: "web_nav_item", label: "Navigation links" }
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Header",
+      description: "A page header with navigation menu",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Header identifier"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        LOGO_TEXT: {
+          type: "string",
+          description: "Text for the website logo/brand",
+          default: "My Website"
+        },
+        INCLUDE_SIGNUP: {
+          type: "boolean",
+          description: "Whether to include a sign-up button",
+          default: true
+        },
+        LINKS: {
+          type: "array",
+          description: "Navigation links in the header",
+          items: {
+            type: "object",
+            $ref: "#/definitions/web_nav_item"
+          }
+        }
+      },
+      required: ["LOGO_TEXT"]
+    }
   },
   
   web_nav_item: {
@@ -58,7 +92,33 @@ const navigationBlockConfigs: WebBlockConfigs = {
       { type: "field_text", name: "TEXT", default: "Home" },
       { type: "field_text", name: "URL", default: "#" }
     ],
-    connections: { previous: "web_nav_item", next: "web_nav_item" }
+    connections: { previous: "web_nav_item", next: "web_nav_item" },
+    schema: {
+      type: "object",
+      title: "Navigation Item",
+      description: "A navigation link in the header",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Link identifier"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        TEXT: {
+          type: "string",
+          description: "Link text",
+          default: "Home"
+        },
+        URL: {
+          type: "string",
+          description: "Link URL",
+          default: "#"
+        }
+      },
+      required: ["TEXT", "URL"]
+    }
   }
 };
 

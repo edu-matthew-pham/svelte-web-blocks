@@ -273,6 +273,17 @@ export function createGenerator(config: GeneratorConfig) {
         }
       });
       
+      // Process style children if configured
+      const styles: any[] = [];
+      (config.styleInputs || []).forEach(input => {
+        let styleBlock = block.getInputTargetBlock(input.inputName);
+        while (styleBlock) {
+          const style = javascriptGenerator.blockToHighLevel(styleBlock);
+          if (style) styles.push(style);
+          styleBlock = styleBlock.getNextBlock();
+        }
+      });
+      
       // Process onload script if configured
       const onloadScripts: any[] = [];
       if (config.onloadInput) {
@@ -306,6 +317,8 @@ export function createGenerator(config: GeneratorConfig) {
         properties: props,
         children: children.length > 0 ? children : undefined,
         scripts: scripts.length > 0 ? scripts : undefined,
+        styles: styles.length > 0 ? styles : undefined,
+        onloadScripts: onloadScripts.length > 0 ? onloadScripts : undefined,
         attributes: attributes
       };
     }

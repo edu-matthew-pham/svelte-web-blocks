@@ -63,7 +63,45 @@ const styleBlockConfigs: WebBlockConfigs = {
       ]},
       { type: "statement", name: "DECLARATIONS", check: "css_property" }
     ],
-    connections: { previous: "css_selector", next: "css_selector" }
+    connections: { previous: "css_selector", next: "css_selector" },
+    schema: {
+      type: "object",
+      title: "CSS Selector",
+      description: "Define a CSS selector to target elements",
+      properties: {
+        SELECTOR_TYPE: {
+          type: "string",
+          description: "Type of CSS selector",
+          enum: ["element", "id", "class", "combined", "descendant"],
+          default: "element"
+        },
+        SELECTOR: {
+          type: "string",
+          description: "Element selector",
+          enum: ["", "div", "p", "h1", "h2", "h3", "span", "a", "ul", "ol", "li", "button", "input", "form", "section", "article", "main", "header", "footer", "nav", "table", "body"]
+        },
+        ID: {
+          type: "string",
+          description: "ID selector (without #)"
+        },
+        CLASS: {
+          type: "string",
+          description: "Class selector (without .)"
+        },
+        PSEUDO: {
+          type: "string",
+          description: "Pseudo-class or pseudo-element (e.g., hover, before)"
+        },
+        DECLARATIONS: {
+          type: "array",
+          description: "CSS property declarations",
+          items: {
+            type: "object"
+          }
+        }
+      },
+      required: ["SELECTOR_TYPE"]
+    }
   },
   
   // Size Block (width/height)
@@ -102,7 +140,31 @@ const styleBlockConfigs: WebBlockConfigs = {
         ]}
       ]}
     ],
-    connections: { previous: "css_property", next: "css_property" }
+    connections: { previous: "css_property", next: "css_property" },
+    schema: {
+      type: "object",
+      title: "Size Property",
+      description: "Set size-related CSS properties",
+      properties: {
+        PROPERTY: {
+          type: "string",
+          description: "Size property to set",
+          enum: ["width", "height", "max-width", "min-width", "max-height", "min-height"],
+          default: "width"
+        },
+        VALUE: {
+          type: "string",
+          description: "Numeric value"
+        },
+        UNIT: {
+          type: "string",
+          description: "Measurement unit",
+          enum: ["", "px", "%", "em", "rem", "vw", "vh"],
+          default: "px"
+        }
+      },
+      required: ["PROPERTY", "VALUE"]
+    }
   },
   
   // Position Block
@@ -176,7 +238,51 @@ const styleBlockConfigs: WebBlockConfigs = {
         ]}
       ]}
     ],
-    connections: { previous: "css_property", next: "css_property" }
+    connections: { previous: "css_property", next: "css_property" },
+    schema: {
+      type: "object",
+      title: "Position Property",
+      description: "Set position and display properties",
+      properties: {
+        PROPERTY: {
+          type: "string",
+          description: "Position property to set",
+          enum: ["display", "position", "float", "overflow"],
+          default: "position"
+        },
+        VALUE: {
+          type: "string",
+          description: "Property value",
+          enum: ["", "block", "inline", "flex", "grid", "inline-block", "none", "static", "relative", "absolute", "fixed", "sticky", "left", "right", "visible", "hidden", "auto", "scroll"]
+        },
+        TOP: {
+          type: "string",
+          description: "Top position value"
+        },
+        RIGHT: {
+          type: "string",
+          description: "Right position value"
+        },
+        BOTTOM: {
+          type: "string",
+          description: "Bottom position value"
+        },
+        LEFT: {
+          type: "string",
+          description: "Left position value"
+        },
+        ZINDEX: {
+          type: "string",
+          description: "Z-index value"
+        },
+        UNIT: {
+          type: "string",
+          description: "Measurement unit",
+          enum: ["", "px", "%", "em", "rem"]
+        }
+      },
+      required: ["PROPERTY"]
+    }
   },
   
   // Spacing Block
@@ -220,7 +326,43 @@ const styleBlockConfigs: WebBlockConfigs = {
         ]}
       ]}
     ],
-    connections: { previous: "css_property", next: "css_property" }
+    connections: { previous: "css_property", next: "css_property" },
+    schema: {
+      type: "object",
+      title: "Spacing Property",
+      description: "Set margin or padding for all sides of an element",
+      properties: {
+        PROPERTY: {
+          type: "string",
+          description: "Spacing property to set",
+          enum: ["margin", "padding"],
+          default: "margin"
+        },
+        TOP: {
+          type: "string",
+          description: "Top spacing value"
+        },
+        RIGHT: {
+          type: "string",
+          description: "Right spacing value"
+        },
+        BOTTOM: {
+          type: "string",
+          description: "Bottom spacing value"
+        },
+        LEFT: {
+          type: "string",
+          description: "Left spacing value"
+        },
+        UNIT: {
+          type: "string",
+          description: "Measurement unit",
+          enum: ["px", "%", "em", "rem"],
+          default: "px"
+        }
+      },
+      required: ["PROPERTY"]
+    }
   },
   
   // Flexbox Block
@@ -288,7 +430,43 @@ const styleBlockConfigs: WebBlockConfigs = {
         ]}
       ]}
     ],
-    connections: { previous: "css_property", next: "css_property" }
+    connections: { previous: "css_property", next: "css_property" },
+    schema: {
+      type: "object",
+      title: "Flexbox Properties",
+      description: "Set flexbox layout properties",
+      properties: {
+        DIRECTION: {
+          type: "string",
+          description: "Flex direction",
+          enum: ["", "row", "column", "row-reverse", "column-reverse"]
+        },
+        JUSTIFY: {
+          type: "string",
+          description: "Justify content alignment",
+          enum: ["", "flex-start", "center", "flex-end", "space-between", "space-around", "space-evenly"]
+        },
+        ALIGN_ITEMS: {
+          type: "string",
+          description: "Align items",
+          enum: ["", "flex-start", "center", "flex-end", "stretch", "baseline"]
+        },
+        WRAP: {
+          type: "string",
+          description: "Flex wrap behavior",
+          enum: ["", "nowrap", "wrap", "wrap-reverse"]
+        },
+        GAP: {
+          type: "string",
+          description: "Gap between flex items"
+        },
+        GAP_UNIT: {
+          type: "string",
+          description: "Gap measurement unit",
+          enum: ["", "px", "%", "em", "rem"]
+        }
+      }
+    }
   },
   
   // Typography Block
@@ -351,7 +529,43 @@ const styleBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "LINE_HEIGHT", default: "" }
       ]}
     ],
-    connections: { previous: "css_property", next: "css_property" }
+    connections: { previous: "css_property", next: "css_property" },
+    schema: {
+      type: "object",
+      title: "Typography Properties",
+      description: "Set text styling properties",
+      properties: {
+        FONT_SIZE: {
+          type: "string",
+          description: "Font size value"
+        },
+        FONT_SIZE_UNIT: {
+          type: "string",
+          description: "Font size unit",
+          enum: ["", "px", "em", "rem", "%"],
+          default: "px"
+        },
+        FONT_WEIGHT: {
+          type: "string",
+          description: "Font weight",
+          enum: ["", "normal", "bold", "lighter", "bolder", "100", "200", "300", "400", "500", "600", "700", "800", "900"]
+        },
+        COLOR: {
+          type: "string",
+          description: "Text color (hex code)",
+          pattern: "^#[0-9A-Fa-f]{6}$"
+        },
+        TEXT_ALIGN: {
+          type: "string",
+          description: "Text alignment",
+          enum: ["", "left", "center", "right", "justify"]
+        },
+        LINE_HEIGHT: {
+          type: "string",
+          description: "Line height value"
+        }
+      }
+    }
   },
   
   // Border Block
@@ -405,7 +619,45 @@ const styleBlockConfigs: WebBlockConfigs = {
         ]}
       ]}
     ],
-    connections: { previous: "css_property", next: "css_property" }
+    connections: { previous: "css_property", next: "css_property" },
+    schema: {
+      type: "object",
+      title: "Border Properties",
+      description: "Set border styling properties",
+      properties: {
+        WIDTH: {
+          type: "string",
+          description: "Border width value"
+        },
+        UNIT: {
+          type: "string",
+          description: "Border width unit",
+          enum: ["", "px", "em", "rem"],
+          default: "px"
+        },
+        STYLE: {
+          type: "string",
+          description: "Border style",
+          enum: ["", "solid", "dashed", "dotted", "double", "none"],
+          default: "solid"
+        },
+        COLOR: {
+          type: "string",
+          description: "Border color (hex code)",
+          pattern: "^#[0-9A-Fa-f]{6}$"
+        },
+        RADIUS: {
+          type: "string",
+          description: "Border radius value"
+        },
+        RADIUS_UNIT: {
+          type: "string",
+          description: "Border radius unit",
+          enum: ["", "px", "%", "em", "rem"],
+          default: "px"
+        }
+      }
+    }
   },
   
   // Background Block
@@ -444,7 +696,33 @@ const styleBlockConfigs: WebBlockConfigs = {
         ]}
       ]}
     ],
-    connections: { previous: "css_property", next: "css_property" }
+    connections: { previous: "css_property", next: "css_property" },
+    schema: {
+      type: "object",
+      title: "Background Properties",
+      description: "Set background styling properties",
+      properties: {
+        COLOR: {
+          type: "string",
+          description: "Background color (hex code)",
+          pattern: "^#[0-9A-Fa-f]{6}$"
+        },
+        IMAGE: {
+          type: "string",
+          description: "Background image URL"
+        },
+        SIZE: {
+          type: "string",
+          description: "Background size",
+          enum: ["", "cover", "contain", "auto"]
+        },
+        REPEAT: {
+          type: "string",
+          description: "Background repeat",
+          enum: ["", "repeat", "no-repeat", "repeat-x", "repeat-y"]
+        }
+      }
+    }
   },
   
   // Effects Block
@@ -498,7 +776,41 @@ const styleBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "DURATION", default: "" }
       ]}
     ],
-    connections: { previous: "css_property", next: "css_property" }
+    connections: { previous: "css_property", next: "css_property" },
+    schema: {
+      type: "object",
+      title: "Effects Properties",
+      description: "Set visual effects like transitions and transforms",
+      properties: {
+        OPACITY: {
+          type: "string",
+          description: "Opacity value (0-1)"
+        },
+        TRANSFORM: {
+          type: "string",
+          description: "Transform function",
+          enum: ["", "translate", "scale", "rotate", "skew"]
+        },
+        TRANSFORM_VALUE: {
+          type: "string",
+          description: "Transform function value"
+        },
+        TRANSFORM_UNIT: {
+          type: "string",
+          description: "Transform value unit",
+          enum: ["", "px", "deg", "%"]
+        },
+        TRANSITION: {
+          type: "string",
+          description: "CSS property to transition",
+          enum: ["", "all", "color", "background", "transform", "opacity"]
+        },
+        DURATION: {
+          type: "string",
+          description: "Transition duration in seconds"
+        }
+      }
+    }
   },
   
   // Custom Property Block
@@ -522,7 +834,27 @@ const styleBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "UNIT", default: "" }
       ]}
     ],
-    connections: { previous: "css_property", next: "css_property" }
+    connections: { previous: "css_property", next: "css_property" },
+    schema: {
+      type: "object",
+      title: "Custom CSS Property",
+      description: "Define any custom CSS property",
+      properties: {
+        PROPERTY: {
+          type: "string",
+          description: "CSS property name"
+        },
+        VALUE: {
+          type: "string",
+          description: "CSS property value"
+        },
+        UNIT: {
+          type: "string",
+          description: "Unit for the value (if applicable)"
+        }
+      },
+      required: ["PROPERTY", "VALUE"]
+    }
   }
 };
 

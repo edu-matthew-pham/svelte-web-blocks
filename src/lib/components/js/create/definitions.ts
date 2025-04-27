@@ -53,7 +53,45 @@ const jsCreateBlockConfigs: WebBlockConfigs = {
         { type: "field_multiline", name: "CONTENT", default: "" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Create Container",
+      description: "Create a container element like div, section, or form",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Container identifier (required)",
+          default: "myContainer"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        TAG: {
+          type: "string",
+          description: "Type of container element",
+          enum: ["div", "section", "article", "form", "header", "footer", "main", "aside", "nav"],
+          default: "div"
+        },
+        CONTAINER: {
+          type: "string",
+          description: "Parent element to add this container to",
+          default: "document-1"
+        },
+        CONTENT_TYPE: {
+          type: "string",
+          description: "Type of initial content",
+          enum: ["html", "text", "empty"],
+          default: "empty"
+        },
+        CONTENT: {
+          type: "string",
+          description: "Initial content for the container"
+        }
+      },
+      required: ["ID", "TAG", "CONTAINER"]
+    }
   },
   
   // Interactive Elements (button, input, img, etc.)
@@ -98,7 +136,44 @@ const jsCreateBlockConfigs: WebBlockConfigs = {
         { type: "field_multiline", name: "ATTRIBUTES", default: '{"placeholder": "Enter text"}' }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Create Interactive Element",
+      description: "Create interactive elements like buttons, inputs, and images",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Element identifier (optional)"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        TAG: {
+          type: "string",
+          description: "Type of interactive element",
+          enum: ["button", "input[text]", "input[checkbox]", "input[radio]", "img", "input[file]", "input[range]"],
+          default: "button"
+        },
+        LABEL: {
+          type: "string",
+          description: "Label or text content for the element",
+          default: "Click me"
+        },
+        CONTAINER: {
+          type: "string",
+          description: "Parent element to add this element to",
+          default: "document-1"
+        },
+        ATTRIBUTES: {
+          type: "string",
+          description: "JSON object of additional attributes",
+          default: '{"placeholder": "Enter text"}'
+        }
+      },
+      required: ["TAG", "CONTAINER"]
+    }
   },
   
   // Text Elements (headings, paragraphs, links, etc.)
@@ -144,7 +219,43 @@ const jsCreateBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "HREF", default: "" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Create Text Element",
+      description: "Create text elements like headings, paragraphs, and links",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Element identifier (optional)"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        TAG: {
+          type: "string",
+          description: "Type of text element",
+          enum: ["h1", "h2", "h3", "p", "a", "span", "strong", "em"],
+          default: "p"
+        },
+        CONTENT: {
+          type: "string",
+          description: "Text content for the element",
+          default: "Text content here"
+        },
+        CONTAINER: {
+          type: "string",
+          description: "Parent element to add this element to",
+          default: "document-1"
+        },
+        HREF: {
+          type: "string",
+          description: "URL for link elements"
+        }
+      },
+      required: ["TAG", "CONTENT", "CONTAINER"]
+    }
   },
   
   // Hierarchical/Data Elements (tables, lists, etc.)
@@ -191,7 +302,49 @@ const jsCreateBlockConfigs: WebBlockConfigs = {
         { type: "field_multiline", name: "ITEMS", default: "Item 1, Item 2, Item 3" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Create Structured Element",
+      description: "Create structured elements like tables and lists",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Element identifier (required)",
+          default: "myList"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        STRUCTURE_TYPE: {
+          type: "string",
+          description: "Type of structured element",
+          enum: ["ul", "ol", "table", "dl", "select"],
+          default: "ul"
+        },
+        CONTAINER: {
+          type: "string",
+          description: "Parent element to add this element to",
+          default: "document-1"
+        },
+        DATA_SOURCE: {
+          type: "string",
+          description: "Variable name containing data (optional)"
+        },
+        ITEM_TEMPLATE: {
+          type: "string",
+          description: "Template for each item with ${item} placeholder",
+          default: "<li>${item}</li>"
+        },
+        ITEMS: {
+          type: "string",
+          description: "Comma-separated list of manual items",
+          default: "Item 1, Item 2, Item 3"
+        }
+      },
+      required: ["ID", "STRUCTURE_TYPE", "CONTAINER"]
+    }
   },
   
   // Tree operation
@@ -219,7 +372,31 @@ const jsCreateBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "PARENT", default: "container" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "DOM Tree Operation",
+      description: "Perform operations on the DOM tree",
+      properties: {
+        ACTION: {
+          type: "string",
+          description: "Type of DOM tree operation",
+          enum: ["append", "prepend", "before", "replace", "remove"],
+          default: "append"
+        },
+        CHILD: {
+          type: "string",
+          description: "Element to be operated on",
+          default: "newElement"
+        },
+        PARENT: {
+          type: "string",
+          description: "Target element for the operation",
+          default: "container"
+        }
+      },
+      required: ["ACTION", "CHILD", "PARENT"]
+    }
   },
   
   // Iterative data manipulation
@@ -253,7 +430,36 @@ const jsCreateBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "TEMPLATE", default: "${item.name}" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Create Elements from Data",
+      description: "Create DOM elements from an array of data",
+      properties: {
+        DATA_SOURCE: {
+          type: "string",
+          description: "Variable name containing the data array",
+          default: "items"
+        },
+        CONTAINER: {
+          type: "string",
+          description: "Selector for the container element",
+          default: "#item-list"
+        },
+        ELEMENT_TYPE: {
+          type: "string",
+          description: "Type of element to create for each data item",
+          enum: ["li", "div", "p", "tr"],
+          default: "li"
+        },
+        TEMPLATE: {
+          type: "string",
+          description: "Template for element content with ${item} placeholders",
+          default: "${item.name}"
+        }
+      },
+      required: ["DATA_SOURCE", "CONTAINER", "ELEMENT_TYPE"]
+    }
   },
   
   // Table population
@@ -282,7 +488,35 @@ const jsCreateBlockConfigs: WebBlockConfigs = {
         { type: "field_checkbox", name: "HEADERS", checked: true }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Populate Table",
+      description: "Populate a table with data from an array",
+      properties: {
+        DATA_SOURCE: {
+          type: "string",
+          description: "Variable name containing the data array",
+          default: "users"
+        },
+        TABLE: {
+          type: "string",
+          description: "Selector for the table element",
+          default: "#data-table"
+        },
+        COLUMNS: {
+          type: "string",
+          description: "Comma-separated list of data columns to display",
+          default: "name,email,role"
+        },
+        HEADERS: {
+          type: "boolean",
+          description: "Whether to include column headers",
+          default: true
+        }
+      },
+      required: ["DATA_SOURCE", "TABLE", "COLUMNS"]
+    }
   },
   
   // Template-based element creation
@@ -307,7 +541,30 @@ const jsCreateBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "CONTAINER", default: "#container" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Create from Template",
+      description: "Create elements from a template and data",
+      properties: {
+        TEMPLATE: {
+          type: "string",
+          description: "HTML template with ${item} placeholders",
+          default: "<div class=\"item\">${item.name}</div>"
+        },
+        DATA_SOURCE: {
+          type: "string",
+          description: "Variable name containing the data",
+          default: "items"
+        },
+        CONTAINER: {
+          type: "string",
+          description: "Selector for the container element",
+          default: "#container"
+        }
+      },
+      required: ["TEMPLATE", "DATA_SOURCE", "CONTAINER"]
+    }
   },
   
   // Structured Item Creation
@@ -372,7 +629,60 @@ const jsCreateBlockConfigs: WebBlockConfigs = {
         { type: "field_multiline", name: "ATTRIBUTES", default: "{}" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Create Structured Item",
+      description: "Create items for structured elements like lists and tables",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Item identifier (optional)"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        ITEM_TYPE: {
+          type: "string",
+          description: "Type of structured item",
+          enum: ["li", "tr", "td", "th", "dt", "dd", "option"],
+          default: "li"
+        },
+        CONTAINER: {
+          type: "string",
+          description: "Parent element to add this item to",
+          default: "myList"
+        },
+        CONTENT_TYPE: {
+          type: "string",
+          description: "Whether to create single or multiple items",
+          enum: ["single", "multiple"],
+          default: "single"
+        },
+        CONTENT: {
+          type: "string",
+          description: "Content for the item(s)",
+          default: "Item content"
+        },
+        OPTION_VALUES: {
+          type: "string",
+          description: "Values for option elements (for select dropdowns)"
+        },
+        SEPARATOR: {
+          type: "string",
+          description: "Separator for multiple items",
+          enum: [",", "\n", ";", "\t"],
+          default: ","
+        },
+        ATTRIBUTES: {
+          type: "string",
+          description: "JSON object of additional attributes",
+          default: "{}"
+        }
+      },
+      required: ["ITEM_TYPE", "CONTAINER", "CONTENT"]
+    }
   }
 };
 

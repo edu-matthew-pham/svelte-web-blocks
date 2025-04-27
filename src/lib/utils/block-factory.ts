@@ -318,7 +318,11 @@ function buildInput(block: Blockly.Block, input: BlockInputConfig) {
               Blockly.Extensions.apply(extName, this, false);
             });
           }
-        }
+        },
+        // Store the original block config for reference
+        blockConfig: config,
+        // Pass through the schema if it exists
+        schema: config.schema
       };
     });
     

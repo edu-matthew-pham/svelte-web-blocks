@@ -10,7 +10,6 @@ const dynamicBlockConfigs: WebBlockConfigs = {
     tooltip: "Display dynamic cards from JSON data",
     helpUrl: "https://getbootstrap.com/docs/5.3/components/card/",
     inputs: [
-
       { type: "row", children: [
         { type: "label", text: "Dynamic Cards" },
         { type: "label", text: "ID" },
@@ -46,7 +45,45 @@ const dynamicBlockConfigs: WebBlockConfigs = {
         { type: "field_multiline", name: "DATA", default: '[\n  {"title": "Fast Performance", "icon": "🚀", "description": "Our platform is optimized for speed and reliability."},\n  {"title": "Easy to Use", "icon": "⚡", "description": "Simple interface that anyone can master quickly."},\n  {"title": "Powerful Analytics", "icon": "📊", "description": "Gain insights with comprehensive data analysis."}\n]' }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Dynamic Cards",
+      description: "Display dynamic cards from JSON data",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Component identifier"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        TITLE: {
+          type: "string",
+          description: "Section title",
+          default: "Features"
+        },
+        LAYOUT: {
+          type: "string",
+          description: "Layout style for the cards",
+          enum: ["grid", "list", "carousel"],
+          default: "grid"
+        },
+        COLUMNS: {
+          type: "string",
+          description: "Number of columns in grid layout",
+          enum: ["1", "2", "3", "4"],
+          default: "3"
+        },
+        DATA: {
+          type: "string",
+          description: "JSON data for the cards",
+          default: '[\n  {"title": "Fast Performance", "icon": "🚀", "description": "Our platform is optimized for speed and reliability."},\n  {"title": "Easy to Use", "icon": "⚡", "description": "Simple interface that anyone can master quickly."},\n  {"title": "Powerful Analytics", "icon": "📊", "description": "Gain insights with comprehensive data analysis."}\n]'
+        }
+      },
+      required: ["TITLE", "LAYOUT", "DATA"]
+    }
   },
   
   web_image_gallery: {
@@ -86,7 +123,45 @@ const dynamicBlockConfigs: WebBlockConfigs = {
         { type: "field_multiline", name: "DATA", default: '[\n  {"url": "https://picsum.photos/id/1/800/600", "caption": "Mountain View", "thumbnail": "https://picsum.photos/id/1/200/150"},\n  {"url": "https://picsum.photos/id/10/800/600", "caption": "Ocean Waves", "thumbnail": "https://picsum.photos/id/10/200/150"},\n  {"url": "https://picsum.photos/id/100/800/600", "caption": "Beach Sunset", "thumbnail": "https://picsum.photos/id/100/200/150"}\n]' }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Image Gallery",
+      description: "Display images in a gallery format",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Component identifier"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        TITLE: {
+          type: "string",
+          description: "Gallery title",
+          default: "Gallery"
+        },
+        THUMBNAIL_SIZE: {
+          type: "string",
+          description: "Size of thumbnail images",
+          enum: ["small", "medium", "large"],
+          default: "medium"
+        },
+        LIGHTBOX: {
+          type: "string",
+          description: "Enable lightbox for full-size image viewing",
+          enum: ["TRUE", "FALSE"],
+          default: "TRUE"
+        },
+        DATA: {
+          type: "string",
+          description: "JSON data for gallery images",
+          default: '[\n  {"url": "https://picsum.photos/id/1/800/600", "caption": "Mountain View", "thumbnail": "https://picsum.photos/id/1/200/150"},\n  {"url": "https://picsum.photos/id/10/800/600", "caption": "Ocean Waves", "thumbnail": "https://picsum.photos/id/10/200/150"},\n  {"url": "https://picsum.photos/id/100/800/600", "caption": "Beach Sunset", "thumbnail": "https://picsum.photos/id/100/200/150"}\n]'
+        }
+      },
+      required: ["TITLE", "DATA"]
+    }
   },
   
   web_accordion: {
@@ -118,7 +193,39 @@ const dynamicBlockConfigs: WebBlockConfigs = {
         { type: "field_multiline", name: "DATA", default: '[\n  {"title": "How do I get started?", "content": "Sign up for an account and follow our simple onboarding process."},\n  {"title": "Is there a free trial?", "content": "Yes, we offer a 14-day free trial with all features included."},\n  {"title": "How does billing work?", "content": "We offer monthly and annual subscription plans with various tiers."}\n]' }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Accordion",
+      description: "Create an accordion component for FAQs or collapsible content",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Component identifier"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        TITLE: {
+          type: "string",
+          description: "Accordion section title",
+          default: "Frequently Asked Questions"
+        },
+        ALLOW_MULTIPLE: {
+          type: "string",
+          description: "Allow multiple accordion items to be open simultaneously",
+          enum: ["TRUE", "FALSE"],
+          default: "FALSE"
+        },
+        DATA: {
+          type: "string",
+          description: "JSON data for accordion items with title and content",
+          default: '[\n  {"title": "How do I get started?", "content": "Sign up for an account and follow our simple onboarding process."},\n  {"title": "Is there a free trial?", "content": "Yes, we offer a 14-day free trial with all features included."},\n  {"title": "How does billing work?", "content": "We offer monthly and annual subscription plans with various tiers."}\n]'
+        }
+      },
+      required: ["TITLE", "DATA"]
+    }
   }
 };
 

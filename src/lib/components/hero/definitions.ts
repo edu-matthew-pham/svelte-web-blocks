@@ -50,7 +50,53 @@ const heroBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "IMAGE_URL", default: "https://placekitten.com/500/300" }
       ]}
     ],
-    connections: { previous: "web_component", next: "web_component" }
+    connections: { previous: "web_component", next: "web_component" },
+    schema: {
+      type: "object",
+      title: "Hero Section",
+      description: "Add a hero section with headline and call-to-action",
+      properties: {
+        ID: {
+          type: "string",
+          description: "Hero section identifier"
+        },
+        CLASS: {
+          type: "string",
+          description: "CSS classes to apply"
+        },
+        HEADLINE: {
+          type: "string",
+          description: "Main headline text",
+          default: "Welcome to our website"
+        },
+        SUBHEADLINE: {
+          type: "string",
+          description: "Secondary headline text",
+          default: "The best solution for your needs"
+        },
+        BUTTON_TEXT: {
+          type: "string",
+          description: "Text for the call-to-action button",
+          default: "Get Started"
+        },
+        BUTTON_URL: {
+          type: "string",
+          description: "URL for the button link",
+          default: "#"
+        },
+        HAS_IMAGE: {
+          type: "boolean",
+          description: "Whether to include an image",
+          default: true
+        },
+        IMAGE_URL: {
+          type: "string",
+          description: "URL for the hero image",
+          default: "https://placekitten.com/500/300"
+        }
+      },
+      required: ["HEADLINE", "SUBHEADLINE"]
+    }
   }
 };
 
