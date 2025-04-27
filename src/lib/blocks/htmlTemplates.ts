@@ -84,6 +84,7 @@ export function createCarouselIndicatorsHTML(componentId: string, slideCount: nu
  * @param theme Theme name (Bootstrap standard or Bootswatch theme)
  * @param content Inner page content
  * @param scripts JavaScript code
+ * @param styles CSS styles to be included
  * @param onloadScripts JavaScript code for onload functionality
  * @param attributes Optional ID, class and data attributes
  * @returns Complete HTML document
@@ -93,6 +94,7 @@ export function createDocumentHTML(
   theme: string,
   content: string, 
   scripts: string,
+  styles: string = '',
   onloadScripts: string = '',
   attributes: ComponentAttributes
 ): string {
@@ -118,6 +120,11 @@ export function createDocumentHTML(
   <!-- Bootstrap CSS -->
   ${cssLink}
   ${isBootstrapTheme ? `<meta name="theme" content="${theme}">` : ''}
+  
+  <!-- Custom styles -->
+  <style>
+    ${styles}
+  </style>
 </head>
 <body${bodyId}${bodyClass}${bodyData} ${isBootstrapTheme ? `data-bs-theme="${theme}"` : ''}>
   ${content}

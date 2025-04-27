@@ -56,7 +56,6 @@ const navigationBlockConfigs: WebBlockConfigs = {
         default: "" 
       },
       { type: "field_text", name: "TEXT", default: "Home" },
-      { type: "label", text: "URL" },
       { type: "field_text", name: "URL", default: "#" }
     ],
     connections: { previous: "web_nav_item", next: "web_nav_item" }

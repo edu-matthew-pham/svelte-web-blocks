@@ -30,6 +30,12 @@ export interface GeneratorConfig {
     inputName: string;
   }[];
   
+  // Style input configurations for CSS style blocks
+  styleInputs?: {
+    // Name of the input in the block
+    inputName: string;
+  }[];
+  
   // Custom HTML generator function
   htmlRenderer?: (props: Record<string, any>, childrenHtml: Record<string, string>, attributes: ComponentAttributes) => string;
   
@@ -102,10 +108,31 @@ export function createGenerator(config: GeneratorConfig) {
       // Process scripts
       if (config.scriptInputs && config.scriptInputs.length > 0) {
         let scriptsCode = '';
+        
         config.scriptInputs.forEach(input => {
-          scriptsCode += javascriptGenerator.statementToCode(block, input.inputName);
+          // Get the generated JavaScript from the generator
+          const scriptCode = javascriptGenerator.statementToCode(block, input.inputName);
+          if (scriptCode) {
+            scriptsCode += scriptCode + '\n';
+          }
         });
+        
         childrenHtml['scripts'] = scriptsCode;
+      }
+      
+      // Process styles
+      if (config.styleInputs && config.styleInputs.length > 0) {
+        let stylesCode = '';
+        
+        config.styleInputs.forEach(input => {
+          // Get the generated CSS from the generator
+          const styleCode = javascriptGenerator.statementToCode(block, input.inputName);
+          if (styleCode) {
+            stylesCode += styleCode + '\n';
+          }
+        });
+        
+        childrenHtml['styles'] = stylesCode;
       }
       
       // Process onload script if configured

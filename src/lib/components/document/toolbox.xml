@@ -10,7 +10,7 @@
     <field name="CLASS"></field>
     <field name="TITLE">My Web Page</field>
     <field name="THEME">light</field>
-    <statement name="STYLE">
+    <statement name="STYLES">
         <block type="css_selector">
             <field name="SELECTOR_TYPE">element</field>
             <field name="SELECTOR">body</field>
@@ -32,6 +32,12 @@
             </statement>
         </block>
     </statement>
+</block>
+<block type="web_document">
+    <field name="ID"></field>
+    <field name="CLASS"></field>
+    <field name="TITLE">My Web Page</field>
+    <field name="THEME">light</field>
     <statement name="SCRIPTS">
         <block type="procedures_defreturn">
             <field name="NAME">myFunction</field>

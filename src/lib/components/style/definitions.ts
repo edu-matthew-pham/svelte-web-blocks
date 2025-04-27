@@ -23,7 +23,28 @@ const styleBlockConfigs: WebBlockConfigs = {
       ]},
       { type: "row", children: [
         { type: "label", text: "Selector" },
-        { type: "field_text", name: "SELECTOR", default: "div" }
+        { type: "field_dropdown", name: "SELECTOR", options: [
+          ["div", "div"],
+          ["p", "p"],
+          ["h1", "h1"],
+          ["h2", "h2"],
+          ["h3", "h3"],
+          ["span", "span"],
+          ["a", "a"],
+          ["ul", "ul"],
+          ["ol", "ol"],
+          ["li", "li"],
+          ["button", "button"],
+          ["input", "input"],
+          ["form", "form"],
+          ["section", "section"],
+          ["article", "article"],
+          ["main", "main"],
+          ["header", "header"],
+          ["footer", "footer"],
+          ["nav", "nav"],
+          ["table", "table"]
+        ]}
       ]},
       { type: "row", children: [
         { type: "label", text: "ID" },

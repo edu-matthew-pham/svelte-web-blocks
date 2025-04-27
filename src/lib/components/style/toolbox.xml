@@ -1,4 +1,4 @@
-<category name="CSS" colour="210">
+<category name="Styles" colour="210">
   <!-- CSS Selector Block -->
   <block type="css_selector">
     <field name="SELECTOR_TYPE">element</field>

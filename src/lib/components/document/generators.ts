@@ -14,8 +14,11 @@ export const documentGenerators = {
     scriptInputs: [
       { inputName: 'SCRIPTS' }
     ],
+    styleInputs: [
+      { inputName: 'STYLES' }
+    ],
     onloadInput: "ONLOAD",
     htmlRenderer: (props, children, attributes) => 
-      HTML.createDocumentHTML(props.title, props.theme, children.content, children.scripts, children.onloadScripts, attributes)
+      HTML.createDocumentHTML(props.title, props.theme, children.content, children.scripts, children.styles, children.onloadScripts, attributes)
   })
 }; 

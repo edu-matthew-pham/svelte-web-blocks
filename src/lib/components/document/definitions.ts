@@ -53,7 +53,7 @@ const documentBlocks: Record<string, BlockConfig> = {
       },
       {
         type: "statement",
-        name: "STYLE",
+        name: "STYLES",
         label: "Styles",
         check: "css_selector"
       },
