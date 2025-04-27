@@ -1,0 +1,2011 @@
+{
+  "document": {
+    "type": "object",
+    "title": "Web Document",
+    "description": "Create a complete webpage with Bootstrap included",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Document identifier"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "TITLE": {
+        "type": "string",
+        "description": "Page title",
+        "default": "My Web Page"
+      },
+      "THEME": {
+        "type": "string",
+        "description": "Bootstrap theme",
+        "enum": [
+          "light",
+          "dark",
+          "cerulean",
+          "cosmo",
+          "flatly",
+          "journal",
+          "litera",
+          "lumen",
+          "minty",
+          "pulse",
+          "sandstone",
+          "simplex",
+          "sketchy",
+          "spacelab",
+          "united",
+          "zephyr"
+        ]
+      }
+    },
+    "required": [
+      "TITLE",
+      "THEME"
+    ]
+  },
+  "header": {
+    "type": "object",
+    "title": "Header",
+    "description": "A page header with navigation menu",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Header identifier"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "LOGO_TEXT": {
+        "type": "string",
+        "description": "Text for the website logo/brand",
+        "default": "My Website"
+      },
+      "INCLUDE_SIGNUP": {
+        "type": "boolean",
+        "description": "Whether to include a sign-up button",
+        "default": true
+      },
+      "LINKS": {
+        "type": "array",
+        "description": "Navigation links in the header",
+        "items": {
+          "type": "object",
+          "$ref": "#/definitions/web_nav_item"
+        }
+      }
+    },
+    "required": [
+      "LOGO_TEXT"
+    ]
+  },
+  "nav_item": {
+    "type": "object",
+    "title": "Navigation Item",
+    "description": "A navigation link in the header",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Link identifier"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "TEXT": {
+        "type": "string",
+        "description": "Link text",
+        "default": "Home"
+      },
+      "URL": {
+        "type": "string",
+        "description": "Link URL",
+        "default": "#"
+      }
+    },
+    "required": [
+      "TEXT",
+      "URL"
+    ]
+  },
+  "hero": {
+    "type": "object",
+    "title": "Hero Section",
+    "description": "Add a hero section with headline and call-to-action",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Hero section identifier"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "HEADLINE": {
+        "type": "string",
+        "description": "Main headline text",
+        "default": "Welcome to our website"
+      },
+      "SUBHEADLINE": {
+        "type": "string",
+        "description": "Secondary headline text",
+        "default": "The best solution for your needs"
+      },
+      "BUTTON_TEXT": {
+        "type": "string",
+        "description": "Text for the call-to-action button",
+        "default": "Get Started"
+      },
+      "BUTTON_URL": {
+        "type": "string",
+        "description": "URL for the button link",
+        "default": "#"
+      },
+      "HAS_IMAGE": {
+        "type": "boolean",
+        "description": "Whether to include an image",
+        "default": true
+      },
+      "IMAGE_URL": {
+        "type": "string",
+        "description": "URL for the hero image",
+        "default": "https://placekitten.com/500/300"
+      }
+    },
+    "required": [
+      "HEADLINE",
+      "SUBHEADLINE"
+    ]
+  },
+  "content_section": {
+    "type": "object",
+    "title": "Content Section",
+    "description": "A section with headline and formatted content blocks",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Content section identifier"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "HEADLINE": {
+        "type": "string",
+        "description": "Section headline text",
+        "default": "Section Title"
+      },
+      "COLUMNS": {
+        "type": "string",
+        "description": "Number of columns for content layout",
+        "enum": [
+          "1",
+          "2",
+          "3"
+        ],
+        "default": "1"
+      },
+      "CONTENT_BLOCKS": {
+        "type": "array",
+        "description": "Content blocks contained in this section",
+        "items": {
+          "type": "object",
+          "$ref": "#/definitions/web_content_block"
+        }
+      }
+    },
+    "required": [
+      "HEADLINE",
+      "COLUMNS"
+    ]
+  },
+  "content_block": {
+    "type": "object",
+    "title": "Content Block",
+    "description": "A block of markdown-formatted content",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Content block identifier"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "CONTENT": {
+        "type": "string",
+        "description": "Markdown-formatted content",
+        "default": "# Heading\n\nAdd your **formatted** content here.\n\n- Bullet point\n- Another point\n\n[Link text](https://example.com)"
+      }
+    },
+    "required": [
+      "CONTENT"
+    ]
+  },
+  "feature_cards": {
+    "type": "object",
+    "title": "Feature Cards",
+    "description": "A section displaying feature cards in a grid layout",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Component identifier"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "TITLE": {
+        "type": "string",
+        "description": "Section title",
+        "default": "Our Features"
+      },
+      "COLUMNS": {
+        "type": "number",
+        "description": "Number of columns in the grid",
+        "default": 3,
+        "minimum": 1,
+        "maximum": 6
+      },
+      "CARDS": {
+        "type": "array",
+        "description": "Feature cards contained in this section",
+        "items": {
+          "type": "object",
+          "$ref": "#/definitions/web_feature_card"
+        }
+      }
+    },
+    "required": [
+      "TITLE",
+      "COLUMNS"
+    ]
+  },
+  "feature_card": {
+    "type": "object",
+    "title": "Feature Card",
+    "description": "A card highlighting a specific feature with icon and description",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Card identifier"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "TITLE": {
+        "type": "string",
+        "description": "Feature title",
+        "default": "Feature Title"
+      },
+      "ICON": {
+        "type": "string",
+        "description": "Icon representing the feature"
+      },
+      "DESCRIPTION": {
+        "type": "string",
+        "description": "Feature description text",
+        "default": "Description of this amazing feature."
+      }
+    },
+    "required": [
+      "TITLE",
+      "DESCRIPTION"
+    ]
+  },
+  "footer": {
+    "type": "object",
+    "title": "Footer",
+    "description": "A page footer with links and copyright information",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Footer identifier"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "COPYRIGHT": {
+        "type": "string",
+        "description": "Copyright text",
+        "default": "© 2023 My Company"
+      },
+      "LINKS": {
+        "type": "array",
+        "description": "Links displayed in the footer",
+        "items": {
+          "type": "object",
+          "$ref": "#/definitions/web_footer_link"
+        }
+      }
+    },
+    "required": [
+      "COPYRIGHT"
+    ]
+  },
+  "footer_link": {
+    "type": "object",
+    "title": "Footer Link",
+    "description": "A link displayed in the footer",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Link identifier"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "TEXT": {
+        "type": "string",
+        "description": "Link text",
+        "default": "Privacy Policy"
+      },
+      "URL": {
+        "type": "string",
+        "description": "Link URL",
+        "default": "/privacy"
+      }
+    },
+    "required": [
+      "TEXT",
+      "URL"
+    ]
+  },
+  "basic_form": {
+    "type": "object",
+    "title": "Basic Form",
+    "description": "A form for collecting user input",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Form identifier"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "TITLE": {
+        "type": "string",
+        "description": "Form title",
+        "default": "Contact Us"
+      },
+      "SUBMIT_TEXT": {
+        "type": "string",
+        "description": "Text for the submit button",
+        "default": "Send"
+      },
+      "FIELDS": {
+        "type": "array",
+        "description": "Form fields contained in this form",
+        "items": {
+          "type": "object",
+          "$ref": "#/definitions/web_form_field"
+        }
+      }
+    },
+    "required": [
+      "TITLE",
+      "SUBMIT_TEXT"
+    ]
+  },
+  "form_field": {
+    "type": "object",
+    "title": "Form Field",
+    "description": "An input field within a form",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Field identifier"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "LABEL": {
+        "type": "string",
+        "description": "Field label text",
+        "default": "Email"
+      },
+      "TYPE": {
+        "type": "string",
+        "description": "Type of input field",
+        "enum": [
+          "text",
+          "email",
+          "number",
+          "tel",
+          "textarea",
+          "checkbox",
+          "radio",
+          "select",
+          "date",
+          "time"
+        ],
+        "default": "text"
+      },
+      "REQUIRED": {
+        "type": "string",
+        "description": "Whether the field is required",
+        "enum": [
+          "TRUE",
+          "FALSE"
+        ],
+        "default": "FALSE"
+      },
+      "OPTIONS": {
+        "type": "string",
+        "description": "Comma-separated options for select/radio fields",
+        "default": "Option 1, Option 2, Option 3"
+      }
+    },
+    "required": [
+      "LABEL",
+      "TYPE"
+    ]
+  },
+  "dynamic_cards": {
+    "type": "object",
+    "title": "Dynamic Cards",
+    "description": "Display dynamic cards from JSON data",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Component identifier"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "TITLE": {
+        "type": "string",
+        "description": "Section title",
+        "default": "Features"
+      },
+      "LAYOUT": {
+        "type": "string",
+        "description": "Layout style for the cards",
+        "enum": [
+          "grid",
+          "list",
+          "carousel"
+        ],
+        "default": "grid"
+      },
+      "COLUMNS": {
+        "type": "string",
+        "description": "Number of columns in grid layout",
+        "enum": [
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "default": "3"
+      },
+      "DATA": {
+        "type": "string",
+        "description": "JSON data for the cards",
+        "default": "[\n  {\"title\": \"Fast Performance\", \"icon\": \"🚀\", \"description\": \"Our platform is optimized for speed and reliability.\"},\n  {\"title\": \"Easy to Use\", \"icon\": \"⚡\", \"description\": \"Simple interface that anyone can master quickly.\"},\n  {\"title\": \"Powerful Analytics\", \"icon\": \"📊\", \"description\": \"Gain insights with comprehensive data analysis.\"}\n]"
+      }
+    },
+    "required": [
+      "TITLE",
+      "LAYOUT",
+      "DATA"
+    ]
+  },
+  "image_gallery": {
+    "type": "object",
+    "title": "Image Gallery",
+    "description": "Display images in a gallery format",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Component identifier"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "TITLE": {
+        "type": "string",
+        "description": "Gallery title",
+        "default": "Gallery"
+      },
+      "THUMBNAIL_SIZE": {
+        "type": "string",
+        "description": "Size of thumbnail images",
+        "enum": [
+          "small",
+          "medium",
+          "large"
+        ],
+        "default": "medium"
+      },
+      "LIGHTBOX": {
+        "type": "string",
+        "description": "Enable lightbox for full-size image viewing",
+        "enum": [
+          "TRUE",
+          "FALSE"
+        ],
+        "default": "TRUE"
+      },
+      "DATA": {
+        "type": "string",
+        "description": "JSON data for gallery images",
+        "default": "[\n  {\"url\": \"https://picsum.photos/id/1/800/600\", \"caption\": \"Mountain View\", \"thumbnail\": \"https://picsum.photos/id/1/200/150\"},\n  {\"url\": \"https://picsum.photos/id/10/800/600\", \"caption\": \"Ocean Waves\", \"thumbnail\": \"https://picsum.photos/id/10/200/150\"},\n  {\"url\": \"https://picsum.photos/id/100/800/600\", \"caption\": \"Beach Sunset\", \"thumbnail\": \"https://picsum.photos/id/100/200/150\"}\n]"
+      }
+    },
+    "required": [
+      "TITLE",
+      "DATA"
+    ]
+  },
+  "accordion": {
+    "type": "object",
+    "title": "Accordion",
+    "description": "Create an accordion component for FAQs or collapsible content",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Component identifier"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "TITLE": {
+        "type": "string",
+        "description": "Accordion section title",
+        "default": "Frequently Asked Questions"
+      },
+      "ALLOW_MULTIPLE": {
+        "type": "string",
+        "description": "Allow multiple accordion items to be open simultaneously",
+        "enum": [
+          "TRUE",
+          "FALSE"
+        ],
+        "default": "FALSE"
+      },
+      "DATA": {
+        "type": "string",
+        "description": "JSON data for accordion items with title and content",
+        "default": "[\n  {\"title\": \"How do I get started?\", \"content\": \"Sign up for an account and follow our simple onboarding process.\"},\n  {\"title\": \"Is there a free trial?\", \"content\": \"Yes, we offer a 14-day free trial with all features included.\"},\n  {\"title\": \"How does billing work?\", \"content\": \"We offer monthly and annual subscription plans with various tiers.\"}\n]"
+      }
+    },
+    "required": [
+      "TITLE",
+      "DATA"
+    ]
+  },
+  "css_selector": {
+    "type": "object",
+    "title": "CSS Selector",
+    "description": "Define a CSS selector to target elements",
+    "properties": {
+      "SELECTOR_TYPE": {
+        "type": "string",
+        "description": "Type of CSS selector",
+        "enum": [
+          "element",
+          "id",
+          "class",
+          "combined",
+          "descendant"
+        ],
+        "default": "element"
+      },
+      "SELECTOR": {
+        "type": "string",
+        "description": "Element selector",
+        "enum": [
+          "",
+          "div",
+          "p",
+          "h1",
+          "h2",
+          "h3",
+          "span",
+          "a",
+          "ul",
+          "ol",
+          "li",
+          "button",
+          "input",
+          "form",
+          "section",
+          "article",
+          "main",
+          "header",
+          "footer",
+          "nav",
+          "table",
+          "body"
+        ]
+      },
+      "ID": {
+        "type": "string",
+        "description": "ID selector (without #)"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "Class selector (without .)"
+      },
+      "PSEUDO": {
+        "type": "string",
+        "description": "Pseudo-class or pseudo-element (e.g., hover, before)"
+      },
+      "DECLARATIONS": {
+        "type": "array",
+        "description": "CSS property declarations",
+        "items": {
+          "type": "object"
+        }
+      }
+    },
+    "required": [
+      "SELECTOR_TYPE"
+    ]
+  },
+  "css_size": {
+    "type": "object",
+    "title": "Size Property",
+    "description": "Set size-related CSS properties",
+    "properties": {
+      "PROPERTY": {
+        "type": "string",
+        "description": "Size property to set",
+        "enum": [
+          "width",
+          "height",
+          "max-width",
+          "min-width",
+          "max-height",
+          "min-height"
+        ],
+        "default": "width"
+      },
+      "VALUE": {
+        "type": "string",
+        "description": "Numeric value"
+      },
+      "UNIT": {
+        "type": "string",
+        "description": "Measurement unit",
+        "enum": [
+          "",
+          "px",
+          "%",
+          "em",
+          "rem",
+          "vw",
+          "vh"
+        ],
+        "default": "px"
+      }
+    },
+    "required": [
+      "PROPERTY",
+      "VALUE"
+    ]
+  },
+  "css_position": {
+    "type": "object",
+    "title": "Position Property",
+    "description": "Set position and display properties",
+    "properties": {
+      "PROPERTY": {
+        "type": "string",
+        "description": "Position property to set",
+        "enum": [
+          "display",
+          "position",
+          "float",
+          "overflow"
+        ],
+        "default": "position"
+      },
+      "VALUE": {
+        "type": "string",
+        "description": "Property value",
+        "enum": [
+          "",
+          "block",
+          "inline",
+          "flex",
+          "grid",
+          "inline-block",
+          "none",
+          "static",
+          "relative",
+          "absolute",
+          "fixed",
+          "sticky",
+          "left",
+          "right",
+          "visible",
+          "hidden",
+          "auto",
+          "scroll"
+        ]
+      },
+      "TOP": {
+        "type": "string",
+        "description": "Top position value"
+      },
+      "RIGHT": {
+        "type": "string",
+        "description": "Right position value"
+      },
+      "BOTTOM": {
+        "type": "string",
+        "description": "Bottom position value"
+      },
+      "LEFT": {
+        "type": "string",
+        "description": "Left position value"
+      },
+      "ZINDEX": {
+        "type": "string",
+        "description": "Z-index value"
+      },
+      "UNIT": {
+        "type": "string",
+        "description": "Measurement unit",
+        "enum": [
+          "",
+          "px",
+          "%",
+          "em",
+          "rem"
+        ]
+      }
+    },
+    "required": [
+      "PROPERTY"
+    ]
+  },
+  "css_spacing": {
+    "type": "object",
+    "title": "Spacing Property",
+    "description": "Set margin or padding for all sides of an element",
+    "properties": {
+      "PROPERTY": {
+        "type": "string",
+        "description": "Spacing property to set",
+        "enum": [
+          "margin",
+          "padding"
+        ],
+        "default": "margin"
+      },
+      "TOP": {
+        "type": "string",
+        "description": "Top spacing value"
+      },
+      "RIGHT": {
+        "type": "string",
+        "description": "Right spacing value"
+      },
+      "BOTTOM": {
+        "type": "string",
+        "description": "Bottom spacing value"
+      },
+      "LEFT": {
+        "type": "string",
+        "description": "Left spacing value"
+      },
+      "UNIT": {
+        "type": "string",
+        "description": "Measurement unit",
+        "enum": [
+          "px",
+          "%",
+          "em",
+          "rem"
+        ],
+        "default": "px"
+      }
+    },
+    "required": [
+      "PROPERTY"
+    ]
+  },
+  "css_flexbox": {
+    "type": "object",
+    "title": "Flexbox Properties",
+    "description": "Set flexbox layout properties",
+    "properties": {
+      "DIRECTION": {
+        "type": "string",
+        "description": "Flex direction",
+        "enum": [
+          "",
+          "row",
+          "column",
+          "row-reverse",
+          "column-reverse"
+        ]
+      },
+      "JUSTIFY": {
+        "type": "string",
+        "description": "Justify content alignment",
+        "enum": [
+          "",
+          "flex-start",
+          "center",
+          "flex-end",
+          "space-between",
+          "space-around",
+          "space-evenly"
+        ]
+      },
+      "ALIGN_ITEMS": {
+        "type": "string",
+        "description": "Align items",
+        "enum": [
+          "",
+          "flex-start",
+          "center",
+          "flex-end",
+          "stretch",
+          "baseline"
+        ]
+      },
+      "WRAP": {
+        "type": "string",
+        "description": "Flex wrap behavior",
+        "enum": [
+          "",
+          "nowrap",
+          "wrap",
+          "wrap-reverse"
+        ]
+      },
+      "GAP": {
+        "type": "string",
+        "description": "Gap between flex items"
+      },
+      "GAP_UNIT": {
+        "type": "string",
+        "description": "Gap measurement unit",
+        "enum": [
+          "",
+          "px",
+          "%",
+          "em",
+          "rem"
+        ]
+      }
+    }
+  },
+  "css_typography": {
+    "type": "object",
+    "title": "Typography Properties",
+    "description": "Set text styling properties",
+    "properties": {
+      "FONT_SIZE": {
+        "type": "string",
+        "description": "Font size value"
+      },
+      "FONT_SIZE_UNIT": {
+        "type": "string",
+        "description": "Font size unit",
+        "enum": [
+          "",
+          "px",
+          "em",
+          "rem",
+          "%"
+        ],
+        "default": "px"
+      },
+      "FONT_WEIGHT": {
+        "type": "string",
+        "description": "Font weight",
+        "enum": [
+          "",
+          "normal",
+          "bold",
+          "lighter",
+          "bolder",
+          "100",
+          "200",
+          "300",
+          "400",
+          "500",
+          "600",
+          "700",
+          "800",
+          "900"
+        ]
+      },
+      "COLOR": {
+        "type": "string",
+        "description": "Text color (hex code)",
+        "pattern": "^#[0-9A-Fa-f]{6}$"
+      },
+      "TEXT_ALIGN": {
+        "type": "string",
+        "description": "Text alignment",
+        "enum": [
+          "",
+          "left",
+          "center",
+          "right",
+          "justify"
+        ]
+      },
+      "LINE_HEIGHT": {
+        "type": "string",
+        "description": "Line height value"
+      }
+    }
+  },
+  "css_border": {
+    "type": "object",
+    "title": "Border Properties",
+    "description": "Set border styling properties",
+    "properties": {
+      "WIDTH": {
+        "type": "string",
+        "description": "Border width value"
+      },
+      "UNIT": {
+        "type": "string",
+        "description": "Border width unit",
+        "enum": [
+          "",
+          "px",
+          "em",
+          "rem"
+        ],
+        "default": "px"
+      },
+      "STYLE": {
+        "type": "string",
+        "description": "Border style",
+        "enum": [
+          "",
+          "solid",
+          "dashed",
+          "dotted",
+          "double",
+          "none"
+        ],
+        "default": "solid"
+      },
+      "COLOR": {
+        "type": "string",
+        "description": "Border color (hex code)",
+        "pattern": "^#[0-9A-Fa-f]{6}$"
+      },
+      "RADIUS": {
+        "type": "string",
+        "description": "Border radius value"
+      },
+      "RADIUS_UNIT": {
+        "type": "string",
+        "description": "Border radius unit",
+        "enum": [
+          "",
+          "px",
+          "%",
+          "em",
+          "rem"
+        ],
+        "default": "px"
+      }
+    }
+  },
+  "css_background": {
+    "type": "object",
+    "title": "Background Properties",
+    "description": "Set background styling properties",
+    "properties": {
+      "COLOR": {
+        "type": "string",
+        "description": "Background color (hex code)",
+        "pattern": "^#[0-9A-Fa-f]{6}$"
+      },
+      "IMAGE": {
+        "type": "string",
+        "description": "Background image URL"
+      },
+      "SIZE": {
+        "type": "string",
+        "description": "Background size",
+        "enum": [
+          "",
+          "cover",
+          "contain",
+          "auto"
+        ]
+      },
+      "REPEAT": {
+        "type": "string",
+        "description": "Background repeat",
+        "enum": [
+          "",
+          "repeat",
+          "no-repeat",
+          "repeat-x",
+          "repeat-y"
+        ]
+      }
+    }
+  },
+  "css_effects": {
+    "type": "object",
+    "title": "Effects Properties",
+    "description": "Set visual effects like transitions and transforms",
+    "properties": {
+      "OPACITY": {
+        "type": "string",
+        "description": "Opacity value (0-1)"
+      },
+      "TRANSFORM": {
+        "type": "string",
+        "description": "Transform function",
+        "enum": [
+          "",
+          "translate",
+          "scale",
+          "rotate",
+          "skew"
+        ]
+      },
+      "TRANSFORM_VALUE": {
+        "type": "string",
+        "description": "Transform function value"
+      },
+      "TRANSFORM_UNIT": {
+        "type": "string",
+        "description": "Transform value unit",
+        "enum": [
+          "",
+          "px",
+          "deg",
+          "%"
+        ]
+      },
+      "TRANSITION": {
+        "type": "string",
+        "description": "CSS property to transition",
+        "enum": [
+          "",
+          "all",
+          "color",
+          "background",
+          "transform",
+          "opacity"
+        ]
+      },
+      "DURATION": {
+        "type": "string",
+        "description": "Transition duration in seconds"
+      }
+    }
+  },
+  "css_custom": {
+    "type": "object",
+    "title": "Custom CSS Property",
+    "description": "Define any custom CSS property",
+    "properties": {
+      "PROPERTY": {
+        "type": "string",
+        "description": "CSS property name"
+      },
+      "VALUE": {
+        "type": "string",
+        "description": "CSS property value"
+      },
+      "UNIT": {
+        "type": "string",
+        "description": "Unit for the value (if applicable)"
+      }
+    },
+    "required": [
+      "PROPERTY",
+      "VALUE"
+    ]
+  },
+  "js_create_container": {
+    "type": "object",
+    "title": "Create Container",
+    "description": "Create a container element like div, section, or form",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Container identifier (required)",
+        "default": "myContainer"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "TAG": {
+        "type": "string",
+        "description": "Type of container element",
+        "enum": [
+          "div",
+          "section",
+          "article",
+          "form",
+          "header",
+          "footer",
+          "main",
+          "aside",
+          "nav"
+        ],
+        "default": "div"
+      },
+      "CONTAINER": {
+        "type": "string",
+        "description": "Parent element to add this container to",
+        "default": "document-1"
+      },
+      "CONTENT_TYPE": {
+        "type": "string",
+        "description": "Type of initial content",
+        "enum": [
+          "html",
+          "text",
+          "empty"
+        ],
+        "default": "empty"
+      },
+      "CONTENT": {
+        "type": "string",
+        "description": "Initial content for the container"
+      }
+    },
+    "required": [
+      "ID",
+      "TAG",
+      "CONTAINER"
+    ]
+  },
+  "js_create_interactive": {
+    "type": "object",
+    "title": "Create Interactive Element",
+    "description": "Create interactive elements like buttons, inputs, and images",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Element identifier (optional)"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "TAG": {
+        "type": "string",
+        "description": "Type of interactive element",
+        "enum": [
+          "button",
+          "input[text]",
+          "input[checkbox]",
+          "input[radio]",
+          "img",
+          "input[file]",
+          "input[range]"
+        ],
+        "default": "button"
+      },
+      "LABEL": {
+        "type": "string",
+        "description": "Label or text content for the element",
+        "default": "Click me"
+      },
+      "CONTAINER": {
+        "type": "string",
+        "description": "Parent element to add this element to",
+        "default": "document-1"
+      },
+      "ATTRIBUTES": {
+        "type": "string",
+        "description": "JSON object of additional attributes",
+        "default": "{\"placeholder\": \"Enter text\"}"
+      }
+    },
+    "required": [
+      "TAG",
+      "CONTAINER"
+    ]
+  },
+  "js_create_text": {
+    "type": "object",
+    "title": "Create Text Element",
+    "description": "Create text elements like headings, paragraphs, and links",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Element identifier (optional)"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "TAG": {
+        "type": "string",
+        "description": "Type of text element",
+        "enum": [
+          "h1",
+          "h2",
+          "h3",
+          "p",
+          "a",
+          "span",
+          "strong",
+          "em"
+        ],
+        "default": "p"
+      },
+      "CONTENT": {
+        "type": "string",
+        "description": "Text content for the element",
+        "default": "Text content here"
+      },
+      "CONTAINER": {
+        "type": "string",
+        "description": "Parent element to add this element to",
+        "default": "document-1"
+      },
+      "HREF": {
+        "type": "string",
+        "description": "URL for link elements"
+      }
+    },
+    "required": [
+      "TAG",
+      "CONTENT",
+      "CONTAINER"
+    ]
+  },
+  "js_create_structured": {
+    "type": "object",
+    "title": "Create Structured Element",
+    "description": "Create structured elements like tables and lists",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Element identifier (required)",
+        "default": "myList"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "STRUCTURE_TYPE": {
+        "type": "string",
+        "description": "Type of structured element",
+        "enum": [
+          "ul",
+          "ol",
+          "table",
+          "dl",
+          "select"
+        ],
+        "default": "ul"
+      },
+      "CONTAINER": {
+        "type": "string",
+        "description": "Parent element to add this element to",
+        "default": "document-1"
+      },
+      "DATA_SOURCE": {
+        "type": "string",
+        "description": "Variable name containing data (optional)"
+      },
+      "ITEM_TEMPLATE": {
+        "type": "string",
+        "description": "Template for each item with ${item} placeholder",
+        "default": "<li>${item}</li>"
+      },
+      "ITEMS": {
+        "type": "string",
+        "description": "Comma-separated list of manual items",
+        "default": "Item 1, Item 2, Item 3"
+      }
+    },
+    "required": [
+      "ID",
+      "STRUCTURE_TYPE",
+      "CONTAINER"
+    ]
+  },
+  "js_tree_operation": {
+    "type": "object",
+    "title": "DOM Tree Operation",
+    "description": "Perform operations on the DOM tree",
+    "properties": {
+      "ACTION": {
+        "type": "string",
+        "description": "Type of tree operation to perform",
+        "enum": [
+          "append",
+          "prepend",
+          "before",
+          "replace",
+          "remove"
+        ],
+        "default": "append"
+      },
+      "CHILD": {
+        "type": "string",
+        "description": "Element to be operated on",
+        "default": "newElement"
+      },
+      "PARENT": {
+        "type": "string",
+        "description": "Target element for the operation",
+        "default": "container"
+      }
+    },
+    "required": [
+      "ACTION",
+      "CHILD",
+      "PARENT"
+    ]
+  },
+  "js_iterate_data": {
+    "type": "object",
+    "title": "Create Elements from Data",
+    "description": "Create DOM elements from an array of data",
+    "properties": {
+      "DATA_SOURCE": {
+        "type": "string",
+        "description": "Variable name containing the data array",
+        "default": "items"
+      },
+      "CONTAINER": {
+        "type": "string",
+        "description": "Selector for the container element",
+        "default": "#item-list"
+      },
+      "ELEMENT_TYPE": {
+        "type": "string",
+        "description": "Type of element to create for each data item",
+        "enum": [
+          "li",
+          "div",
+          "p",
+          "tr"
+        ],
+        "default": "li"
+      },
+      "TEMPLATE": {
+        "type": "string",
+        "description": "Template for element content with ${item} placeholders",
+        "default": "${item.name}"
+      }
+    },
+    "required": [
+      "DATA_SOURCE",
+      "CONTAINER",
+      "ELEMENT_TYPE"
+    ]
+  },
+  "js_populate_table": {
+    "type": "object",
+    "title": "Populate Table",
+    "description": "Populate a table with data from an array",
+    "properties": {
+      "DATA_SOURCE": {
+        "type": "string",
+        "description": "Variable name containing the data array",
+        "default": "users"
+      },
+      "TABLE": {
+        "type": "string",
+        "description": "Selector for the table element",
+        "default": "#data-table"
+      },
+      "COLUMNS": {
+        "type": "string",
+        "description": "Comma-separated list of data columns to display",
+        "default": "name,email,role"
+      },
+      "HEADERS": {
+        "type": "boolean",
+        "description": "Whether to include column headers",
+        "default": true
+      }
+    },
+    "required": [
+      "DATA_SOURCE",
+      "TABLE",
+      "COLUMNS"
+    ]
+  },
+  "js_create_from_template": {
+    "type": "object",
+    "title": "Create from Template",
+    "description": "Create elements from a template and data",
+    "properties": {
+      "TEMPLATE": {
+        "type": "string",
+        "description": "HTML template with ${item} placeholders",
+        "default": "<div class=\"item\">${item.name}</div>"
+      },
+      "DATA_SOURCE": {
+        "type": "string",
+        "description": "Variable name containing the data",
+        "default": "items"
+      },
+      "CONTAINER": {
+        "type": "string",
+        "description": "Selector for the container element",
+        "default": "#container"
+      }
+    },
+    "required": [
+      "TEMPLATE",
+      "DATA_SOURCE",
+      "CONTAINER"
+    ]
+  },
+  "js_create_structured_item": {
+    "type": "object",
+    "title": "Create Structured Item",
+    "description": "Create items for structured elements like lists and tables",
+    "properties": {
+      "ID": {
+        "type": "string",
+        "description": "Item identifier (optional)"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS classes to apply"
+      },
+      "ITEM_TYPE": {
+        "type": "string",
+        "description": "Type of structured item",
+        "enum": [
+          "li",
+          "tr",
+          "td",
+          "th",
+          "dt",
+          "dd",
+          "option"
+        ],
+        "default": "li"
+      },
+      "CONTAINER": {
+        "type": "string",
+        "description": "Parent element to add this item to",
+        "default": "myList"
+      },
+      "CONTENT_TYPE": {
+        "type": "string",
+        "description": "Whether to create single or multiple items",
+        "enum": [
+          "single",
+          "multiple"
+        ],
+        "default": "single"
+      },
+      "CONTENT": {
+        "type": "string",
+        "description": "Content for the item(s)",
+        "default": "Item content"
+      },
+      "OPTION_VALUES": {
+        "type": "string",
+        "description": "Values for option elements (for select dropdowns)"
+      },
+      "SEPARATOR": {
+        "type": "string",
+        "description": "Separator for multiple items",
+        "enum": [
+          ",",
+          "\n",
+          ";",
+          "\t"
+        ],
+        "default": ","
+      },
+      "ATTRIBUTES": {
+        "type": "string",
+        "description": "JSON object of additional attributes",
+        "default": "{}"
+      }
+    },
+    "required": [
+      "ITEM_TYPE",
+      "CONTAINER",
+      "CONTENT"
+    ]
+  },
+  "js_select_element": {
+    "type": "object",
+    "title": "Select Element",
+    "description": "Select a DOM element and store it as a variable",
+    "properties": {
+      "SELECTOR": {
+        "type": "string",
+        "description": "CSS selector to find the element",
+        "default": "#element-id"
+      },
+      "VARIABLE": {
+        "type": "string",
+        "description": "Variable name to store the element",
+        "default": "element"
+      }
+    },
+    "required": [
+      "SELECTOR",
+      "VARIABLE"
+    ]
+  },
+  "js_element_property": {
+    "type": "object",
+    "title": "Element Property",
+    "description": "Get or set an element's property, attribute, or style",
+    "properties": {
+      "ACTION": {
+        "type": "string",
+        "description": "Whether to get or set the property",
+        "enum": [
+          "set",
+          "get"
+        ],
+        "default": "set"
+      },
+      "ELEMENT": {
+        "type": "string",
+        "description": "Element ID or variable name",
+        "default": "document-1"
+      },
+      "PROPERTY_TYPE": {
+        "type": "string",
+        "description": "Type of property to manipulate",
+        "enum": [
+          "text",
+          "html",
+          "attribute",
+          "style",
+          "value"
+        ],
+        "default": "style"
+      },
+      "PROPERTY": {
+        "type": "string",
+        "description": "Name of the property or attribute",
+        "default": "background-color"
+      },
+      "VALUE": {
+        "type": "string",
+        "description": "Value to set (for set action)",
+        "default": "lightblue"
+      },
+      "IS_EXPRESSION": {
+        "type": "boolean",
+        "description": "Whether to evaluate the value as an expression",
+        "default": false
+      },
+      "LOGGING_LEVEL": {
+        "type": "string",
+        "description": "Level of logging for this operation",
+        "enum": [
+          "none",
+          "basic",
+          "detailed"
+        ],
+        "default": "none"
+      }
+    },
+    "required": [
+      "ACTION",
+      "ELEMENT",
+      "PROPERTY_TYPE"
+    ]
+  },
+  "js_element_class": {
+    "type": "object",
+    "title": "Element Class",
+    "description": "Add, remove, or toggle a class on an element",
+    "properties": {
+      "ACTION": {
+        "type": "string",
+        "description": "Action to perform on the class",
+        "enum": [
+          "add",
+          "remove",
+          "toggle",
+          "contains"
+        ],
+        "default": "add"
+      },
+      "CLASS": {
+        "type": "string",
+        "description": "CSS class name",
+        "default": "active"
+      },
+      "ELEMENT": {
+        "type": "string",
+        "description": "Element ID or variable name",
+        "default": "element"
+      }
+    },
+    "required": [
+      "ACTION",
+      "CLASS",
+      "ELEMENT"
+    ]
+  },
+  "js_event_handler": {
+    "type": "object",
+    "title": "Event Handler",
+    "description": "Create an event handler for a DOM element",
+    "properties": {
+      "ELEMENT": {
+        "type": "string",
+        "description": "Element ID or variable name",
+        "default": "element"
+      },
+      "EVENT": {
+        "type": "string",
+        "description": "Type of event to listen for",
+        "enum": [
+          "click",
+          "change",
+          "submit",
+          "keyup",
+          "focus",
+          "blur",
+          "mouseenter",
+          "mouseleave"
+        ],
+        "default": "click"
+      },
+      "PREVENT_DEFAULT": {
+        "type": "boolean",
+        "description": "Whether to prevent the default action",
+        "default": false
+      },
+      "HANDLER": {
+        "type": "array",
+        "description": "Blocks to execute when the event occurs",
+        "items": {
+          "type": "object"
+        }
+      }
+    },
+    "required": [
+      "ELEMENT",
+      "EVENT"
+    ]
+  },
+  "js_modify_element": {
+    "type": "object",
+    "title": "Modify Element",
+    "description": "Modify an existing DOM element",
+    "properties": {
+      "ELEMENT": {
+        "type": "string",
+        "description": "Element ID or variable name",
+        "default": "myElement"
+      },
+      "IS_VARIABLE": {
+        "type": "boolean",
+        "description": "Whether the element is a variable reference",
+        "default": false
+      },
+      "ACTION": {
+        "type": "string",
+        "description": "Type of modification to perform",
+        "enum": [
+          "content",
+          "attribute",
+          "style",
+          "clear"
+        ],
+        "default": "content"
+      },
+      "PROPERTY": {
+        "type": "string",
+        "description": "Property or attribute name to modify",
+        "default": "innerHTML"
+      },
+      "VALUE": {
+        "type": "string",
+        "description": "Value to set",
+        "default": "New content"
+      }
+    },
+    "required": [
+      "ELEMENT",
+      "ACTION"
+    ]
+  },
+  "js_delete_element": {
+    "type": "object",
+    "title": "Delete Element",
+    "description": "Remove an element from the DOM",
+    "properties": {
+      "ELEMENT": {
+        "type": "string",
+        "description": "Element ID or variable name to delete",
+        "default": "elementToDelete"
+      },
+      "IS_VARIABLE": {
+        "type": "boolean",
+        "description": "Whether the element is a variable reference",
+        "default": false
+      }
+    },
+    "required": [
+      "ELEMENT"
+    ]
+  },
+  "js_clone_element": {
+    "type": "object",
+    "title": "Clone Element",
+    "description": "Clone an existing DOM element",
+    "properties": {
+      "SOURCE": {
+        "type": "string",
+        "description": "Element ID or variable name to clone",
+        "default": "sourceElement"
+      },
+      "NEW_ID": {
+        "type": "string",
+        "description": "ID for the cloned element",
+        "default": "clonedElement"
+      },
+      "DEEP": {
+        "type": "boolean",
+        "description": "Whether to clone child elements",
+        "default": true
+      },
+      "CONTAINER": {
+        "type": "string",
+        "description": "Container to add the cloned element to",
+        "default": "parentElement"
+      }
+    },
+    "required": [
+      "SOURCE",
+      "NEW_ID",
+      "CONTAINER"
+    ]
+  },
+  "text_multiline_js": {
+    "type": "object",
+    "title": "Multiline Text",
+    "description": "A multiline text string as a JavaScript value",
+    "properties": {
+      "TEXT": {
+        "type": "string",
+        "description": "Multiline text content",
+        "default": "line 1\nline 2\nline 3"
+      }
+    },
+    "required": [
+      "TEXT"
+    ]
+  },
+  "console_log": {
+    "type": "object",
+    "title": "Console Log",
+    "description": "Log a message to the console for debugging",
+    "properties": {
+      "TEXT": {
+        "type": "string",
+        "description": "Value or expression to log to the console"
+      }
+    },
+    "required": [
+      "TEXT"
+    ]
+  },
+  "js_variable_declaration": {
+    "type": "object",
+    "title": "Variable Declaration",
+    "description": "Declare a JavaScript variable with a value",
+    "properties": {
+      "TYPE": {
+        "type": "string",
+        "description": "Type of variable declaration",
+        "enum": [
+          "let",
+          "const",
+          "var"
+        ],
+        "default": "let"
+      },
+      "NAME": {
+        "type": "string",
+        "description": "Variable name",
+        "default": "myVariable"
+      },
+      "VALUE": {
+        "type": "string",
+        "description": "Initial value for the variable"
+      }
+    },
+    "required": [
+      "TYPE",
+      "NAME"
+    ]
+  },
+  "js_variable_assignment": {
+    "type": "object",
+    "title": "Variable Assignment",
+    "description": "Assign a new value to an existing variable",
+    "properties": {
+      "NAME": {
+        "type": "string",
+        "description": "Variable name",
+        "default": "myVariable"
+      },
+      "VALUE": {
+        "type": "string",
+        "description": "New value for the variable"
+      }
+    },
+    "required": [
+      "NAME",
+      "VALUE"
+    ]
+  },
+  "js_variable_get": {
+    "type": "object",
+    "title": "Get Variable",
+    "description": "Get the value of a variable",
+    "properties": {
+      "NAME": {
+        "type": "string",
+        "description": "Variable name to retrieve",
+        "default": "myVariable"
+      }
+    },
+    "required": [
+      "NAME"
+    ]
+  },
+  "js_array_literal": {
+    "type": "object",
+    "title": "Array Literal",
+    "description": "Create an array with specified items",
+    "properties": {
+      "ITEMS": {
+        "type": "string",
+        "description": "Comma-separated array items",
+        "default": "\"item1\",\n\"item2\",\n\"item3\""
+      }
+    },
+    "required": [
+      "ITEMS"
+    ]
+  },
+  "js_object_literal": {
+    "type": "object",
+    "title": "Object Literal",
+    "description": "Create a JavaScript object with properties",
+    "properties": {
+      "PROPERTIES": {
+        "type": "string",
+        "description": "Object properties in key-value format",
+        "default": "name: \"John\",\nage: 30,\nisActive: true"
+      }
+    },
+    "required": [
+      "PROPERTIES"
+    ]
+  },
+  "js_function_definition": {
+    "type": "object",
+    "title": "Function Definition",
+    "description": "Define a JavaScript function with parameters",
+    "properties": {
+      "NAME": {
+        "type": "string",
+        "description": "Function name",
+        "default": "myFunction"
+      },
+      "PARAMS": {
+        "type": "string",
+        "description": "Comma-separated parameter names",
+        "default": "param1, param2"
+      },
+      "BODY": {
+        "type": "array",
+        "description": "Function body statements",
+        "items": {
+          "type": "object"
+        }
+      }
+    },
+    "required": [
+      "NAME"
+    ]
+  },
+  "js_function_call": {
+    "type": "object",
+    "title": "Function Call",
+    "description": "Call a JavaScript function with arguments",
+    "properties": {
+      "NAME": {
+        "type": "string",
+        "description": "Function name to call",
+        "default": "myFunction"
+      },
+      "ARGS": {
+        "type": "string",
+        "description": "Comma-separated arguments",
+        "default": "arg1, arg2"
+      }
+    },
+    "required": [
+      "NAME"
+    ]
+  },
+  "js_return": {
+    "type": "object",
+    "title": "Return Statement",
+    "description": "Return a value from a function",
+    "properties": {
+      "VALUE": {
+        "type": "string",
+        "description": "Value to return from the function"
+      }
+    },
+    "required": [
+      "VALUE"
+    ]
+  },
+  "js_fetch": {
+    "type": "object",
+    "title": "Fetch Data",
+    "description": "Fetch data from an API endpoint",
+    "properties": {
+      "URL": {
+        "type": "string",
+        "description": "API endpoint URL",
+        "default": "https://api.example.com/data"
+      },
+      "METHOD": {
+        "type": "string",
+        "description": "HTTP method",
+        "enum": [
+          "GET",
+          "POST",
+          "PUT",
+          "DELETE"
+        ],
+        "default": "GET"
+      },
+      "HEADERS": {
+        "type": "string",
+        "description": "HTTP headers as JSON object",
+        "default": "{\n  \"Content-Type\": \"application/json\"\n}"
+      },
+      "BODY": {
+        "type": "string",
+        "description": "Request body for POST/PUT requests",
+        "default": "{\n  \"name\": \"John\",\n  \"email\": \"john@example.com\"\n}"
+      },
+      "RESULT": {
+        "type": "string",
+        "description": "Variable name to store the response",
+        "default": "response"
+      }
+    },
+    "required": [
+      "URL",
+      "METHOD",
+      "RESULT"
+    ]
+  }
+}

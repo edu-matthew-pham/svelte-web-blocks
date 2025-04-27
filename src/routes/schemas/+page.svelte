@@ -22,11 +22,19 @@
         schemas = Object.fromEntries(
           Object.entries(blockDefinitions)
             .map(([key, definition]) => {
+              // Remove "web_" prefix from the key
+              const cleanKey = key.replace(/^web_/, '');
+              
               // Use the schema if it exists, or fall back to generating one
               const schema = definition.schema || definition.blockConfig?.schema;
               
               if (schema) {
-                return [key, schema] as [string, any];
+                // Clone the schema and update the title if needed
+                const cleanSchema = {...schema};
+                if (cleanSchema.title && cleanSchema.title === key) {
+                  cleanSchema.title = cleanKey;
+                }
+                return [cleanKey, cleanSchema] as [string, any];
               }
               
               // Try to find a corresponding block config
@@ -41,8 +49,8 @@
                 [key: string]: any;
               } = {
                 type: "object",
-                title: key,
-                description: blockConfig?.tooltip || definition.tooltip || `Schema for ${key}`,
+                title: cleanKey, // Use clean key for title
+                description: blockConfig?.tooltip || definition.tooltip || `Schema for ${cleanKey}`,
                 properties: {},
                 required: []
               };
@@ -91,7 +99,7 @@
                 generatedSchema.connections = blockConfig.connections;
               }
               
-              return [key, generatedSchema] as [string, any];
+              return [cleanKey, generatedSchema] as [string, any];
             })
             .filter((entry): entry is [string, any] => entry[1] !== undefined)
         );
