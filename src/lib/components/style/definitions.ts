@@ -18,12 +18,14 @@ const styleBlockConfigs: WebBlockConfigs = {
           ["Element", "element"],
           ["ID", "id"],
           ["Class", "class"],
-          ["Combined", "combined"]
+          ["Combined", "combined"],
+          ["Descendant", "descendant"]
         ]}
       ]},
       { type: "row", children: [
         { type: "label", text: "Selector" },
         { type: "field_dropdown", name: "SELECTOR", options: [
+          ["none", ""],
           ["div", "div"],
           ["p", "p"],
           ["h1", "h1"],

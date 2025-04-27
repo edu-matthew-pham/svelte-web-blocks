@@ -25,37 +25,40 @@ export function createCssSelector(
   // Build selector based on type
   switch (selectorType) {
     case 'element':
-      selectorText = selector || 'div'; // Default to div if empty
+      selectorText = selector;
       break;
     case 'id':
-      selectorText = id ? `#${id}` : 'div'; // Default to div if no ID
+      selectorText = `#${id}`;
       break;
     case 'class':
-      selectorText = className ? `.${className}` : 'div'; // Default to div if no class
+      selectorText = `.${className}`;
       break;
     case 'combined':
-      // Start with element selector if available
+      // Start with element selector only if not empty
       selectorText = selector || '';
+      if (id) selectorText += `#${id}`;
+      if (className) selectorText += `.${className}`;
+      break;
+    case 'descendant':
+      // Create a descendant selector pattern: #id .class element
+      const parts = [];
       
       // Add ID if provided
-      if (id) selectorText += `#${id}`;
+      if (id) parts.push(`#${id}`);
       
       // Add class if provided
-      if (className) selectorText += `.${className}`;
+      if (className) parts.push(`.${className}`);
       
-      // Default to div if nothing specified
-      if (!selectorText) selectorText = 'div';
+      // Add element if provided and not empty
+      if (selector) parts.push(selector);
+      
+      // Join with spaces to create descendant relationship
+      selectorText = parts.join(' ');
       break;
   }
   
   // Add pseudo-class/element if provided
-  if (pseudo) {
-    // Add colon if not already present
-    if (!pseudo.startsWith(':')) {
-      selectorText += ':';
-    }
-    selectorText += pseudo;
-  }
+  if (pseudo) selectorText += pseudo;
   
   return `${selectorText} {\n${declarations}\n}\n`;
 }
