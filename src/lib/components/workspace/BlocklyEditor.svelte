@@ -244,6 +244,59 @@
         window.removeEventListener('message', () => {});
       };
     });
+
+    // Function to copy text to clipboard
+    async function copyToClipboard(text: string) {
+      try {
+        await navigator.clipboard.writeText(text);
+        alert('Copied to clipboard');
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+        alert('Failed to copy to clipboard');
+      }
+    }
+    
+    // Function to download text as a file
+    function downloadFile(content: string, defaultFilename: string) {
+      // Prompt user for filename
+      const filename = prompt('Enter a filename:', defaultFilename) || defaultFilename;
+      
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Function to handle importing JSON files
+    function importJsonFile() {
+      // Create a file input element
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = '.json,application/json';
+      
+      // Set up event handling for when a file is selected
+      fileInput.onchange = (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const contents = event.target?.result as string;
+          if (contents) {
+            loadFromJson(contents);
+          }
+        };
+        reader.readAsText(file);
+      };
+      
+      // Trigger file selection dialog
+      fileInput.click();
+    }
   </script>
   
   <div class="blockly-container">
@@ -306,11 +359,20 @@
       
       <!-- JSON view -->
       <div class="code-container" style="display: {activeTab === 'json' ? 'block' : 'none'}">
+        <div class="action-buttons">
+          <button on:click={() => copyToClipboard(jsonCode)}>Copy JSON Code</button>
+          <button on:click={() => downloadFile(jsonCode, 'component.json')}>Download JSON File</button>
+          <button on:click={importJsonFile}>Import JSON File</button>
+        </div>
         <pre class="code-display"><code class="language-json">{jsonCode}</code></pre>
       </div>
       
       <!-- HTML view -->
       <div class="code-container" style="display: {activeTab === 'code' ? 'block' : 'none'}">
+        <div class="action-buttons">
+          <button on:click={() => copyToClipboard(generatedCode)}>Copy HTML Code</button>
+          <button on:click={() => downloadFile(generatedCode, 'component.html')}>Download HTML File</button>
+        </div>
         <pre class="code-display"><code class="language-html">{generatedCode}</code></pre>
       </div>
 
@@ -417,6 +479,24 @@
       width: 100%;
       height: 100%;
       border: none;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .action-buttons button {
+      padding: 6px 12px;
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .action-buttons button:hover {
+      background: #e0e0e0;
     }
 
   </style> 
