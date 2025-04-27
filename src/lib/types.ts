@@ -27,7 +27,7 @@ export interface BlockInputConfig {
   variable?: string; // For specifying the default variable name
 }
 
-export type BlockCategory = "component" | "item" | "document" | "javascript" | "reactive" | "dataObjects" | "expressions" | "lists" | "logic" | "loops" | "dom" | "create" | "js" | "variables" | "variable";
+export type BlockCategory = "component" | "item" | "document" | "javascript" | "reactive" | "dataObjects" | "expressions" | "lists" | "logic" | "loops" | "dom" | "create" | "js" | "variables" | "variable" | "css";
 
 export interface BlockConnections {
   previous?: string | false;

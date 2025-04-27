@@ -10,6 +10,28 @@
     <field name="CLASS"></field>
     <field name="TITLE">My Web Page</field>
     <field name="THEME">light</field>
+    <statement name="STYLE">
+        <block type="css_selector">
+            <field name="SELECTOR_TYPE">element</field>
+            <field name="SELECTOR">body</field>
+            <statement name="DECLARATIONS">
+                <block type="css_typography">
+                    <field name="FONT_SIZE">16</field>
+                    <field name="FONT_SIZE_UNIT">px</field>
+                    <field name="COLOR">#333333</field>
+                    <next>
+                        <block type="css_spacing">
+                            <field name="PROPERTY">margin</field>
+                            <field name="TOP">0</field>
+                            <field name="RIGHT">0</field>
+                            <field name="BOTTOM">0</field>
+                            <field name="LEFT">0</field>
+                        </block>
+                    </next>
+                </block>
+            </statement>
+        </block>
+    </statement>
     <statement name="SCRIPTS">
         <block type="procedures_defreturn">
             <field name="NAME">myFunction</field>

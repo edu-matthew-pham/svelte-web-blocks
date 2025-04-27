@@ -15,6 +15,7 @@ const componentModules = [
   import('../footer/index.js'),
   import('../forms/index.js'),
   import('../dynamic/index.js'),
+  import('../style/index.js'),
   import('$lib/components/js/create/index.js'),
   import('$lib/components/js/dom/index.js'),
   import('$lib/components/js/variables/index.js'),
@@ -53,7 +54,7 @@ export async function initializeBlocks(): Promise<BlocksBundle> {
       } else if (key.endsWith('Toolbox')) {
         // Separate HTML and JS toolbox categories
         // The first 8 imports are HTML-related components
-        if (index < 8) {
+        if (index < 9) {
           htmlToolboxCategories.push(module[key]);
         } else {
           jsToolboxCategories.push(module[key]);

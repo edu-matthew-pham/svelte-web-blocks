@@ -53,6 +53,12 @@ const documentBlocks: Record<string, BlockConfig> = {
       },
       {
         type: "statement",
+        name: "STYLE",
+        label: "Styles",
+        check: "css_selector"
+      },
+      {
+        type: "statement",
         name: "CONTENT",
         label: "Content",
         check: "web_component"
