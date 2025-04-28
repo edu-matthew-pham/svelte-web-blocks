@@ -23,12 +23,16 @@ export const jsCreateGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'create_container',
-        tag: block.getFieldValue('TAG'),
-        id: block.getFieldValue('ID'),
-        class: block.getFieldValue('CLASS'),
-        container: block.getFieldValue('CONTAINER'),
-        contentType: block.getFieldValue('CONTENT_TYPE'),
-        content: block.getFieldValue('CONTENT')
+        properties: {
+          tag: block.getFieldValue('TAG'),
+          container: block.getFieldValue('CONTAINER'),
+          contentType: block.getFieldValue('CONTENT_TYPE'),
+          content: block.getFieldValue('CONTENT')
+        },
+        attributes: {
+          id: block.getFieldValue('ID'),
+          className: block.getFieldValue('CLASS')
+        }
       };
     }
   },

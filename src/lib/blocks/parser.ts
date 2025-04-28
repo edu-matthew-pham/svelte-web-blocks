@@ -8,6 +8,7 @@ export interface ComponentNode {
     styles?: ComponentNode[];
     scripts?: ComponentNode[];
     value?: string;
+    onloadScripts?: ComponentNode[];
 }
 
 export function parseHighLevelCode(jsonString: string): ComponentNode[] {
@@ -279,6 +280,32 @@ function createComponentBlock(
             }
         }
         
+        // Process onloadScripts - scripts that run when page loads
+        if (component.onloadScripts && component.onloadScripts.length > 0) {
+            // Find appropriate statement input for onload scripts
+            const onloadInput = block.getInput('ONLOAD_SCRIPTS') ? 'ONLOAD_SCRIPTS' : 
+                               (block.getInput('ONLOAD') ? 'ONLOAD' : findStatementInput(block));
+            
+            if (onloadInput) {
+                let previousOnloadBlock: any = null;
+                
+                component.onloadScripts.forEach(onloadScript => {
+                    const onloadBlock = createComponentBlock(
+                        workspace, 
+                        onloadScript,
+                        previousOnloadBlock || block,
+                        previousOnloadBlock ? 'NEXT' : onloadInput
+                    );
+                    
+                    if (onloadBlock) {
+                        previousOnloadBlock = onloadBlock;
+                    }
+                });
+            } else {
+                console.warn(`No onload scripts input found for block ${blockType} onloadScripts`);
+            }
+        }
+        
         // Force a workspace render after all children are added
         if (!parentBlock) {
             workspace.render();
@@ -334,7 +361,9 @@ function mapComponentTypeToBlockType(componentType: string): string {
         'footerLink': 'web_footer_link',
         'dynamicCards': 'web_dynamic_cards',
         'imageGallery': 'web_image_gallery',
-        'accordion': 'web_accordion'
+        'accordion': 'web_accordion',
+        'create_container': 'js_create_container',
+        'create_interactive': 'js_create_interactive'
     };
     
     // No transformation needed for CSS and script components
@@ -345,7 +374,8 @@ function mapComponentTypeToBlockType(componentType: string): string {
     }
     
     // Return mapped type or use web_ prefix as fallback
-    return typeMap[componentType] || `web_${componentType}`;
+    //return typeMap[componentType] || `web_${componentType}`;
+    return typeMap[componentType] || `${componentType}`;
 }
 
 function setBlockFields(block: any, properties: Record<string, any>): void {
