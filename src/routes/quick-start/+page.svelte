@@ -26,10 +26,6 @@
 </script>
 
 <div class="container">
-    <header>
-        <h1>Component-Based Blockly Editor</h1>
-        <p>Test the new component-based block system with bidirectional JSON support</p>
-    </header>
     
     <main>
         <div class="editor-container">
@@ -58,7 +54,7 @@
 
 <style>
     .container {
-        max-width: 1200px;
+        
         margin: 0 auto;
         padding: 20px;
     }
@@ -74,7 +70,7 @@
     }
     
     .editor-container {
-        height: 500px;
+        height: 800px;
         margin-bottom: 20px;
         border: 1px solid #ccc;
     }

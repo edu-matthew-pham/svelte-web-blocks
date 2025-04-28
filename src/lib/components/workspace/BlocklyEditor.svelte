@@ -447,12 +447,15 @@
       height: 100%;
       display: flex;
       flex-direction: column;
+      
     }
     
     .blockly-tabs {
       display: flex;
       border-bottom: 1px solid #ddd;
       margin-bottom: 0;
+      position: relative;
+      z-index: 10;
     }
     
     .tab-button {
@@ -533,6 +536,8 @@
       display: flex;
       gap: 10px;
       margin-bottom: 10px;
+      position: relative;
+      z-index: 10;
     }
     
     .action-buttons button {
