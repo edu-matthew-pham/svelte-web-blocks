@@ -19,8 +19,11 @@ export const jsDomGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'dom_select',
-        selector: block.getFieldValue('SELECTOR'),
-        variable: block.getFieldValue('VARIABLE')
+        properties: {
+          selector: block.getFieldValue('SELECTOR'),
+          variable: block.getFieldValue('VARIABLE')
+        },
+        attributes: {}
       };
     }
   },
@@ -44,12 +47,16 @@ export const jsDomGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'dom_property',
-        action: block.getFieldValue('ACTION'),
-        element: block.getFieldValue('ELEMENT'),
-        propertyType: block.getFieldValue('PROPERTY_TYPE'),
-        property: block.getFieldValue('PROPERTY'),
-        value: block.getFieldValue('VALUE'),
-        loggingLevel: block.getFieldValue('LOGGING_LEVEL')
+        properties: {
+          action: block.getFieldValue('ACTION'),
+          element: block.getFieldValue('ELEMENT'),
+          propertyType: block.getFieldValue('PROPERTY_TYPE'),
+          property: block.getFieldValue('PROPERTY'),
+          value: block.getFieldValue('VALUE'),
+          isExpression: block.getFieldValue('IS_EXPRESSION') === 'TRUE',
+          loggingLevel: block.getFieldValue('LOGGING_LEVEL')
+        },
+        attributes: {}
       };
     }
   },
@@ -67,9 +74,12 @@ export const jsDomGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'dom_class',
-        action: block.getFieldValue('ACTION'),
-        element: block.getFieldValue('ELEMENT'),
-        className: block.getFieldValue('CLASS')
+        properties: {
+          action: block.getFieldValue('ACTION'),
+          element: block.getFieldValue('ELEMENT'),
+          className: block.getFieldValue('CLASS')
+        },
+        attributes: {}
       };
     }
   },
@@ -88,10 +98,13 @@ export const jsDomGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'dom_event',
-        element: block.getFieldValue('ELEMENT'),
-        event: block.getFieldValue('EVENT'),
-        preventDefault: block.getFieldValue('PREVENT_DEFAULT') === 'TRUE',
-        handler: 'HANDLER_CODE'
+        properties: {
+          element: block.getFieldValue('ELEMENT'),
+          event: block.getFieldValue('EVENT'),
+          preventDefault: block.getFieldValue('PREVENT_DEFAULT') === 'TRUE',
+          handler: 'HANDLER_CODE'
+        },
+        attributes: {}
       };
     }
   },
@@ -110,11 +123,14 @@ export const jsDomGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'dom_modify',
-        element: block.getFieldValue('ELEMENT'),
-        isVariable: block.getFieldValue('IS_VARIABLE') === 'TRUE',
-        action: block.getFieldValue('ACTION'),
-        property: block.getFieldValue('PROPERTY'),
-        value: block.getFieldValue('VALUE')
+        properties: {
+          element: block.getFieldValue('ELEMENT'),
+          isVariable: block.getFieldValue('IS_VARIABLE') === 'TRUE',
+          action: block.getFieldValue('ACTION'),
+          property: block.getFieldValue('PROPERTY'),
+          value: block.getFieldValue('VALUE')
+        },
+        attributes: {}
       };
     }
   },
@@ -130,8 +146,11 @@ export const jsDomGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'dom_delete',
-        element: block.getFieldValue('ELEMENT'),
-        isVariable: block.getFieldValue('IS_VARIABLE') === 'TRUE'
+        properties: {
+          element: block.getFieldValue('ELEMENT'),
+          isVariable: block.getFieldValue('IS_VARIABLE') === 'TRUE'
+        },
+        attributes: {}
       };
     }
   },
@@ -149,10 +168,13 @@ export const jsDomGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'dom_clone',
-        source: block.getFieldValue('SOURCE'),
-        newId: block.getFieldValue('NEW_ID'),
-        deep: block.getFieldValue('DEEP') === 'TRUE',
-        container: block.getFieldValue('CONTAINER')
+        properties: {
+          source: block.getFieldValue('SOURCE'),
+          newId: block.getFieldValue('NEW_ID'),
+          deep: block.getFieldValue('DEEP') === 'TRUE',
+          container: block.getFieldValue('CONTAINER')
+        },
+        attributes: {}
       };
     }
   }

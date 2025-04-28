@@ -371,7 +371,15 @@ function mapComponentTypeToBlockType(componentType: string): string {
         'dom_tree': 'js_tree_operation',
         'dom_iterate': 'js_iterate_data',
         'dom_table': 'js_populate_table',
-        'dom_template': 'js_create_from_template'
+        'dom_template': 'js_create_from_template',
+        // Add DOM component mappings
+        'dom_select': 'js_select_element',
+        'dom_property': 'js_element_property',
+        'dom_class': 'js_element_class',
+        'dom_event': 'js_event_handler',
+        'dom_modify': 'js_modify_element',
+        'dom_delete': 'js_delete_element',
+        'dom_clone': 'js_clone_element'
     };
     
     // No transformation needed for CSS and script components
