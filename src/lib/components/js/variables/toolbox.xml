@@ -10,6 +10,8 @@
 
     <label text="Variables" web-class="toolboxLabel"></label>
 
+    <button text="Create Variable..." callbackKey="CREATE_VARIABLE"></button>
+
     
     <block type="variables_set">
       <value name="VALUE">
@@ -35,6 +37,7 @@
         </block>
       </value>
     </block>
+
 
     
     <block type="variables_set">

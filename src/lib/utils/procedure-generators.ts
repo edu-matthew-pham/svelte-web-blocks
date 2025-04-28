@@ -81,7 +81,7 @@ export function extractProcedureInfo(block: Blockly.Block): ProcedureInfo {
   if (block.getInput && block.getInput('RETURN')) {
     try {
       returnValue = javascriptGenerator.valueToCode(
-        block, 'RETURN', javascriptGenerator.ORDER_NONE
+        block, 'RETURN', (javascriptGenerator as any).ORDER_NONE
       ) || 'null';
     } catch (e) {
       console.warn("Error extracting return value:", e);

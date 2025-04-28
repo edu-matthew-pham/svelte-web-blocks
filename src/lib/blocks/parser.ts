@@ -27,6 +27,13 @@ export function createBlocksFromJson(workspace: WorkspaceSvg, jsonString: string
     // Clear workspace
     workspace.clear();
     
+    // Check for scripts in the top-level components
+    components.forEach(component => {
+        if (component.scripts && component.scripts.length > 0) {
+            console.log("Found scripts array in component:", component.scripts);
+        }
+    });
+    
     // Create blocks for each component
     components.forEach(component => {
         createComponentBlock(workspace, component);
@@ -43,24 +50,121 @@ function createComponentBlock(
     
     // Map component type to block type
     const blockType = mapComponentTypeToBlockType(component.type);
-    console.log(`Creating block of type: ${blockType} from component type: ${component.type}`);
+    console.log(`Creating block of type: ${blockType} from component type: ${component.type}`, component);
     
     try {
         // Create the block
         const block = workspace.newBlock(blockType);
+        
+        // Handle variable blocks
+        if (component.type === 'variables_set') {
+            console.log("PROCESSING VARIABLES_SET BLOCK", component);
+            try {
+                // Get variableId from properties or directly from component
+                const variableId = component.properties?.variableId || 
+                                  (component as any).variableId;
+                
+                const variableName = component.properties?.variableName || 
+                                    (component as any).variableName || 'item';
+                
+                console.log("Variable details:", { 
+                    variableId, 
+                    variableName,
+                    directId: (component as any).variableId,
+                    propsId: component.properties?.variableId
+                });
+                
+                if (variableId) {
+                    // Create variable if it doesn't exist
+                    let variable = workspace.getVariableById(variableId);
+                    console.log("Existing variable?", variable);
+                    
+                    if (!variable) {
+                        variable = workspace.createVariable(
+                            variableName, 
+                            undefined, 
+                            variableId
+                        );
+                        console.log("Created new variable:", variable);
+                    }
+                    
+                    // Set the variable field
+                    const variableField = block.getField('VAR');
+                    console.log("Variable field:", variableField);
+                    
+                    if (variableField) {
+                        variableField.setValue(variableId);
+                        console.log("Set variable field value");
+                    }
+                    
+                    // Handle the value input - check both locations
+                    const valueData = component.properties?.value || (component as any).value;
+                    console.log("Value data:", valueData);
+                    
+                    if (valueData && typeof valueData === 'object') {
+                        console.log("Handling value input for variable");
+                        handleValueInput(workspace, block, 'VALUE', valueData);
+                    }
+                } else {
+                    console.warn("No variableId found for variables_set block");
+                }
+            } catch (e) {
+                console.warn('Error handling variables_set block:', e);
+            }
+        }
         
         // Set properties
         if (component.properties) {
             setBlockFields(block, component.properties);
         }
         
-        // Set value for script blocks
-        if (component.value !== undefined) {
-            try {
-                block.setFieldValue(component.value, 'VALUE');
-                console.log(`Set script VALUE field to: ${component.value}`);
-            } catch (e) {
-                console.warn(`Could not set VALUE field for script:`, e);
+        // Handle console_log and other blocks with value property
+        if (component.value !== undefined && component.type !== 'variables_set') {
+            if (blockType === 'console_log') {
+                // For console_log blocks specifically
+                try {
+                    // If value is a simple string
+                    if (typeof component.value === 'string') {
+                        const valueInput = block.getInput('TEXT');
+                        if (valueInput) {
+                            // Create text shadow block
+                            const textBlock = workspace.newBlock('text');
+                            textBlock.initSvg();
+                            
+                            // Remove extra quotes if present
+                            let textValue = component.value;
+                            if (textValue.startsWith("'") && textValue.endsWith("'")) {
+                                textValue = textValue.slice(1, -1);
+                            }
+                            
+                            textBlock.setFieldValue(textValue, 'TEXT');
+                            
+                            // Connect to console_log
+                            const connection = valueInput.connection;
+                            const textConnection = textBlock.outputConnection;
+                            if (connection && textConnection) {
+                                connection.connect(textConnection);
+                            }
+                        } else {
+                            // Fallback to direct field setting if no input exists
+                            block.setFieldValue(component.value, 'TEXT');
+                        }
+                    } 
+                    // If value is an object with nested structure
+                    else if (typeof component.value === 'object') {
+                        handleValueInput(workspace, block, 'TEXT', component.value);
+                    }
+                } catch (e) {
+                    console.warn(`Could not set TEXT field for console_log:`, e);
+                }
+            } else {
+                // General case for other blocks with value field
+                try {
+                    block.setFieldValue(component.value, 'VALUE');
+                    console.log(`Set script VALUE field to: ${component.value}`);
+                } catch (e) {
+                    console.warn(`Could not set VALUE field for script:`, e);
+                }
             }
         }
         
@@ -187,7 +291,33 @@ function createComponentBlock(
     }
 }
 
+// Define an enum for built-in Blockly blocks
+enum BuiltinBlocklyBlocks {
+    VARIABLES_SET = 'variables_set',
+    VARIABLES_GET = 'variables_get',
+    MATH_NUMBER = 'math_number',
+    TEXT = 'text',
+    VARIABLES_SET_WITH_KEY = 'variables_set_with_key',
+    LOGIC_BOOLEAN = 'logic_boolean',
+    CONTROLS_IF = 'controls_if',
+    CONTROLS_REPEAT_EXT = 'controls_repeat_ext',
+    LOGIC_COMPARE = 'logic_compare',
+    LOGIC_OPERATION = 'logic_operation',
+    LISTS_CREATE_WITH = 'lists_create_with',
+    PROCEDURES_DEFNORETURN = 'procedures_defnoreturn',
+    PROCEDURES_CALLNORETURN = 'procedures_callnoreturn',
+    PROCEDURES_DEFRETURN = 'procedures_defreturn',
+    PROCEDURES_CALLRETURN = 'procedures_callreturn',
+    PROCEDURES_RETURN = 'procedures_return'
+}
+
 function mapComponentTypeToBlockType(componentType: string): string {
+    // Check if this is a built-in Blockly block
+    const builtinBlocks = Object.values(BuiltinBlocklyBlocks);
+    if (builtinBlocks.includes(componentType as any)) {
+        return componentType;
+    }
+    
     // Define mappings only for types that need transformation
     const typeMap: Record<string, string> = {
         'header': 'web_header',
@@ -401,5 +531,38 @@ function connectToParent(childBlock: any, parentBlock: any, connectionName: stri
         }
     } catch (e) {
         console.warn(`Failed to connect block to parent: ${e}`);
+    }
+}
+
+function handleValueInput(workspace: WorkspaceSvg, block: any, inputName: string, valueData: any): void {
+    try {
+        if (!valueData || !valueData.type) return;
+        
+        const input = block.getInput(inputName);
+        if (!input || !input.connection) return;
+        
+        // Create value block based on its type
+        const valueBlock = workspace.newBlock(valueData.type);
+        valueBlock.initSvg();
+        
+        // Set field value if specified
+        if (valueData.value !== undefined) {
+            // Different field names based on block type
+            let fieldName = 'TEXT';
+            if (valueData.type === 'math_number') fieldName = 'NUM';
+            if (valueData.type === 'logic_boolean') fieldName = 'BOOL';
+            
+            valueBlock.setFieldValue(valueData.value, fieldName);
+        }
+        
+        // Connect to parent block
+        const blockConnection = input.connection;
+        const valueConnection = valueBlock.outputConnection;
+        
+        if (blockConnection && valueConnection) {
+            blockConnection.connect(valueConnection);
+        }
+    } catch (e) {
+        console.warn(`Error handling value input:`, e);
     }
 }

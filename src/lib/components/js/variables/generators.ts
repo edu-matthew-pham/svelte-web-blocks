@@ -15,9 +15,14 @@ export const variableGenerators: WebBlockGeneratorFunctions = {
     },
     
     highLevel: function(block: Blockly.Block) {
-      const value = javascriptGenerator.valueToCode(
-        block, 'TEXT', (javascriptGenerator as any).ORDER_NONE
-      ) || '""';
+      // Get the input value block directly
+      const valueBlock = block.getInputTargetBlock('TEXT');
+      let value = null;
+      
+      if (valueBlock) {
+        // Get the high-level representation of the value
+        value = javascriptGenerator.blockToHighLevel(valueBlock);
+      }
       
       return {
         type: 'console_log',
