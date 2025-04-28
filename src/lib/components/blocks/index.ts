@@ -16,10 +16,12 @@ const componentModules = [
   import('../forms/index.js'),
   import('../dynamic/index.js'),
   import('../style/index.js'),
+
   import('$lib/components/js/create/index.js'),
   import('$lib/components/js/dom/index.js'),
   import('$lib/components/js/variables/index.js'),
   import('$lib/components/js/default/index.js'),
+  import('../custom/index.js'),
   // Add new components here
 ];
 
