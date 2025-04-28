@@ -363,7 +363,15 @@ function mapComponentTypeToBlockType(componentType: string): string {
         'imageGallery': 'web_image_gallery',
         'accordion': 'web_accordion',
         'create_container': 'js_create_container',
-        'create_interactive': 'js_create_interactive'
+        'create_interactive': 'js_create_interactive',
+        'create_text': 'js_create_text',
+        'create_structured': 'js_create_structured',
+        'create_structured_item': 'js_create_structured_item',
+        'dom_create': 'js_create_element',
+        'dom_tree': 'js_tree_operation',
+        'dom_iterate': 'js_iterate_data',
+        'dom_table': 'js_populate_table',
+        'dom_template': 'js_create_from_template'
     };
     
     // No transformation needed for CSS and script components

@@ -53,12 +53,16 @@ export const jsCreateGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'create_interactive',
-        tag: block.getFieldValue('TAG'),
-        id: block.getFieldValue('ID'),
-        class: block.getFieldValue('CLASS'),
-        label: block.getFieldValue('LABEL'),
-        container: block.getFieldValue('CONTAINER'),
-        attributes: block.getFieldValue('ATTRIBUTES')
+        properties: {
+          tag: block.getFieldValue('TAG'),
+          label: block.getFieldValue('LABEL'),
+          container: block.getFieldValue('CONTAINER'),
+          attributesJson: block.getFieldValue('ATTRIBUTES')
+        },
+        attributes: {
+          id: block.getFieldValue('ID'),
+          className: block.getFieldValue('CLASS')
+        }
       };
     }
   },
@@ -79,12 +83,16 @@ export const jsCreateGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'create_text',
-        tag: block.getFieldValue('TAG'),
-        id: block.getFieldValue('ID'),
-        class: block.getFieldValue('CLASS'),
-        content: block.getFieldValue('CONTENT'),
-        container: block.getFieldValue('CONTAINER'),
-        href: block.getFieldValue('HREF')
+        properties: {
+          tag: block.getFieldValue('TAG'),
+          content: block.getFieldValue('CONTENT'),
+          container: block.getFieldValue('CONTAINER'),
+          href: block.getFieldValue('HREF')
+        },
+        attributes: {
+          id: block.getFieldValue('ID'),
+          className: block.getFieldValue('CLASS')
+        }
       };
     }
   },
@@ -106,13 +114,17 @@ export const jsCreateGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'create_structured',
-        structureType: block.getFieldValue('STRUCTURE_TYPE'),
-        id: block.getFieldValue('ID'),
-        class: block.getFieldValue('CLASS'),
-        container: block.getFieldValue('CONTAINER'),
-        dataSource: block.getFieldValue('DATA_SOURCE'),
-        itemTemplate: block.getFieldValue('ITEM_TEMPLATE'),
-        items: block.getFieldValue('ITEMS')
+        properties: {
+          structureType: block.getFieldValue('STRUCTURE_TYPE'),
+          container: block.getFieldValue('CONTAINER'),
+          dataSource: block.getFieldValue('DATA_SOURCE'),
+          itemTemplate: block.getFieldValue('ITEM_TEMPLATE'),
+          items: block.getFieldValue('ITEMS')
+        },
+        attributes: {
+          id: block.getFieldValue('ID'),
+          className: block.getFieldValue('CLASS')
+        }
       };
     }
   },
@@ -149,15 +161,19 @@ export const jsCreateGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'create_structured_item',
-        itemType: block.getFieldValue('ITEM_TYPE'),
-        id: block.getFieldValue('ID'),
-        class: block.getFieldValue('CLASS'),
-        container: block.getFieldValue('CONTAINER'),
-        contentType: block.getFieldValue('CONTENT_TYPE'),
-        content: block.getFieldValue('CONTENT'),
-        optionValues: block.getFieldValue('OPTION_VALUES'),
-        separator: block.getFieldValue('SEPARATOR'),
-        attributes: block.getFieldValue('ATTRIBUTES')
+        properties: {
+          itemType: block.getFieldValue('ITEM_TYPE'),
+          container: block.getFieldValue('CONTAINER'),
+          contentType: block.getFieldValue('CONTENT_TYPE'),
+          content: block.getFieldValue('CONTENT'),
+          optionValues: block.getFieldValue('OPTION_VALUES'),
+          separator: block.getFieldValue('SEPARATOR'),
+          attributesJson: block.getFieldValue('ATTRIBUTES')
+        },
+        attributes: {
+          id: block.getFieldValue('ID'),
+          className: block.getFieldValue('CLASS')
+        }
       };
     }
   },
@@ -174,8 +190,11 @@ export const jsCreateGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'dom_create',
-        tag: block.getFieldValue('TAG'),
-        variable: block.getFieldValue('VARIABLE')
+        properties: {
+          tag: block.getFieldValue('TAG'),
+          variable: block.getFieldValue('VARIABLE')
+        },
+        attributes: {}
       };
     }
   },
@@ -193,9 +212,12 @@ export const jsCreateGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'dom_tree',
-        action: block.getFieldValue('ACTION'),
-        child: block.getFieldValue('CHILD'),
-        parent: block.getFieldValue('PARENT')
+        properties: {
+          action: block.getFieldValue('ACTION'),
+          child: block.getFieldValue('CHILD'),
+          parent: block.getFieldValue('PARENT')
+        },
+        attributes: {}
       };
     }
   },
@@ -214,10 +236,13 @@ export const jsCreateGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'dom_iterate',
-        dataSource: block.getFieldValue('DATA_SOURCE'),
-        container: block.getFieldValue('CONTAINER'),
-        elementType: block.getFieldValue('ELEMENT_TYPE'),
-        template: block.getFieldValue('TEMPLATE')
+        properties: {
+          dataSource: block.getFieldValue('DATA_SOURCE'),
+          container: block.getFieldValue('CONTAINER'),
+          elementType: block.getFieldValue('ELEMENT_TYPE'),
+          template: block.getFieldValue('TEMPLATE')
+        },
+        attributes: {}
       };
     }
   },
@@ -236,10 +261,13 @@ export const jsCreateGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'dom_table',
-        dataSource: block.getFieldValue('DATA_SOURCE'),
-        table: block.getFieldValue('TABLE'),
-        columns: block.getFieldValue('COLUMNS').split(','),
-        headers: block.getFieldValue('HEADERS') === true
+        properties: {
+          dataSource: block.getFieldValue('DATA_SOURCE'),
+          table: block.getFieldValue('TABLE'),
+          columns: block.getFieldValue('COLUMNS').split(','),
+          headers: block.getFieldValue('HEADERS') === true
+        },
+        attributes: {}
       };
     }
   },
@@ -257,9 +285,12 @@ export const jsCreateGenerators: WebBlockGeneratorFunctions = {
     highLevel: function(block: Blockly.Block) {
       return {
         type: 'dom_template',
-        template: block.getFieldValue('TEMPLATE'),
-        dataSource: block.getFieldValue('DATA_SOURCE'),
-        container: block.getFieldValue('CONTAINER')
+        properties: {
+          template: block.getFieldValue('TEMPLATE'),
+          dataSource: block.getFieldValue('DATA_SOURCE'),
+          container: block.getFieldValue('CONTAINER')
+        },
+        attributes: {}
       };
     }
   }
