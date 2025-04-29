@@ -10,11 +10,9 @@ This project provides Svelte components for visual programming using Google Bloc
 - 📝 Code generation for multiple languages
 - 🎨 Customizable workspace themes
 - 📱 Responsive design and mobile support
-- 💡 Multiple examples showcasing different use cases:
-  - Basic Blockly implementation
-  - JSON to Blocks conversion
-  - HTML to PUG transformation
-  - Blockly to JSON export
+- 🔍 Live preview of generated code
+- 📊 DOM inspection and visualization
+- 🔄 Bidirectional JSON conversion
 
 ## Installation
 
@@ -24,75 +22,152 @@ npm install svelte-web-blocks
 
 ## Usage
 
-### Basic Example
+### Basic Example with BlocklyEditor
 
 ```javascript
 <script>
-  import { BlocklyWorkspaceWithPreview } from 'svelte-web-blocks';
+  import { BlocklyEditor } from 'svelte-web-blocks';
   
-  // Variables to store generated code
-  let htmlOutput = '';
-  let jsonOutput = '';
-</script>
-
-<BlocklyWorkspaceWithPreview 
-  bind:generatedHtml={htmlOutput}
-  bind:generatedJson={jsonOutput}
-/>
-```
-
-### With JSON Utility Buttons
-```javascript
-<script>
-  import { BlocklyWorkspaceWithPreview } from 'svelte-web-blocks';
-  
-  // Variables to store generated code
-  let htmlOutput = '';
+  let editor;
   let jsonOutput = '';
   
-  // Function to log JSON to console
-  function logJson() {
-    console.log(JSON.parse(jsonOutput));
+  function handleEditorChange(event) {
+    if (event.detail && event.detail.json) {
+      jsonOutput = event.detail.json;
+    }
   }
   
-  // Function to download JSON
-  function downloadJson() {
-    const blob = new Blob([jsonOutput], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'blockly-workspace.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  function clearWorkspace() {
+    if (editor) {
+      editor.clearWorkspace();
+    }
   }
 </script>
 
-<div class="workspace-container">
-  <BlocklyWorkspaceWithPreview 
-    bind:generatedHtml={htmlOutput}
-    bind:generatedJson={jsonOutput}
+<div class="editor-container" style="height: 600px;">
+  <BlocklyEditor 
+    bind:this={editor}
+    showCodeView={true}
+    showJsonView={true}
+    on:change={handleEditorChange}
   />
 </div>
 
-<div class="json-actions">
-  <button on:click={logJson}>Log JSON to Console</button>
-  <button on:click={downloadJson}>Download JSON</button>
+<div class="controls">
+  <button on:click={clearWorkspace}>Clear Workspace</button>
 </div>
 ```
 
-## Examples
+### Loading from JSON
 
-This package includes several example components demonstrating different use cases:
+```javascript
+<script>
+  import { BlocklyEditor } from 'svelte-web-blocks';
+  
+  let editor;
+  let jsonInput = `[
+    {
+      "type": "document",
+      "properties": {
+        "title": "My Web Page"
+      },
+      "children": [
+        {
+          "type": "heading",
+          "properties": {
+            "text": "Hello World"
+          }
+        }
+      ]
+    }
+  ]`;
+  
+  function loadJson() {
+    if (editor && jsonInput) {
+      editor.loadFromJson(jsonInput);
+    }
+  }
+</script>
 
-- `QuickStart.svelte`: Simple Blockly workspace setup
-- `BasicBlockly.svelte`: Convert Blockly to HTML
-- `BlocklyToJson.svelte`: Convert Blockly to JSON
-- `JsonToBlocks.svelte`: Convert JSON structures to Blockly blocks
-- `HtmlToPug.svelte`: Transform HTML to PUG
+<div class="editor-container" style="height: 600px;">
+  <BlocklyEditor bind:this={editor} />
+</div>
 
-You can view a live deployment of these examples [here](https://svelte-web-blocks.vercel.app/).
+<div class="json-input">
+  <textarea bind:value={jsonInput} rows="10"></textarea>
+  <button on:click={loadJson}>Load from JSON</button>
+</div>
+```
+
+## Key Components
+
+### Main Components
+
+- **BlocklyEditor**: Full-featured editor with tabs for Blocks, JSON, HTML, Preview, and DOM inspection
+- **BlocklyWorkspace**: Simple Blockly workspace without preview
+- **BlocklyWorkspaceWithPreview**: Workspace with HTML preview functionality
+
+### Example Components
+
+- **BasicBlockly**: Simple implementation showing HTML generation from blocks
+- **BlocklyToJson**: Demonstrates how to convert Blockly workspace to JSON
+- **JsonToBlocks**: Shows conversion from JSON structures to Blockly blocks
+- **HtmlToPug**: Provides transformation from HTML to PUG format
+
+### Utility Functions
+
+- `createBlocksFromJson`: Convert JSON to Blockly blocks
+- `convertHTMLToPug`: Transform HTML to PUG format
+- `initializeBlocks`: Load all block definitions and generators
+
+## Example Use Cases
+
+This package supports various workflows:
+
+- Creating web components visually with blocks
+- Converting JSON specifications to visual blocks
+- Generating HTML code from blocks
+- Transforming HTML to PUG
+- Live previewing generated components
+- Inspecting the DOM structure of components
+
+### Quick Integration Guide
+
+1. **Basic HTML Generation**
+   ```javascript
+   <script>
+     import { BasicBlockly } from 'svelte-web-blocks';
+   </script>
+   
+   <BasicBlockly />
+   ```
+
+2. **JSON Generation**
+   ```javascript
+   <script>
+     import { BlocklyToJson } from 'svelte-web-blocks';
+   </script>
+   
+   <BlocklyToJson />
+   ```
+
+3. **JSON to Blocks Conversion**
+   ```javascript
+   <script>
+     import { JsonToBlocks } from 'svelte-web-blocks';
+   </script>
+   
+   <JsonToBlocks />
+   ```
+
+4. **HTML to PUG Conversion**
+   ```javascript
+   <script>
+     import { HtmlToPug } from 'svelte-web-blocks';
+   </script>
+   
+   <HtmlToPug />
+   ```
 
 ## Contributing
 
