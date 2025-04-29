@@ -1,6 +1,6 @@
 import { documentDefinitions } from './definitions.js';
 import { documentGenerators } from './generators.js';
-import documentToolbox from './toolbox.xml?raw';
+import { toolboxXml as documentToolbox } from './toolbox.js';
 
 export {
   documentDefinitions,

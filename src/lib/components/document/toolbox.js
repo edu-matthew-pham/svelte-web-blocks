@@ -1,0 +1,73 @@
+// Auto-generated from toolbox.xml
+// Do not edit directly - use the XML file instead
+
+export const toolboxXml = `<category name="Document" colour="290">
+<block type="web_document">
+    <field name="ID"></field>
+    <field name="CLASS"></field>
+    <field name="TITLE">My Web Page</field>
+    <field name="THEME">light</field>
+</block>
+<block type="web_document">
+    <field name="ID"></field>
+    <field name="CLASS"></field>
+    <field name="TITLE">My Web Page</field>
+    <field name="THEME">light</field>
+    <statement name="STYLES">
+        <block type="css_selector">
+            <field name="SELECTOR_TYPE">element</field>
+            <field name="SELECTOR">body</field>
+            <statement name="DECLARATIONS">
+                <block type="css_typography">
+                    <field name="FONT_SIZE">16</field>
+                    <field name="FONT_SIZE_UNIT">px</field>
+                    <field name="COLOR">#333333</field>
+                    <next>
+                        <block type="css_spacing">
+                            <field name="PROPERTY">margin</field>
+                            <field name="TOP">0</field>
+                            <field name="RIGHT">0</field>
+                            <field name="BOTTOM">0</field>
+                            <field name="LEFT">0</field>
+                        </block>
+                    </next>
+                </block>
+            </statement>
+        </block>
+    </statement>
+</block>
+<block type="web_document">
+    <field name="ID"></field>
+    <field name="CLASS"></field>
+    <field name="TITLE">My Web Page</field>
+    <field name="THEME">light</field>
+    <statement name="SCRIPTS">
+        <block type="procedures_defreturn">
+            <field name="NAME">myFunction</field>
+            <statement name="STACK">
+                <block type="variables_set">
+                    <value name="VALUE">
+                        <block type="text">
+                            <field name="TEXT">abc</field>
+                        </block>
+                    </value>
+                    <next>
+                        <block type="console_log">
+                            <value name="TEXT">
+                                <shadow type="text">
+                                    <field name="TEXT">Hello world</field>
+                                </shadow>
+                            </value>
+                        </block>
+                    </next>
+                </block>
+            </statement>
+            <value name="RETURN">
+                <block type="text">
+                    <field name="TEXT">return value</field>
+                </block>
+            </value>
+        </block>
+    </statement>
+</block>
+</category>`;

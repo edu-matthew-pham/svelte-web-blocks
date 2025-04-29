@@ -1,4 +1,4 @@
 // Export all content component functionality
-export { default as contentToolbox } from './toolbox.xml?raw';
+export { toolboxXml as contentToolbox } from './toolbox.js';
 export { contentDefinitions } from './definitions.js';
 export { contentGenerators } from './generators.js'; 

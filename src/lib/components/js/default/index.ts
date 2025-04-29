@@ -1,1 +1,1 @@
-export { default as variablesToolbox } from './toolbox.xml?raw';
+export { toolboxXml as defaultToolbox } from './toolbox.js';

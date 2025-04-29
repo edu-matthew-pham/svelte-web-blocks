@@ -1,4 +1,4 @@
 // Export all features component functionality
-export { default as featuresToolbox } from './toolbox.xml?raw';
+export { toolboxXml as featuresToolbox } from './toolbox.js';
 export { featuresDefinitions } from './definitions.js';
 export { featuresGenerators } from './generators.js'; 

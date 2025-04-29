@@ -1,0 +1,238 @@
+// Auto-generated from jsToolbox.xml
+// Do not edit directly - use the XML file instead
+
+export const jsToolboxXml = `<xml id="toolbox" style="display: none">
+  <category name="JavaScript" colour="270">
+  
+    <category name="Variables & Functions" colour="290">
+      <label text="Variables" web-class="toolboxLabel"></label>
+      <block type="variables_set">
+        <field name="VAR">myVariable</field>
+      </block>
+      <block type="variables_get">
+        <field name="VAR">myVariable</field>
+      </block>
+
+      <label text="Functions" web-class="toolboxLabel"></label>
+      <sep gap="8"></sep>
+      
+      <block type="procedures_defnoreturn">
+        <field name="NAME">myFunction</field>
+      </block>
+      <block type="procedures_defreturn">
+        <field name="NAME">myFunctionWithReturn</field>
+      </block>
+      <block type="procedures_callnoreturn">
+        <mutation name="myFunction"></mutation>
+      </block>
+      <block type="procedures_callreturn">
+        <mutation name="myFunctionWithReturn"></mutation>
+      </block>
+    </category>
+
+    <category name="Logic & Loops" colour="210">
+      <label text="Logic" web-class="toolboxLabel"></label>
+      <block type="js_conditional">
+        <field name="CONDITION">x > 10</field>
+      </block>
+      
+      <block type="js_conditional_else">
+        <field name="CONDITION">x > 10</field>
+      </block>
+      
+      <block type="js_comparison">
+        <field name="LEFT">a</field>
+        <field name="OPERATOR">===</field>
+        <field name="RIGHT">b</field>
+      </block>
+      
+      <block type="js_logical">
+        <field name="OPERATOR">&&</field>
+        <field name="LEFT">a > 5</field>
+        <field name="RIGHT">b < 10</field>
+      </block>
+      
+      <sep gap="8"></sep>
+      <label text="Loops" web-class="toolboxLabel"></label>
+      
+      <block type="js_for_loop">
+        <field name="INIT">let i = 0</field>
+        <field name="CONDITION">i < 10</field>
+        <field name="UPDATE">i++</field>
+      </block>
+      
+      <block type="js_for_of">
+        <field name="VARIABLE">item</field>
+        <field name="ARRAY">items</field>
+      </block>
+      
+      <block type="js_while_loop">
+        <field name="CONDITION">condition</field>
+      </block>
+      
+      <block type="js_repeat_loop">
+        <field name="TIMES">10</field>
+      </block>
+    </category>
+
+    <category name="Lists & Arrays" colour="260">
+      <block type="js_create_list">
+        <field name="NAME">myList</field>
+        <field name="CONST">true</field>
+      </block>
+      
+      <block type="js_list_operation">
+        <field name="OPERATION">add</field>
+        <field name="LIST">myList</field>
+      </block>
+      
+      <block type="js_list_query">
+        <field name="QUERY">length</field>
+        <field name="LIST">myList</field>
+      </block>
+      
+      <block type="js_list_transform">
+        <field name="OPERATION">sort</field>
+        <field name="LIST">myList</field>
+      </block>
+    </category>
+
+    <category name="Objects & JSON" colour="170">
+      <block type="js_create_object">
+        <field name="NAME">myObject</field>
+        <field name="CONST">true</field>
+      </block>
+      
+      <block type="js_get_property">
+        <field name="OBJECT">myObject</field>
+        <field name="PROPERTY">property</field>
+      </block>
+      
+      <block type="js_set_property">
+        <field name="OBJECT">myObject</field>
+        <field name="PROPERTY">property</field>
+      </block>
+      
+      <block type="js_parse_json">
+        <field name="JSON_STRING">{"data": "value"}</field>
+        <field name="RESULT_VAR">result</field>
+      </block>
+      
+      <block type="js_stringify_object">
+        <field name="OBJECT">myObject</field>
+        <field name="PRETTY">true</field>
+      </block>
+    </category>
+
+    <category name="DOM Manipulation" colour="180">
+      <block type="js_modify_element">
+        <field name="SELECTOR">#element-id</field>
+        <field name="ACTION">text</field>
+        <field name="VALUE">New content</field>
+      </block>
+      
+      <block type="js_event_listener">
+        <field name="SELECTOR">#button-id</field>
+        <field name="EVENT_TYPE">click</field>
+        <field name="PREVENT_DEFAULT">false</field>
+      </block>
+    </category>
+
+    <category name="Expressions & Formatting" colour="230">
+      <block type="js_format_currency">
+        <field name="AMOUNT">19.99</field>
+        <field name="CURRENCY">USD</field>
+      </block>
+      
+      <block type="js_format_date">
+        <field name="DATE">new Date()</field>
+        <field name="FORMAT">short</field>
+      </block>
+      
+      <block type="js_calculate_percentage">
+        <field name="VALUE">25</field>
+        <field name="TOTAL">100</field>
+        <field name="DECIMALS">2</field>
+      </block>
+      
+      <block type="js_string_template">
+        <field name="TEMPLATE">Hello, {name}! Your score is {score}.</field>
+      </block>
+      
+      <block type="js_validate_input">
+        <field name="VALUE">email</field>
+        <field name="TYPE">email</field>
+      </block>
+      
+      <block type="js_data_operation">
+        <field name="OPERATION">filter</field>
+        <field name="ARRAY">items</field>
+        <field name="EXPRESSION">item.price > 20</field>
+      </block>
+    </category>
+
+    <category name="High-Level Components" colour="290">
+      <block type="js_tab_system">
+        <field name="CONTAINER_ID">tabs-container</field>
+      </block>
+      
+      <block type="js_modal_dialog">
+        <field name="TRIGGER_ID">open-modal</field>
+        <field name="TITLE">Modal Title</field>
+      </block>
+      
+      <block type="js_data_table">
+        <field name="DATA_SOURCE">tableData</field>
+      </block>
+      
+      <block type="js_form_validator">
+        <field name="FORM_ID">contact-form</field>
+      </block>
+    </category>
+
+    <category name="Reactive Data" colour="300">
+      <block type="js_reactive_store">
+        <field name="STORE_NAME">appState</field>
+        <field name="INITIAL_DATA">{ count: 0 }</field>
+      </block>
+      
+      <block type="js_reactive_get">
+        <field name="STORE_NAME">appState</field>
+        <field name="KEY">count</field>
+      </block>
+      
+      <block type="js_reactive_set">
+        <field name="STORE_NAME">appState</field>
+        <field name="KEY">count</field>
+      </block>
+      
+      <block type="js_reactive_expression">
+        <field name="STORE_NAME">appState</field>
+        <field name="KEY">count</field>
+        <field name="EXPRESSION">appState.get('count') + 1</field>
+      </block>
+      
+      <block type="js_reactive_bind_element">
+        <field name="SELECTOR">#counter</field>
+        <field name="STORE_NAME">appState</field>
+        <field name="KEY">count</field>
+        <field name="ATTRIBUTE">textContent</field>
+      </block>
+      
+      <block type="js_reactive_bind_template">
+        <field name="SELECTOR">#items-container</field>
+        <field name="STORE_NAME">appState</field>
+        <field name="ARRAY_KEY">items</field>
+        <field name="SCHEMA">{ id: 'string', name: 'string' }</field>
+      </block>
+      
+      <block type="js_reactive_listen">
+        <field name="STORE_NAME">appState</field>
+        <field name="KEY">count</field>
+      </block>
+      
+      <block type="js_reactive_new_value"></block>
+      <block type="js_reactive_old_value"></block>
+    </category>
+  </category>
+</xml>`;

@@ -1,0 +1,54 @@
+// Auto-generated from toolbox.xml
+// Do not edit directly - use the XML file instead
+
+export const toolboxXml = `<category name="DOM Manipulation" colour="180">
+
+  
+  <!-- Unified Property Manipulation -->
+  <block type="js_element_property">
+    <field name="ACTION">set</field>
+    <field name="ELEMENT">document-1</field>
+    <field name="PROPERTY_TYPE">style</field>
+    <field name="PROPERTY">background-color</field>
+    <field name="VALUE">lightblue</field>
+    <field name="IS_EXPRESSION">FALSE</field>
+    <field name="LOGGING_LEVEL">none</field>
+  </block>
+  
+  <!-- Event Handling -->
+  <block type="js_event_handler">
+    <field name="ELEMENT">myButton</field>
+    <field name="EVENT">click</field>
+    <field name="PREVENT_DEFAULT">FALSE</field>
+  </block>
+  
+  <!-- Class Manipulation -->
+  <block type="js_element_class" disabled="true">
+    <field name="ACTION">add</field>
+    <field name="CLASS">active</field>
+    <field name="ELEMENT">myElement</field>
+  </block>
+
+  <!-- Element Modification (new) -->
+  <block type="js_modify_element" disabled="true">
+    <field name="ELEMENT">myElement</field>
+    <field name="IS_VARIABLE">FALSE</field>
+    <field name="ACTION">content</field>
+    <field name="PROPERTY">innerHTML</field>
+    <field name="VALUE">New content</field>
+  </block>
+  
+  <!-- Element Deletion (new) -->
+  <block type="js_delete_element" disabled="true">
+    <field name="ELEMENT">elementToDelete</field>
+    <field name="IS_VARIABLE">FALSE</field>
+  </block>
+  
+  <!-- Element Cloning (new) -->
+  <block type="js_clone_element" disabled="true">
+    <field name="SOURCE">sourceElement</field>
+    <field name="NEW_ID">clonedElement</field>
+    <field name="DEEP">TRUE</field>
+    <field name="CONTAINER">parentElement</field>
+  </block>
+</category> `;

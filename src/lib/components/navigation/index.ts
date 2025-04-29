@@ -1,4 +1,4 @@
 // Export all navigation component functionality
-export { default as navigationToolbox } from './toolbox.xml?raw';
+export { toolboxXml as navigationToolbox } from './toolbox.js';
 export { navigationDefinitions } from './definitions.js';
 export { navigationGenerators } from './generators.js';

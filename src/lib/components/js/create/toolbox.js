@@ -1,0 +1,59 @@
+// Auto-generated from toolbox.xml
+// Do not edit directly - use the XML file instead
+
+export const toolboxXml = `<category name="Create DOM Elements" colour="160">
+  <!-- Container Elements -->
+  <block type="js_create_container">
+    <field name="TAG">div</field>
+    <field name="ID">myContainer</field>
+    <field name="CLASS"></field>
+    <field name="CONTAINER">document-1</field>
+    <field name="CONTENT_TYPE">empty</field>
+    <field name="CONTENT"></field>
+  </block>
+  
+  <!-- Interactive Elements -->
+  <block type="js_create_interactive">
+    <field name="TAG">button</field>
+    <field name="ID">myButton</field>
+    <field name="CLASS"></field>
+    <field name="LABEL">Click me</field>
+    <field name="CONTAINER">document-1</field>
+    <field name="ATTRIBUTES">{"type": "button"}</field>
+  </block>
+  
+  <!-- Text Elements -->
+  <block type="js_create_text">
+    <field name="TAG">h1</field>
+    <field name="ID"></field>
+    <field name="CLASS"></field>
+    <field name="CONTENT">Hello World</field>
+    <field name="CONTAINER">document-1</field>
+    <field name="HREF"></field>
+  </block>
+  
+  <!-- Structured Elements -->
+  <block type="js_create_structured">
+    <field name="STRUCTURE_TYPE">ul</field>
+    <field name="ID">myList</field>
+    <field name="CLASS"></field>
+    <field name="CONTAINER">document-1</field>
+    <field name="DATA_SOURCE"></field>
+    <field name="ITEM_TEMPLATE"><li>${item}</li></field>
+    <field name="ITEMS">Item 1, Item 2, Item 3</field>
+  </block>
+  
+  <!-- Structured Items -->
+  <block type="js_create_structured_item">
+    <field name="ITEM_TYPE">li</field>
+    <field name="ID"></field>
+    <field name="CLASS"></field>
+    <field name="CONTAINER">myList</field>
+    <field name="CONTENT_TYPE">single</field>
+    <field name="CONTENT">Item content</field>
+    <field name="OPTION_VALUES"></field>
+    <field name="SEPARATOR">,</field>
+    <field name="ATTRIBUTES">{}</field>
+  </block>
+  
+</category>`;

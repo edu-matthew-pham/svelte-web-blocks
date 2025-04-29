@@ -1,10 +1,10 @@
 import { jsDomDefinitions } from './definitions.js';
 import { jsDomGenerators } from './generators.js';
-import toolbox from './toolbox.xml?raw';
+import { toolboxXml as jsDomToolbox } from './toolbox.js';
 
 // Export everything according to the expected naming pattern
 export { 
   jsDomDefinitions,
   jsDomGenerators,
-  toolbox as jsDomToolbox
+  jsDomToolbox
 };

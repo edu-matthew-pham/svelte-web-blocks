@@ -1,3 +1,3 @@
 // Export all footer component functionality
-export { default as customToolbox } from './toolbox.xml?raw';
+export { toolboxXml as customToolbox } from './toolbox.js';
 export { customDefinitions } from './definitions.js';
