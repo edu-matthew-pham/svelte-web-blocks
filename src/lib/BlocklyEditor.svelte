@@ -7,6 +7,11 @@
   import { WorkspaceSvg } from 'blockly';
   import { createBlocksFromJson } from '$lib/blocks/parser.js';
   import { javascriptGenerator } from 'blockly/javascript';
+  
+  // Import Prism for syntax highlighting
+  import Prism from 'prismjs';
+  import 'prismjs/components/prism-json';
+  import 'prismjs/components/prism-html';
 
   // Props
   export let initialXml = '';
@@ -202,6 +207,29 @@
       Blockly.svgResize(workspace);
     }
   }
+
+  // Add these exports to match the interface expected in the other project
+  export function loadFromJson(jsonString: string) {
+    if (!workspace) return;
+    try {
+      workspace.clear();
+      const parsedJson = JSON.parse(jsonString);
+      // Implement the logic to create blocks from JSON
+      createBlocksFromJson(workspace, JSON.stringify(parsedJson));
+    } catch (e) {
+      console.error('Error loading from JSON', e);
+    }
+  }
+
+  // Add this function to highlight code after updates
+  afterUpdate(() => {
+    if (activeTab === 'json' || activeTab === 'code') {
+      // Ensure Prism is available before using it
+      if (typeof Prism !== 'undefined') {
+        Prism.highlightAll();
+      }
+    }
+  });
 </script>
 
 <div class="blockly-container">
