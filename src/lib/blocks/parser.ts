@@ -348,10 +348,10 @@ function mapComponentTypeToBlockType(componentType: string): string {
     // Define mappings only for types that need transformation
     const typeMap: Record<string, string> = {
         'header': 'web_header',
-        'navItem': 'web_nav_item',
+        'nav_item': 'web_nav_item',
         'hero': 'web_hero',
-        'featureCard': 'web_feature_card',
-        'featureCards': 'web_feature_cards',
+        'feature_card': 'web_feature_card',
+        'feature_cards': 'web_feature_cards',
         'content_section': 'web_content_section',
         'content_block': 'web_content_block',
         'document': 'web_document',

@@ -1,34 +1,55 @@
-import { createGenerator } from '$lib/utils/generator-factory.js';
 import { createFeatureCardsHTML, createFeatureCardHTML } from '$lib/blocks/htmlTemplates.js';
 import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript';
 
 // Create generators for feature components
 export const featuresGenerators = {
-  web_feature_cards: createGenerator({
-    propertyMappings: [
-      { componentProp: 'title' },
-      { componentProp: 'columns' },
-      // Note: If you're missing a backgroundColor field in your definition,
-      // you might need to add it or handle its absence in the htmlRenderer
-    ],
-    childInputs: [
-      { inputName: 'CARDS' }
-    ],
-    
-    // Custom HTML renderer that uses the existing template
-    htmlRenderer: (props, childrenHtml, attributes) => {
-      const { title, columns } = props;
-      const backgroundColor = props.backgroundColor || '#ffffff';
+  web_feature_cards: {
+    html: function(block: Blockly.Block): string {
+      const title = block.getFieldValue('TITLE');
+      const columns = block.getFieldValue('COLUMNS');
+      const backgroundColor = block.getFieldValue('BACKGROUND_COLOR') || '#ffffff';
+      const cards = javascriptGenerator.statementToCode(block, 'CARDS');
+      
+      // Get ID and CLASS values
+      const id = block.getFieldValue('ID') || '';
+      const className = block.getFieldValue('CLASS') || '';
+      
+      const attributes = { id, className };
       
       return createFeatureCardsHTML(
         title,
         backgroundColor,
-        childrenHtml.cards || '',
+        cards,
         attributes
       );
+    },
+    
+    highLevel: function(block: Blockly.Block): any {
+      const title = block.getFieldValue('TITLE');
+      const columns = block.getFieldValue('COLUMNS');
+      const backgroundColor = block.getFieldValue('BACKGROUND_COLOR') || '#ffffff';
+      
+      // Process feature cards
+      const children = [];
+      let cardBlock = block.getInputTargetBlock('CARDS');
+      while (cardBlock) {
+        const card = javascriptGenerator.blockToHighLevel(cardBlock);
+        if (card) children.push(card);
+        cardBlock = cardBlock.getNextBlock();
+      }
+      
+      return {
+        type: "feature_cards",
+        properties: {
+          title,
+          columns,
+          backgroundColor
+        },
+        children: children
+      };
     }
-  }),
+  },
   
   // For feature_card, we need custom implementation to handle column settings from parent
   web_feature_card: {
@@ -59,7 +80,7 @@ export const featuresGenerators = {
     
     highLevel: function(block: Blockly.Block): any {
       return {
-        type: "featureCard",
+        type: "feature_card",
         properties: {
           icon: block.getFieldValue('ICON'),
           title: block.getFieldValue('TITLE'),

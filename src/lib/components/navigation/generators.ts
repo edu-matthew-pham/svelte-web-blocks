@@ -61,7 +61,7 @@ export const navigationGenerators = {
     
     highLevel: function(block: Blockly.Block) {
       return {
-        type: "navItem",
+        type: "nav_item",
         properties: {
           text: block.getFieldValue('TEXT'),
           url: block.getFieldValue('URL')
