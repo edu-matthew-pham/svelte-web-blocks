@@ -22,11 +22,11 @@ async function generateXmlModules() {
       const baseName = path.basename(xmlFile, '.xml');
       const varName = `${baseName}Xml`;
       
-      // Create JavaScript content
+      // Create JavaScript content with proper escaping
       const jsContent = `// Auto-generated from ${path.basename(xmlFile)}
 // Do not edit directly - use the XML file instead
 
-export const ${varName} = \`${xmlContent.replace(/`/g, '\\`')}\`;
+export const ${varName} = \`${xmlContent.replace(/\$/g, '\\$').replace(/`/g, '\\`')}\`;
 `;
 
       // Write the JavaScript file
