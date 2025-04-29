@@ -36,6 +36,8 @@ export const webGenerators: WebBlockGeneratorFunctions = {
       const theme = block.getFieldValue('THEME');
       const content = javascriptGenerator.statementToCode(block, 'CONTENT');
       const scripts = javascriptGenerator.statementToCode(block, 'SCRIPTS');
+      const styles = javascriptGenerator.statementToCode(block, 'STYLES');
+      const onloadScripts = javascriptGenerator.statementToCode(block, 'ONLOAD_SCRIPTS');
       
       // Extract ID and CLASS values if they exist on the block
       const id = block.getFieldValue('ID') || '';
@@ -44,7 +46,7 @@ export const webGenerators: WebBlockGeneratorFunctions = {
       // Create attributes object
       const attributes = { id, className };
       
-      return HTML.createDocumentHTML(title, theme, content, scripts, '', attributes) + '\n';
+      return HTML.createDocumentHTML(title, theme, content, scripts, styles, onloadScripts, attributes) + '\n';
     },
     
     highLevel: function(block: Blockly.Block) {

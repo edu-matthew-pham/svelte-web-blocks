@@ -59,16 +59,6 @@
         padding: 20px;
     }
     
-    header {
-        margin-bottom: 20px;
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 10px;
-    }
-    
-    h1 {
-        margin-bottom: 5px;
-    }
-    
     .editor-container {
         height: 800px;
         margin-bottom: 20px;
