@@ -152,42 +152,6 @@ function overrideVariableGenerators() {
       return `var ${variableName} = ${value};\n`;
     }
   };
-  /*
-  // Add high-level generator as a property on the existing generator function
-  javascriptGenerator.forBlock['variables_set'].highLevel = function(block: Blockly.Block) {
-    const variableId = block.getFieldValue('VAR');
-    
-    // Get the actual variable model to access user-facing name
-    const variable = block.workspace.getVariableById(variableId);
-    const variableName = variable ? variable.name : 
-      javascriptGenerator.nameDB_!.getName(variableId, Blockly.Names.NameType.VARIABLE);
-    
-    // Get the value connected to this variable
-    const valueBlock = block.getInputTargetBlock('VALUE');
-    let valueRepresentation = null;
-    
-    if (valueBlock) {
-      // Try to get high-level representation
-      valueRepresentation = javascriptGenerator.blockToHighLevel(valueBlock);
-      
-      // If high-level representation fails but we can get code, create a basic representation
-      if (!valueRepresentation) {
-        const code = javascriptGenerator.valueToCode(block, 'VALUE', (javascriptGenerator as any).ORDER_ASSIGNMENT);
-        if (code) {
-          valueRepresentation = { type: 'literal', value: code };
-        }
-      }
-    }
-    
-    return {
-      type: 'variables_set',
-      variableName: variableName,
-      variableId: variableId,
-      isDeclared: VariableTracker.isDeclared(variableId),
-      value: valueRepresentation || { type: 'literal', value: '0' }
-    };
-  };
-  */
   
   // Similarly override variables_get if needed
   javascriptGenerator.forBlock['variables_get'] = function(block: Blockly.Block) {
@@ -197,20 +161,6 @@ function overrideVariableGenerators() {
       Blockly.Names.NameType.VARIABLE
     );
     return [variableName, (javascriptGenerator as any).ORDER_ATOMIC];
-  };
-  
-  javascriptGenerator.forBlock['variables_get'].highLevel = function(block: Blockly.Block) {
-    const variableId = block.getFieldValue('VAR');
-    const variableName = javascriptGenerator.nameDB_!.getName(
-      variableId,
-      Blockly.Names.NameType.VARIABLE
-    );
-    
-    return {
-      type: 'variable_reference',
-      variableName: variableName,
-      variableId: variableId
-    };
   };
   
   // Reset tracker when starting generation

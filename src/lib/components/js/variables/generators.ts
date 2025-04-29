@@ -26,7 +26,9 @@ export const variableGenerators: WebBlockGeneratorFunctions = {
       
       return {
         type: 'console_log',
-        value: value
+        properties: {
+          value: value
+        }
       };
     }
   }

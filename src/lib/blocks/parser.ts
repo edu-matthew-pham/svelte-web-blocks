@@ -41,6 +41,17 @@ export function createBlocksFromJson(workspace: WorkspaceSvg, jsonString: string
     });
 }
 
+// Add a function to determine if a property should be skipped for a specific block type
+function shouldSkipProperty(blockType: string, propertyName: string): boolean {
+    // Properties that should be skipped for variables_set blocks
+    if (blockType === 'variables_set') {
+        return ['variableName', 'variableId', 'isDeclared', 'value'].includes(propertyName);
+    }
+    
+    // Properties that should be skipped for all blocks
+    return ['children', 'scripts', 'styles', 'onloadScripts'].includes(propertyName);
+}
+
 function createComponentBlock(
     workspace: WorkspaceSvg, 
     component: ComponentNode, 
@@ -61,18 +72,13 @@ function createComponentBlock(
         if (component.type === 'variables_set') {
             //console.log("PROCESSING VARIABLES_SET BLOCK", component);
             try {
-                // Get variableId from properties or directly from component
-                const variableId = component.properties?.variableId || 
-                                  (component as any).variableId;
-                
-                const variableName = component.properties?.variableName || 
-                                    (component as any).variableName || 'item';
+                // Always check properties first, following our standardized approach
+                const variableId = component.properties?.variableId;
+                const variableName = component.properties?.variableName || 'item';
                 
                 console.log("Variable details:", { 
                     variableId, 
-                    variableName,
-                    directId: (component as any).variableId,
-                    propsId: component.properties?.variableId
+                    variableName
                 });
                 
                 if (variableName) {
@@ -102,11 +108,12 @@ function createComponentBlock(
                         //console.log(`Set variable field to: ${variable.getId()}`);
                     }
                     
-                    // Handle the value input - check both locations
-                    const valueData = component.properties?.value || (component as any).value;
+                    // Handle the value input - now consistently in properties
+                    const valueData = component.properties?.value;
                     
                     if (valueData && typeof valueData === 'object') {
                         //console.log("Handling value input for variable");
+                        // This is critical - use the VALUE input, not trying to set a field
                         handleValueInput(workspace, block, 'VALUE', valueData);
                     }
                 } else {
@@ -117,18 +124,30 @@ function createComponentBlock(
             }
         }
         
-        // Set properties
+        // Set properties - this is now the primary way we handle all properties
         if (component.properties) {
-            setBlockFields(block, component.properties);
+            // Create a filtered properties object that excludes properties already handled
+            const filteredProperties = Object.fromEntries(
+                Object.entries(component.properties)
+                    .filter(([key, _]) => !shouldSkipProperty(blockType, key))
+            );
+            
+            // Only call setBlockFields if there are properties to set
+            if (Object.keys(filteredProperties).length > 0) {
+                setBlockFields(block, filteredProperties);
+            }
         }
         
         // Handle console_log and other blocks with value property
-        if (component.value !== undefined && component.type !== 'variables_set') {
+        // Modified to look for value in properties object first
+        if (component.properties?.value !== undefined && 
+            blockType !== 'variables_set') { // Skip for variables_set which is handled above
             if (blockType === 'console_log') {
                 // For console_log blocks specifically
                 try {
+                    const value = component.properties.value;
                     // If value is a simple string
-                    if (typeof component.value === 'string') {
+                    if (typeof value === 'string') {
                         const valueInput = block.getInput('TEXT');
                         if (valueInput) {
                             // Create text shadow block
@@ -136,7 +155,7 @@ function createComponentBlock(
                             textBlock.initSvg();
                             
                             // Remove extra quotes if present
-                            let textValue = component.value;
+                            let textValue = value;
                             if (textValue.startsWith("'") && textValue.endsWith("'")) {
                                 textValue = textValue.slice(1, -1);
                             }
@@ -151,12 +170,12 @@ function createComponentBlock(
                             }
                         } else {
                             // Fallback to direct field setting if no input exists
-                            block.setFieldValue(component.value, 'TEXT');
+                            block.setFieldValue(value, 'TEXT');
                         }
                     } 
                     // If value is an object with nested structure
-                    else if (typeof component.value === 'object') {
-                        handleValueInput(workspace, block, 'TEXT', component.value);
+                    else if (typeof value === 'object') {
+                        handleValueInput(workspace, block, 'TEXT', value);
                     }
                 } catch (e) {
                     console.warn(`Could not set TEXT field for console_log:`, e);
@@ -164,12 +183,17 @@ function createComponentBlock(
             } else {
                 // General case for other blocks with value field
                 try {
-                    block.setFieldValue(component.value, 'VALUE');
-                    console.log(`Set script VALUE field to: ${component.value}`);
+                    block.setFieldValue(component.properties.value, 'VALUE');
+                    console.log(`Set script VALUE field to: ${component.properties.value}`);
                 } catch (e) {
                     console.warn(`Could not set VALUE field for script:`, e);
                 }
             }
+        }
+        // Fallback for direct value property (for backward compatibility)
+        else if (component.value !== undefined && component.type !== 'variables_set') {
+            // Same code as above but using component.value directly
+            // This can eventually be removed when all high-level generators are updated
         }
         
         // Set attributes (ID, className, etc.)
@@ -445,6 +469,11 @@ function setBlockFields(block: any, properties: Record<string, any>): void {
     );
     
     Object.entries(properties).forEach(([key, value]) => {
+        // Skip properties that are known not to be fields
+        if (shouldSkipProperty(block.type, key)) {
+            return;
+        }
+        
         // Special handling for form field types
         if (block.type === 'web_form_field' && key === 'fieldType') {
             try {
@@ -625,23 +654,54 @@ function connectToParent(childBlock: any, parentBlock: any, connectionName: stri
 
 function handleValueInput(workspace: WorkspaceSvg, block: any, inputName: string, valueData: any): void {
     try {
-        if (!valueData || !valueData.type) return;
+        console.log(`Handling value input for ${block.type}, input: ${inputName}`, valueData);
+        
+        if (!valueData || !valueData.type) {
+            console.warn('Invalid value data object', valueData);
+            return;
+        }
         
         const input = block.getInput(inputName);
-        if (!input || !input.connection) return;
+        if (!input || !input.connection) {
+            console.warn(`Block ${block.type} has no input named ${inputName} or it has no connection`);
+            return;
+        }
         
         // Create value block based on its type
         const valueBlock = workspace.newBlock(valueData.type);
         valueBlock.initSvg();
         
-        // Set field value if specified
-        if (valueData.value !== undefined) {
-            // Different field names based on block type
-            let fieldName = 'TEXT';
-            if (valueData.type === 'math_number') fieldName = 'NUM';
-            if (valueData.type === 'logic_boolean') fieldName = 'BOOL';
-            
-            valueBlock.setFieldValue(valueData.value, fieldName);
+        // Set field values from properties if specified
+        if (valueData.properties) {
+            // For text blocks, use TEXT field
+            if (valueData.type === 'text' && valueData.properties.value !== undefined) {
+                valueBlock.setFieldValue(String(valueData.properties.value), 'TEXT');
+                console.log(`Set text value to: ${valueData.properties.value}`);
+            }
+            // For number blocks, use NUM field
+            else if (valueData.type === 'math_number' && valueData.properties.value !== undefined) {
+                valueBlock.setFieldValue(String(valueData.properties.value), 'NUM');
+                console.log(`Set number value to: ${valueData.properties.value}`);
+            }
+            // For boolean blocks, use BOOL field
+            else if (valueData.type === 'logic_boolean' && valueData.properties.value !== undefined) {
+                valueBlock.setFieldValue(
+                    valueData.properties.value === true || valueData.properties.value === 'TRUE' ? 'TRUE' : 'FALSE', 
+                    'BOOL'
+                );
+                console.log(`Set boolean value to: ${valueData.properties.value}`);
+            }
+            // For other blocks, try to set all properties as fields
+            else {
+                setBlockFields(valueBlock, valueData.properties);
+            }
+        }
+        // Backward compatibility: direct value property
+        else if (valueData.value !== undefined) {
+            const fieldName = valueData.type === 'math_number' ? 'NUM' : 
+                              valueData.type === 'logic_boolean' ? 'BOOL' : 'TEXT';
+            valueBlock.setFieldValue(String(valueData.value), fieldName);
+            console.log(`Set ${valueData.type} value to: ${valueData.value} using field ${fieldName}`);
         }
         
         // Connect to parent block
@@ -650,8 +710,11 @@ function handleValueInput(workspace: WorkspaceSvg, block: any, inputName: string
         
         if (blockConnection && valueConnection) {
             blockConnection.connect(valueConnection);
+            console.log(`Connected ${valueData.type} block to ${block.type}'s ${inputName} input`);
+        } else {
+            console.warn(`Failed to connect: blockConnection=${!!blockConnection}, valueConnection=${!!valueConnection}`);
         }
     } catch (e) {
-        console.warn(`Error handling value input:`, e);
+        console.error(`Error handling value input:`, e);
     }
 }
