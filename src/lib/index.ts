@@ -15,11 +15,20 @@ export { initializeBlocks } from './components/blocks/index.js';
 // Export component modules
 export * from './components/document/index.js';
 export * from './components/navigation/index.js';
+export * from './components/hero/index.js';
 export * from './components/content/index.js';
 export * from './components/features/index.js';
+export * from './components/footer/index.js';
 export * from './components/forms/index.js';
 export * from './components/dynamic/index.js';
+export * from './components/style/index.js';
+export * from './components/custom/index.js';
+
+// JS component exports
+export * from './components/js/create/index.js';
 export * from './components/js/dom/index.js';
+export * from './components/js/variables/index.js';
+export * from './components/js/default/index.js';
 
 import BlocklyWorkspace from './BlocklyWorkspace.svelte';
 import BlocklyWorkspaceWithPreview from './BlocklyWorkspaceWithPreview.svelte';
