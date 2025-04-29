@@ -61,7 +61,7 @@ export const contentGenerators = {
     
     highLevel: function(block: Blockly.Block): any {
       return {
-        type: "contentBlock",
+        type: "content_block",
         properties: {
           content: block.getFieldValue('CONTENT'),
           id: block.getFieldValue('ID'),
