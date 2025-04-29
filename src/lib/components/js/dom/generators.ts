@@ -96,13 +96,42 @@ export const jsDomGenerators: WebBlockGeneratorFunctions = {
     },
     
     highLevel: function(block: Blockly.Block) {
+      // Get the connected blocks inside the handler
+      const handlerBlocks = [];
+      let childBlock = block.getInputTargetBlock('HANDLER');
+      
+      while (childBlock) {
+        // Get block type
+        const blockType = childBlock.type;
+        
+        // Find the appropriate generator
+        const generators = javascriptGenerator.forBlock;
+        if (blockType && generators[blockType] && generators[blockType].highLevel) {
+          // Call the highLevel function for this block type
+          const blockJson = generators[blockType].highLevel(childBlock);
+          // Make sure we're adding a valid object, not undefined or null
+          if (blockJson) {
+            handlerBlocks.push(blockJson);
+            //console.log('Added handler block:', blockJson); // Debug output
+          }
+        } else {
+          //console.warn(`No highLevel generator found for block type: ${blockType}`);
+        }
+        
+        childBlock = childBlock.getNextBlock();
+      }
+      
+      // Debug the entire handler array
+      console.log('Complete handler blocks array:', handlerBlocks);
+      
       return {
         type: 'dom_event',
         properties: {
           element: block.getFieldValue('ELEMENT'),
           event: block.getFieldValue('EVENT'),
           preventDefault: block.getFieldValue('PREVENT_DEFAULT') === 'TRUE',
-          handler: 'HANDLER_CODE'
+          // Ensure we're passing the actual array, not a string representation
+          handler: handlerBlocks.length > 0 ? handlerBlocks : []
         },
         attributes: {}
       };

@@ -306,6 +306,33 @@ function createComponentBlock(
             }
         }
         
+        // Special handling for event handler blocks
+        if (blockType === 'js_event_handler' && component.properties && component.properties.handler && 
+            Array.isArray(component.properties.handler) && component.properties.handler.length > 0) {
+            
+            // Find the HANDLER input
+            const handlerInput = block.getInput('HANDLER');
+            
+            if (handlerInput) {
+                let previousHandlerBlock: any = null;
+                
+                component.properties.handler.forEach(handlerComponent => {
+                    const handlerBlock = createComponentBlock(
+                        workspace, 
+                        handlerComponent,
+                        previousHandlerBlock || block,
+                        previousHandlerBlock ? 'NEXT' : 'HANDLER'
+                    );
+                    
+                    if (handlerBlock) {
+                        previousHandlerBlock = handlerBlock;
+                    }
+                });
+            } else {
+                console.warn(`No HANDLER input found for event handler block`);
+            }
+        }
+        
         // Force a workspace render after all children are added
         if (!parentBlock) {
             workspace.render();
@@ -449,14 +476,15 @@ function setBlockFields(block: any, properties: Record<string, any>): void {
             }
         }
         
-        // Try different field name variations (original code)
+        // Try different field name variations
         const fieldVariations = [
             key,                                        // original (camelCase)
             key.toUpperCase(),                          // UPPERCASE
             key.toLowerCase(),                          // lowercase
             key.charAt(0).toUpperCase() + key.slice(1),  // PascalCase
-            // Add snake_case variation
-            key.replace(/([A-Z])/g, '_$1').toUpperCase() // LOGO_TEXT from logoText
+            key.replace(/([A-Z])/g, '_$1').toUpperCase(), // LOGO_TEXT from logoText
+            key.replace(/Json$/, '').toUpperCase(),     // Remove Json suffix and uppercase
+            // Add other variations as needed
         ];
         
         let fieldSet = false;

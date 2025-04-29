@@ -12,7 +12,7 @@
   <!-- Interactive Elements -->
   <block type="js_create_interactive">
     <field name="TAG">button</field>
-    <field name="ID"></field>
+    <field name="ID">myButton</field>
     <field name="CLASS"></field>
     <field name="LABEL">Click me</field>
     <field name="CONTAINER">document-1</field>
