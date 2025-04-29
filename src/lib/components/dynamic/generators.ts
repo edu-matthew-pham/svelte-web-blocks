@@ -67,7 +67,7 @@ export const dynamicGenerators = {
       }
       
       return {
-        type: "dynamicCards",
+        type: "dynamic_cards",
         properties: {
           title: block.getFieldValue('TITLE'),
           layout: block.getFieldValue('LAYOUT'),
@@ -118,7 +118,7 @@ export const dynamicGenerators = {
       }
       
       return {
-        type: "imageGallery",
+        type: "image_gallery",
         properties: {
           title: block.getFieldValue('TITLE'),
           thumbnailSize: block.getFieldValue('THUMBNAIL_SIZE'),
