@@ -356,9 +356,9 @@ function mapComponentTypeToBlockType(componentType: string): string {
         'content_block': 'web_content_block',
         'document': 'web_document',
         'form': 'web_basic_form',
-        'formField': 'web_form_field',
+        'form_field': 'web_form_field',
         'footer': 'web_footer',
-        'footerLink': 'web_footer_link',
+        'footer_link': 'web_footer_link',
         'dynamicCards': 'web_dynamic_cards',
         'imageGallery': 'web_image_gallery',
         'accordion': 'web_accordion',
@@ -415,6 +415,18 @@ function setBlockFields(block: any, properties: Record<string, any>): void {
     );
     
     Object.entries(properties).forEach(([key, value]) => {
+        // Special handling for form field types
+        if (block.type === 'web_form_field' && key === 'fieldType') {
+            try {
+                block.setFieldValue(value, 'TYPE');
+                console.log(`Set form field TYPE to ${value}`);
+                return; // Skip other variations for this property
+            } catch (e) {
+                console.warn(`Could not set form field TYPE:`, e);
+                // Continue to regular field setting below
+            }
+        }
+        
         // Special handling for JSON data in dynamic content blocks
         if ((key === 'data' || key === 'images') && 
             (block.type === 'web_dynamic_cards' || 

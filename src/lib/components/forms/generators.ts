@@ -1,33 +1,54 @@
-import { createGenerator } from '$lib/utils/generator-factory.js';
 import { createFormHTML, createFormFieldHTML } from '$lib/blocks/htmlTemplates.js';
 import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript';
 
 // Create generators for form components
 export const formsGenerators = {
-  web_basic_form: createGenerator({
-    propertyMappings: [
-      { componentProp: 'title' },
-      { componentProp: 'submitText' },
-      { componentProp: 'id' },
-      { componentProp: 'className' }
-    ],
-    childInputs: [
-      { inputName: 'FIELDS' }
-    ],
-    
-    // Custom HTML renderer that uses the existing template
-    htmlRenderer: (props, childrenHtml, attributes) => {
-      const { title, submitText } = props;
+  web_basic_form: {
+    html: function(block: Blockly.Block) {
+      const title = block.getFieldValue('TITLE');
+      const submitText = block.getFieldValue('SUBMIT_TEXT');
+      const fields = javascriptGenerator.statementToCode(block, 'FIELDS');
+      
+      // Extract ID and CLASS values
+      const id = block.getFieldValue('ID') || '';
+      const className = block.getFieldValue('CLASS') || '';
+      
+      const attributes = { id, className };
       
       return createFormHTML(
         title,
         submitText,
-        childrenHtml.fields || '',
+        fields,
         attributes
       );
+    },
+    
+    highLevel: function(block: Blockly.Block) {
+      const title = block.getFieldValue('TITLE');
+      const submitText = block.getFieldValue('SUBMIT_TEXT');
+      
+      // Process form fields
+      const children = [];
+      let fieldBlock = block.getInputTargetBlock('FIELDS');
+      while (fieldBlock) {
+        const field = javascriptGenerator.blockToHighLevel(fieldBlock);
+        if (field) children.push(field);
+        fieldBlock = fieldBlock.getNextBlock();
+      }
+      
+      return {
+        type: "form",
+        properties: {
+          title,
+          submitText,
+          id: block.getFieldValue('ID'),
+          className: block.getFieldValue('CLASS')
+        },
+        children: children
+      };
     }
-  }),
+  },
   
   web_form_field: {
     html: function(block: Blockly.Block): string {
@@ -39,16 +60,12 @@ export const formsGenerators = {
       // Extract ID and CLASS values
       const id = block.getFieldValue('ID') || '';
       const className = block.getFieldValue('CLASS') || '';
-
-      
       
       // Create attributes object
       const attributes = {
         id: id,
         className: className
       };
-
-      console.log('Attributes', attributes);
       
       // For select or radio fields, process the options
       let parsedOptions = [];
@@ -70,7 +87,7 @@ export const formsGenerators = {
         [];
       
       return {
-        type: "formField",
+        type: "form_field",
         properties: {
           label: block.getFieldValue('LABEL'),
           fieldType: type,
