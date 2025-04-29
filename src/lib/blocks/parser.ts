@@ -51,7 +51,7 @@ function createComponentBlock(
     
     // Map component type to block type
     const blockType = mapComponentTypeToBlockType(component.type);
-    console.log(`Creating block of type: ${blockType} from component type: ${component.type}`, component);
+    //console.log(`Creating block of type: ${blockType} from component type: ${component.type}`, component);
     
     try {
         // Create the block
@@ -59,7 +59,7 @@ function createComponentBlock(
         
         // Handle variable blocks
         if (component.type === 'variables_set') {
-            console.log("PROCESSING VARIABLES_SET BLOCK", component);
+            //console.log("PROCESSING VARIABLES_SET BLOCK", component);
             try {
                 // Get variableId from properties or directly from component
                 const variableId = component.properties?.variableId || 
@@ -75,39 +75,42 @@ function createComponentBlock(
                     propsId: component.properties?.variableId
                 });
                 
-                if (variableId) {
-                    // Create variable if it doesn't exist
-                    let variable = workspace.getVariableById(variableId);
-                    console.log("Existing variable?", variable);
+                if (variableName) {
+                    // First check if variable already exists in workspace by name
+                    let variable = workspace.getVariable(variableName);
                     
+                    // If variable doesn't exist, create it
                     if (!variable) {
-                        variable = workspace.createVariable(
-                            variableName, 
-                            undefined, 
-                            variableId
-                        );
-                        console.log("Created new variable:", variable);
+                        //console.log(`Creating new variable: ${variableName}`);
+                        // Create with original ID if possible
+                        try {
+                            variable = workspace.createVariable(variableName, undefined, variableId);
+                        } catch (e) {
+                            // If ID conflict, create with auto-generated ID
+                            //console.log(`Could not create with specified ID, using auto ID: ${e}`);
+                            variable = workspace.createVariable(variableName);
+                        }
+                    } else {
+                        //console.log(`Using existing variable: ${variableName} with ID: ${variable.getId()}`);
                     }
                     
                     // Set the variable field
                     const variableField = block.getField('VAR');
-                    console.log("Variable field:", variableField);
                     
                     if (variableField) {
-                        variableField.setValue(variableId);
-                        console.log("Set variable field value");
+                        variableField.setValue(variable.getId());
+                        //console.log(`Set variable field to: ${variable.getId()}`);
                     }
                     
                     // Handle the value input - check both locations
                     const valueData = component.properties?.value || (component as any).value;
-                    console.log("Value data:", valueData);
                     
                     if (valueData && typeof valueData === 'object') {
-                        console.log("Handling value input for variable");
+                        //console.log("Handling value input for variable");
                         handleValueInput(workspace, block, 'VALUE', valueData);
                     }
                 } else {
-                    console.warn("No variableId found for variables_set block");
+                    console.warn("No variable name found for variables_set block");
                 }
             } catch (e) {
                 console.warn('Error handling variables_set block:', e);
