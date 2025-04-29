@@ -61,7 +61,7 @@ function createComponentBlock(
     if (!component.type) return null;
     
     // Map component type to block type
-    const blockType = mapComponentTypeToBlockType(component.type);
+    const blockType = mapComponentTypeToBlockType(component.type, component);
     //console.log(`Creating block of type: ${blockType} from component type: ${component.type}`, component);
     
     try {
@@ -257,6 +257,35 @@ function createComponentBlock(
             }
         }
         
+        // Special handling for function definition bodies
+        if ((blockType === 'procedures_defnoreturn' || blockType === 'procedures_defreturn') && 
+            component.properties?.body && Array.isArray(component.properties.body) && 
+            component.properties.body.length > 0) {
+            
+            // Function body blocks are attached to the STACK input
+            const stackInput = 'STACK';
+            let previousStackBlock: any = null;
+            
+            component.properties.body.forEach(bodyComponent => {
+                const bodyBlock = createComponentBlock(
+                    workspace,
+                    bodyComponent,
+                    previousStackBlock || block,
+                    previousStackBlock ? 'NEXT' : stackInput
+                );
+                
+                if (bodyBlock) {
+                    previousStackBlock = bodyBlock;
+                }
+            });
+            
+            // If this is a function with return, handle the return value
+            if (blockType === 'procedures_defreturn' && component.properties?.returnValue) {
+                const returnValue = component.properties.returnValue;
+                handleValueInput(workspace, block, 'RETURN', returnValue);
+            }
+        }
+        
         // Process styles - similar to children but using a different input name
         if (component.styles && component.styles.length > 0) {
             // Find appropriate statement input for styles
@@ -392,7 +421,21 @@ enum BuiltinBlocklyBlocks {
     PROCEDURES_RETURN = 'procedures_return'
 }
 
-function mapComponentTypeToBlockType(componentType: string): string {
+function mapComponentTypeToBlockType(componentType: string, component?: ComponentNode): string {
+    // Special case for function definitions
+    if (componentType === 'function_definition' && component) {
+        // Check if this function has a return value
+        const hasReturn = component.properties?.hasReturn === true;
+        return hasReturn ? 'procedures_defreturn' : 'procedures_defnoreturn';
+    }
+    
+    // Special case for function calls
+    if (componentType === 'function_call' && component) {
+        // Check if this function call returns a value
+        const hasReturn = component.properties?.hasReturn === true;
+        return hasReturn ? 'procedures_callreturn' : 'procedures_callnoreturn';
+    }
+    
     // Check if this is a built-in Blockly block
     const builtinBlocks = Object.values(BuiltinBlocklyBlocks);
     if (builtinBlocks.includes(componentType as any)) {
@@ -443,9 +486,8 @@ function mapComponentTypeToBlockType(componentType: string): string {
         return componentType;
     }
     
-    // Return mapped type or use web_ prefix as fallback
-    //return typeMap[componentType] || `web_${componentType}`;
-    return typeMap[componentType] || `${componentType}`;
+    // Return mapped type or use the original as fallback
+    return typeMap[componentType] || componentType;
 }
 
 function setBlockFields(block: any, properties: Record<string, any>): void {
