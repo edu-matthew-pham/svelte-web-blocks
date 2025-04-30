@@ -105,10 +105,9 @@ export const jsCreateGenerators: WebBlockGeneratorFunctions = {
       const className = block.getFieldValue('CLASS');
       const container = block.getFieldValue('CONTAINER');
       const dataSource = block.getFieldValue('DATA_SOURCE');
-      const itemTemplate = block.getFieldValue('ITEM_TEMPLATE');
       const items = block.getFieldValue('ITEMS');
       
-      return jsTemplates.createStructuredElement(structureType, id, className, container, dataSource, itemTemplate, items);
+      return jsTemplates.createStructuredElement(structureType, id, className, container, dataSource, items);
     },
     
     highLevel: function(block: Blockly.Block) {
@@ -118,7 +117,6 @@ export const jsCreateGenerators: WebBlockGeneratorFunctions = {
           structureType: block.getFieldValue('STRUCTURE_TYPE'),
           container: block.getFieldValue('CONTAINER'),
           dataSource: block.getFieldValue('DATA_SOURCE'),
-          itemTemplate: block.getFieldValue('ITEM_TEMPLATE'),
           items: block.getFieldValue('ITEMS')
         },
         attributes: {

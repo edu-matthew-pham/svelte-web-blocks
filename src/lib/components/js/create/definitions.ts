@@ -294,10 +294,6 @@ const jsCreateBlockConfigs: WebBlockConfigs = {
         { type: "field_text", name: "DATA_SOURCE", default: "" }
       ]},
       { type: "row", children: [
-        { type: "label", text: "Item template" },
-        { type: "field_multiline", name: "ITEM_TEMPLATE", default: "<li>${item}</li>" }
-      ]},
-      { type: "row", children: [
         { type: "label", text: "Manual items (CSV)" },
         { type: "field_multiline", name: "ITEMS", default: "Item 1, Item 2, Item 3" }
       ]}
@@ -331,11 +327,6 @@ const jsCreateBlockConfigs: WebBlockConfigs = {
         DATA_SOURCE: {
           type: "string",
           description: "Variable name containing data (optional)"
-        },
-        ITEM_TEMPLATE: {
-          type: "string",
-          description: "Template for each item with ${item} placeholder",
-          default: "<li>${item}</li>"
         },
         ITEMS: {
           type: "string",

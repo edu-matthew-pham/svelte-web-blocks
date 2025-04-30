@@ -39,7 +39,6 @@ export const toolboxXml = `<category name="Create DOM Elements" colour="160">
     <field name="CLASS"></field>
     <field name="CONTAINER">document-1</field>
     <field name="DATA_SOURCE"></field>
-    <field name="ITEM_TEMPLATE"><li>\${item}</li></field>
     <field name="ITEMS">Item 1, Item 2, Item 3</field>
   </block>
   

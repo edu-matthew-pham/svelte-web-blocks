@@ -928,7 +928,6 @@ interface ObjectProperty {
     className: string,
     container: string,
     dataSource: string = '',
-    itemTemplate: string = '',
     items: string = ''
   ): string {
     // Create unique variable name for the element
@@ -956,6 +955,22 @@ interface ObjectProperty {
     code += `  document.body.appendChild(${varName});\n`;
     code += `}\n`;
     
+    // Determine the appropriate template based on structure type
+    let template = '';
+    if (['ul', 'ol'].includes(structureType)) {
+      // Handle list items - support for comma-separated items
+      template = '${Array.isArray(item) ? item.map(i => `<li>${i}</li>`).join("") : typeof item === "string" && item.includes(",") ? item.split(",").map(i => `<li>${i.trim()}</li>`).join("") : `<li>${item}</li>`}';
+    } else if (structureType === 'table') {
+      // Handle table rows - support for comma-separated cells
+      template = '${Array.isArray(item) ? `<tr>${item.map(i => `<td>${i}</td>`).join("")}</tr>` : typeof item === "string" && item.includes(",") ? `<tr>${item.split(",").map(i => `<td>${i.trim()}</td>`).join("")}</tr>` : `<tr><td>${item}</td></tr>`}';
+    } else if (structureType === 'select') {
+      // Handle select options - support for comma-separated options
+      template = '${Array.isArray(item) ? item.map(i => `<option value="${i}">${i}</option>`).join("") : typeof item === "string" && item.includes(",") ? item.split(",").map(i => `<option value="${i.trim()}">${i.trim()}</option>`).join("") : `<option value="${item}">${item}</option>`}';
+    } else if (structureType === 'dl') {
+      // Handle definition lists - support for comma-separated term:description pairs
+      template = '${typeof item === "object" ? `<dt>${item.term}</dt><dd>${item.description}</dd>` : typeof item === "string" && item.includes(",") ? item.split(",").map(i => { const [term, desc] = i.split(":").map(s => s.trim()); return `<dt>${term}</dt><dd>${desc || ""}</dd>`; }).join("") : `<dt>${item}</dt><dd></dd>`}';
+    }
+    
     // Handle data source if provided
     if (dataSource && dataSource.trim() !== '') {
       // Data-driven content generation
@@ -963,15 +978,15 @@ interface ObjectProperty {
         code += `${dataSource}.forEach(function(item) {\n`;
         const liVarName = generateVarName('li');
         code += `  const ${liVarName} = document.createElement('li');\n`;
-        code += `  ${liVarName}.innerHTML = \`${itemTemplate}\`;\n`;
+        code += `  ${liVarName}.innerHTML = \`${template}\`;\n`;
         code += `  ${varName}.appendChild(${liVarName});\n`;
         code += `});\n`;
       } else if (structureType === 'table') {
-        // Assuming itemTemplate is a row template
+        // Assuming template is a row template
         code += `${dataSource}.forEach(function(item) {\n`;
         const trVarName = generateVarName('tr');
         code += `  const ${trVarName} = document.createElement('tr');\n`;
-        code += `  ${trVarName}.innerHTML = \`${itemTemplate}\`;\n`;
+        code += `  ${trVarName}.innerHTML = \`${template}\`;\n`;
         code += `  ${varName}.appendChild(${trVarName});\n`;
         code += `});\n`;
       } else if (structureType === 'dl') {
@@ -979,11 +994,19 @@ interface ObjectProperty {
         const dtVarName = generateVarName('dt');
         const ddVarName = generateVarName('dd');
         code += `  const ${dtVarName} = document.createElement('dt');\n`;
-        code += `  ${dtVarName}.innerHTML = \`${itemTemplate.split('|')[0] || '${item.term}'}\`;\n`;
+        code += `  ${dtVarName}.innerHTML = \`${template.split('|')[0] || '${item.term}'}\`;\n`;
         code += `  const ${ddVarName} = document.createElement('dd');\n`;
-        code += `  ${ddVarName}.innerHTML = \`${itemTemplate.split('|')[1] || '${item.description}'}\`;\n`;
+        code += `  ${ddVarName}.innerHTML = \`${template.split('|')[1] || '${item.description}'}\`;\n`;
         code += `  ${varName}.appendChild(${dtVarName});\n`;
         code += `  ${varName}.appendChild(${ddVarName});\n`;
+        code += `});\n`;
+      } else if (structureType === 'select') {
+        code += `${dataSource}.forEach(function(item) {\n`;
+        const optionVarName = generateVarName('option');
+        code += `  const ${optionVarName} = document.createElement('option');\n`;
+        code += `  ${optionVarName}.value = item;\n`;
+        code += `  ${optionVarName}.textContent = item;\n`;
+        code += `  ${varName}.appendChild(${optionVarName});\n`;
         code += `});\n`;
       }
     } 
