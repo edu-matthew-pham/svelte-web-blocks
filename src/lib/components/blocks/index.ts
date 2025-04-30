@@ -22,8 +22,8 @@ const componentModules = [
   import('$lib/components/js/variables/index.js'),
   import('$lib/components/js/default/index.js'),
   import('../custom/index.js'),
-  import('$lib/components/js/logic/index.js'),
-  import('$lib/components/js/operations/index.js'),
+  //import('$lib/components/js/logic/index.js'),
+  //import('$lib/components/js/operations/index.js'),
   // Add new components here
 ];
 

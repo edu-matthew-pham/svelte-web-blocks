@@ -11,6 +11,8 @@ export { convertHTMLToPug } from './blocks/pugTemplates.js';
 export { initializeBlocks } from './components/blocks/index.js';
 export { createGenerator } from './utils/generator-factory.js';
 export { createBlockDefinitions } from './utils/block-factory.js';
+export  { initializeVisibilityExtensions } from './utils/blockly-extensions.js';
+export { initializeBlocklyOverrides } from './utils/blockly-overrides.js';
 
 // Export main components
 export { default as BlocklyWorkspace } from './BlocklyWorkspace.svelte';
