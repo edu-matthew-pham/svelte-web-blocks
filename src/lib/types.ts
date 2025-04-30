@@ -28,7 +28,7 @@ export interface BlockInputConfig {
   variable?: string; // For specifying the default variable name
 }
 
-export type BlockCategory = "component" | "item" | "document" | "javascript" | "reactive" | "dataObjects" | "expressions" | "lists" | "logic" | "loops" | "dom" | "create" | "js" | "variables" | "variable" | "css";
+export type BlockCategory = "component" | "item" | "document" | "javascript" | "reactive" | "dataObjects" | "expressions" | "lists" | "logic" | "loops" | "dom" | "create" | "js" | "variables" | "variable" | "css" | "operations";
 
 export interface BlockConnections {
   previous?: string | false;
@@ -50,6 +50,7 @@ export interface BlockConfig {
   javascriptGenerator?: (block: Blockly.Block) => string;
   // Add support for block builder function
   blockBuilderFn?: (block: Blockly.Block) => any;
+  mutator?: string;
 }
 
 export interface WebBlockConfigs {
