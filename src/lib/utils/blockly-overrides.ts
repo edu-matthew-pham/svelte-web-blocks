@@ -340,6 +340,14 @@ export function initializeBlocklyOverrides(workspace: Blockly.Workspace) {
     // Register high-level generators
     registerHighLevelGenerators();
     
+    // Import and initialize visibility extensions
+    // This ensures both extension systems are initialized together
+    import('./blockly-extensions.js').then(module => {
+      module.initializeVisibilityExtensions();
+    }).catch(err => {
+      console.error("Error initializing visibility extensions:", err);
+    });
+    
     // Mark as initialized
     initialized = true;
     console.log("Blockly overrides initialized successfully");

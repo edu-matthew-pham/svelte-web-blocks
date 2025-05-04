@@ -11,6 +11,9 @@ export interface VisibilityConfig {
 // Store configurations to register later
 const pendingExtensions: Array<{name: string, config: VisibilityConfig}> = [];
 
+// Track which extensions have been registered
+const registeredExtensions = new Set<string>();
+
 /**
  * Registers an extension which will show/hide fields or inputs
  * based on the value of a given dropdown.
@@ -34,6 +37,23 @@ export function initializeVisibilityExtensions() {
   }
 
   pendingExtensions.forEach(({name, config}) => {
+    // Check if extension is already registered in Blockly itself
+    // This is more reliable than our local tracking
+    try {
+      if (Blockly.Extensions.isRegistered(name)) {
+        console.debug(`Extension "${name}" is already registered in Blockly, skipping.`);
+        return;
+      }
+    } catch (e) {
+      // If isRegistered throws an error, consider it not registered
+    }
+
+    // Skip if this extension is already registered in our local tracking
+    if (registeredExtensions.has(name)) {
+      console.debug(`Extension "${name}" is already registered in our tracking, skipping.`);
+      return;
+    }
+
     Blockly.Extensions.register(name, function(this: BlockSvg) {
       const update = () => {
         // Get the CURRENT value from the dropdown
@@ -83,5 +103,8 @@ export function initializeVisibilityExtensions() {
         return newValue;
       });
     });
+
+    // Mark this extension as registered
+    registeredExtensions.add(name);
   });
 }
