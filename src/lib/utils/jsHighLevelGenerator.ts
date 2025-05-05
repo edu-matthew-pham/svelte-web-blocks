@@ -313,6 +313,7 @@ function registerTextBlockGenerators() {
       }
     };
   };
+  
 }
 
 // ===== Function/Procedure Blocks =====
@@ -466,6 +467,37 @@ function registerFunctionBlockGenerators() {
           name: funcName,
           arguments: argValues,
           hasReturn: true
+        }
+      };
+    };
+  }
+  
+  // procedures_ifreturn
+  if (javascriptGenerator.forBlock['procedures_ifreturn']) {
+    javascriptGenerator.forBlock['procedures_ifreturn'].highLevel = function(block: Blockly.Block) {
+      // Get condition
+      const conditionBlock = block.getInputTargetBlock('CONDITION');
+      let condition = null;
+      if (conditionBlock) {
+        condition = javascriptGenerator.blockToHighLevel(conditionBlock);
+      }
+      
+      // Get value to return (if condition is true)
+      const valueBlock = block.getInputTargetBlock('VALUE');
+      let value = null;
+      if (valueBlock) {
+        value = javascriptGenerator.blockToHighLevel(valueBlock);
+      }
+      
+      // Check if this is a return or a simple "break"
+      const hasValue = block.getFieldValue('HAVE_VALUE') === 'TRUE';
+      
+      return {
+        type: 'procedures_ifreturn',
+        properties: {
+          condition: condition,
+          hasValue: hasValue,
+          value: hasValue ? value : undefined
         }
       };
     };

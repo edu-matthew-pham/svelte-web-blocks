@@ -31,5 +31,34 @@ export const variableGenerators: WebBlockGeneratorFunctions = {
         }
       };
     }
+  },
+  
+  text_multiline_js: {
+    html: function(block: Blockly.Block) {
+      // Get the multiline text value
+      const text = block.getFieldValue('TEXT') || '';
+      
+      // Properly escape the text for JavaScript and maintain line breaks
+      const escapedText = text
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"')
+        .replace(/\n/g, '\\n');
+        
+      // Cast the return value to any to bypass the type check
+      return [`"${escapedText}"`, (javascriptGenerator as any).ORDER_ATOMIC] as any;
+    },
+    
+    highLevel: function(block: Blockly.Block) {
+      const text = block.getFieldValue('TEXT') || '';
+      
+      return {
+        type: 'text_multiline_js',
+        properties: {
+          value: text,
+          lineCount: text.split('\n').length
+        }
+      };
+    }
   }
 };
