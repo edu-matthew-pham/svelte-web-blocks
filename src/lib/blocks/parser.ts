@@ -578,7 +578,10 @@ function setBlockFields(block: any, properties: Record<string, any>): void {
             }
         }
         
-        if (!fieldSet) {
+        if (!fieldSet && 
+            !((block.type === 'text_multiline_js' && 
+              (key === 'value' || key === 'lineCount')) || 
+             (block.type === 'console_log' && key === 'value'))) {
             console.warn(`Could not set any field for property "${key}" with value "${value}" on block ${block.type}`);
         }
     });
