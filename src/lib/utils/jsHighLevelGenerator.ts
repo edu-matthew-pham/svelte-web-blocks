@@ -167,6 +167,106 @@ function registerLogicBlockGenerators() {
       }
     };
   };
+  
+  // logic_operation (AND/OR)
+  javascriptGenerator.forBlock['logic_operation'].highLevel = function(block: Blockly.Block) {
+    const operator = block.getFieldValue('OP');
+    
+    // Get inputs
+    const leftBlock = block.getInputTargetBlock('A');
+    const rightBlock = block.getInputTargetBlock('B');
+    
+    let left = null;
+    let right = null;
+    
+    if (leftBlock) {
+      left = javascriptGenerator.blockToHighLevel(leftBlock);
+    }
+    
+    if (rightBlock) {
+      right = javascriptGenerator.blockToHighLevel(rightBlock);
+    }
+    
+    return {
+      type: 'logic_operation',
+      properties: {
+        operator: operator, // 'AND' or 'OR'
+        left: left,
+        right: right
+      }
+    };
+  };
+  
+  // logic_negate (NOT)
+  javascriptGenerator.forBlock['logic_negate'].highLevel = function(block: Blockly.Block) {
+    // Get input
+    const inputBlock = block.getInputTargetBlock('BOOL');
+    let input = null;
+    
+    if (inputBlock) {
+      input = javascriptGenerator.blockToHighLevel(inputBlock);
+    }
+    
+    return {
+      type: 'logic_negate',
+      properties: {
+        input: input
+      }
+    };
+  };
+  
+  // logic_boolean (TRUE/FALSE)
+  javascriptGenerator.forBlock['logic_boolean'].highLevel = function(block: Blockly.Block) {
+    const value = block.getFieldValue('BOOL') === 'TRUE';
+    
+    return {
+      type: 'logic_boolean',
+      properties: {
+        value: value
+      }
+    };
+  };
+  
+  // logic_null
+  javascriptGenerator.forBlock['logic_null'].highLevel = function(block: Blockly.Block) {
+    return {
+      type: 'logic_null',
+      properties: {}
+    };
+  };
+  
+  // logic_ternary (condition ? if_true : if_false)
+  javascriptGenerator.forBlock['logic_ternary'].highLevel = function(block: Blockly.Block) {
+    // Get condition
+    const conditionBlock = block.getInputTargetBlock('IF');
+    let condition = null;
+    if (conditionBlock) {
+      condition = javascriptGenerator.blockToHighLevel(conditionBlock);
+    }
+    
+    // Get "then" value
+    const thenBlock = block.getInputTargetBlock('THEN');
+    let thenValue = null;
+    if (thenBlock) {
+      thenValue = javascriptGenerator.blockToHighLevel(thenBlock);
+    }
+    
+    // Get "else" value
+    const elseBlock = block.getInputTargetBlock('ELSE');
+    let elseValue = null;
+    if (elseBlock) {
+      elseValue = javascriptGenerator.blockToHighLevel(elseBlock);
+    }
+    
+    return {
+      type: 'logic_ternary',
+      properties: {
+        condition: condition,
+        thenValue: thenValue,
+        elseValue: elseValue
+      }
+    };
+  };
 }
 
 // ===== Loop Blocks =====
@@ -229,6 +329,97 @@ function registerLoopBlockGenerators() {
         variableId: variableId,
         list: list,
         statements: statements
+      }
+    };
+  };
+  
+  // controls_whileUntil (while/until loop)
+  javascriptGenerator.forBlock['controls_whileUntil'].highLevel = function(block: Blockly.Block) {
+    const mode = block.getFieldValue('MODE'); // 'WHILE' or 'UNTIL'
+    
+    // Get condition
+    const conditionBlock = block.getInputTargetBlock('BOOL');
+    let condition = null;
+    if (conditionBlock) {
+      condition = javascriptGenerator.blockToHighLevel(conditionBlock);
+    }
+    
+    // Get loop statements
+    const statements = [];
+    let statementBlock = block.getInputTargetBlock('DO');
+    while (statementBlock) {
+      const statement = javascriptGenerator.blockToHighLevel(statementBlock);
+      if (statement) statements.push(statement);
+      statementBlock = statementBlock.getNextBlock();
+    }
+    
+    return {
+      type: 'controls_whileUntil',
+      properties: {
+        mode: mode,
+        condition: condition,
+        statements: statements
+      }
+    };
+  };
+  
+  // controls_for (counting loop with variable)
+  javascriptGenerator.forBlock['controls_for'].highLevel = function(block: Blockly.Block) {
+    const variableId = block.getFieldValue('VAR');
+    // Get the actual variable model to access user-facing name
+    const variable = block.workspace.getVariableById(variableId);
+    const variableName = variable ? variable.name : 
+      javascriptGenerator.nameDB_!.getName(variableId, Blockly.Names.NameType.VARIABLE);
+    
+    // Get range values (FROM, TO, BY)
+    const fromBlock = block.getInputTargetBlock('FROM');
+    let from = null;
+    if (fromBlock) {
+      from = javascriptGenerator.blockToHighLevel(fromBlock);
+    }
+    
+    const toBlock = block.getInputTargetBlock('TO');
+    let to = null;
+    if (toBlock) {
+      to = javascriptGenerator.blockToHighLevel(toBlock);
+    }
+    
+    const byBlock = block.getInputTargetBlock('BY');
+    let by = null;
+    if (byBlock) {
+      by = javascriptGenerator.blockToHighLevel(byBlock);
+    }
+    
+    // Get loop statements
+    const statements = [];
+    let statementBlock = block.getInputTargetBlock('DO');
+    while (statementBlock) {
+      const statement = javascriptGenerator.blockToHighLevel(statementBlock);
+      if (statement) statements.push(statement);
+      statementBlock = statementBlock.getNextBlock();
+    }
+    
+    return {
+      type: 'controls_for',
+      properties: {
+        variableName: variableName,
+        variableId: variableId,
+        from: from,
+        to: to,
+        by: by,
+        statements: statements
+      }
+    };
+  };
+  
+  // controls_flow_statements (break/continue)
+  javascriptGenerator.forBlock['controls_flow_statements'].highLevel = function(block: Blockly.Block) {
+    const flow = block.getFieldValue('FLOW'); // 'BREAK' or 'CONTINUE'
+    
+    return {
+      type: 'controls_flow_statements',
+      properties: {
+        flow: flow
       }
     };
   };
