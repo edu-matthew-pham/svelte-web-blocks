@@ -28,6 +28,14 @@ const blockInputsMap: Record<string, Record<string, string>> = {
   // Add other blocks with inputs as needed
 };
 
+// Near the top of the file, add this mapping alongside blockInputsMap
+const blockFieldsMap: Record<string, Record<string, string>> = {
+  'logic_compare': {
+    'operator': 'OP'
+  },
+  // Add other field mappings as needed
+};
+
 export function parseHighLevelCode(jsonString: string): ComponentNode[] {
     try {
         const parsed = JSON.parse(jsonString);
@@ -168,64 +176,6 @@ function createComponentBlock(
             if (Object.keys(filteredProperties).length > 0) {
                 setBlockFields(block, filteredProperties);
             }
-        }
-        
-        // Handle console_log and other blocks with value property
-        // Modified to look for value in properties object first
-        if (component.properties?.value !== undefined && 
-            blockType !== 'variables_set') { // Skip for variables_set which is handled above
-            if (blockType === 'console_log') {
-                // For console_log blocks specifically
-                try {
-                    const value = component.properties.value;
-                    // If value is a simple string
-                    if (typeof value === 'string') {
-                        const valueInput = block.getInput('TEXT');
-                        if (valueInput) {
-                            // Create text shadow block
-                            const textBlock = workspace.newBlock('text');
-                            textBlock.initSvg();
-                            
-                            // Remove extra quotes if present
-                            let textValue = value;
-                            if (textValue.startsWith("'") && textValue.endsWith("'")) {
-                                textValue = textValue.slice(1, -1);
-                            }
-                            
-                            textBlock.setFieldValue(textValue, 'TEXT');
-                            
-                            // Connect to console_log
-                            const connection = valueInput.connection;
-                            const textConnection = textBlock.outputConnection;
-                            if (connection && textConnection) {
-                                connection.connect(textConnection);
-                            }
-                        } else {
-                            // Fallback to direct field setting if no input exists
-                            block.setFieldValue(value, 'TEXT');
-                        }
-                    } 
-                    // If value is an object with nested structure
-                    else if (typeof value === 'object') {
-                        handleValueInput(workspace, block, 'TEXT', value);
-                    }
-                } catch (e) {
-                    console.warn(`Could not set TEXT field for console_log:`, e);
-                }
-            } else {
-                // General case for other blocks with value field
-                try {
-                    block.setFieldValue(component.properties.value, 'VALUE');
-                    console.log(`Set script VALUE field to: ${component.properties.value}`);
-                } catch (e) {
-                    console.warn(`Could not set VALUE field for script:`, e);
-                }
-            }
-        }
-        // Fallback for direct value property (for backward compatibility)
-        else if (component.value !== undefined && component.type !== 'variables_set') {
-            // Same code as above but using component.value directly
-            // This can eventually be removed when all high-level generators are updated
         }
         
         // Set attributes (ID, className, etc.)
@@ -548,6 +498,25 @@ function setBlockFields(block: any, properties: Record<string, any>): void {
             return;
         }
         
+        // Check if we have a field mapping for this property
+        const fieldMappings = blockFieldsMap[block.type];
+        const mappedFieldName = fieldMappings?.[key];
+        
+        if (mappedFieldName) {
+            try {
+                const stringValue = typeof value === 'boolean' 
+                    ? (value ? 'TRUE' : 'FALSE') 
+                    : String(value);
+                
+                block.setFieldValue(stringValue, mappedFieldName);
+                console.log(`Set mapped field ${mappedFieldName} = ${value}`);
+                return; // Skip other variations for this property
+            } catch (e) {
+                console.warn(`Could not set mapped field ${mappedFieldName}:`, e);
+                // Continue to try other variations
+            }
+        }
+        
         // Special handling for form field types
         if (block.type === 'web_form_field' && key === 'fieldType') {
             try {
@@ -746,6 +715,12 @@ function handleValueInput(workspace: WorkspaceSvg, block: any, inputName: string
         
         // Create value block based on its type
         const valueBlock = workspace.newBlock(valueData.type);
+        
+        // Important: prevent the block from being a top-level block in the workspace
+        // by setting its parent before initialization
+        valueBlock.setPreviousStatement(false);
+        valueBlock.setNextStatement(false);
+        valueBlock.setOutput(true);
         valueBlock.initSvg();
         
         // Handle input properties first based on the inputs map
