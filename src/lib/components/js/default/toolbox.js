@@ -4,7 +4,6 @@
 export const toolboxXml = `<category name="Standard Blocks" colour="210">
   <category name="Logic" colour="210">
 
-
     <block type="controls_if">
       <value name="IF0">
         <block type="logic_compare">
@@ -32,6 +31,45 @@ export const toolboxXml = `<category name="Standard Blocks" colour="210">
       </statement>
     </block>
 
+    <block type="logic_operation">
+      <field name="OP">AND</field>
+      <value name="A">
+        <block type="logic_boolean">
+          <field name="BOOL">TRUE</field>
+        </block>
+      </value>
+      <value name="B">
+        <block type="logic_boolean">
+          <field name="BOOL">TRUE</field>
+        </block>
+      </value>
+    </block>
+
+    <block type="logic_negate">
+      <value name="BOOL">
+        <block type="logic_boolean">
+          <field name="BOOL">FALSE</field>
+        </block>
+      </value>
+    </block>
+
+    <block type="logic_ternary">
+      <value name="IF">
+        <block type="logic_boolean">
+          <field name="BOOL">TRUE</field>
+        </block>
+      </value>
+      <value name="THEN">
+        <block type="text">
+          <field name="TEXT">yes</field>
+        </block>
+      </value>
+      <value name="ELSE">
+        <block type="text">
+          <field name="TEXT">no</field>
+        </block>
+      </value>
+    </block>
 
     <block type="controls_if"></block>
     <block type="logic_compare">
@@ -49,6 +87,78 @@ export const toolboxXml = `<category name="Standard Blocks" colour="210">
   </category>
 
   <category name="Loops" colour="120">
+    <block type="controls_forEach">
+      <field name="VAR" id="control_foreach_var">item</field>
+      <value name="LIST">
+        <block type="lists_create_with">
+          <mutation items="3"></mutation>
+          <value name="ADD0">
+            <block type="text">
+              <field name="TEXT">apple</field>
+            </block>
+          </value>
+          <value name="ADD1">
+            <block type="text">
+              <field name="TEXT">banana</field>
+            </block>
+          </value>
+          <value name="ADD2">
+            <block type="text">
+              <field name="TEXT">orange</field>
+            </block>
+          </value>
+        </block>
+      </value>
+      <statement name="DO">
+        <block type="text_print">
+          <value name="TEXT">
+            <block type="variables_get">
+              <field name="VAR" id="control_foreach_var">item</field>
+            </block>
+          </value>
+        </block>
+      </statement>
+    </block>
+
+    <block type="controls_whileUntil">
+      <field name="MODE">WHILE</field>
+      <value name="BOOL">
+        <block type="logic_compare">
+          <field name="OP">LT</field>
+          <value name="A">
+            <block type="variables_get">
+              <field name="VAR">i</field>
+            </block>
+          </value>
+          <value name="B">
+            <block type="math_number">
+              <field name="NUM">5</field>
+            </block>
+          </value>
+        </block>
+      </value>
+      <statement name="DO">
+        <block type="variables_set">
+          <field name="VAR">i</field>
+          <value name="VALUE">
+            <block type="math_arithmetic">
+              <field name="OP">ADD</field>
+              <value name="A">
+                <block type="variables_get">
+                  <field name="VAR">i</field>
+                </block>
+              </value>
+              <value name="B">
+                <block type="math_number">
+                  <field name="NUM">1</field>
+                </block>
+              </value>
+            </block>
+          </value>
+        </block>
+      </statement>
+    </block>
+
     <block type="controls_repeat_ext">
       <value name="TIMES">
         <shadow type="math_number">
@@ -282,6 +392,37 @@ export const toolboxXml = `<category name="Standard Blocks" colour="210">
   </category>
 
   <category name="Lists" colour="260">
+    <block type="lists_getIndex">
+      <mutation statement="false" at="true"></mutation>
+      <field name="MODE">GET</field>
+      <field name="WHERE">FROM_START</field>
+      <value name="VALUE">
+        <block type="lists_create_with">
+          <mutation items="3"></mutation>
+          <value name="ADD0">
+            <block type="text">
+              <field name="TEXT">apple</field>
+            </block>
+          </value>
+          <value name="ADD1">
+            <block type="text">
+              <field name="TEXT">banana</field>
+            </block>
+          </value>
+          <value name="ADD2">
+            <block type="text">
+              <field name="TEXT">orange</field>
+            </block>
+          </value>
+        </block>
+      </value>
+      <value name="AT">
+        <block type="math_number">
+          <field name="NUM">1</field>
+        </block>
+      </value>
+    </block>
+
     <block type="lists_create_empty"></block>
     <block type="lists_create_with">
       <mutation items="3"></mutation>
@@ -348,6 +489,5 @@ export const toolboxXml = `<category name="Standard Blocks" colour="210">
     </block>
   </category>
 
- 
 </category>
 `;
