@@ -1,4 +1,5 @@
 import type { WorkspaceSvg } from 'blockly';
+import { processCustomBlock } from './customParser.js';
 
 export interface ComponentNode {
     type: string;
@@ -10,6 +11,22 @@ export interface ComponentNode {
     value?: string;
     onloadScripts?: ComponentNode[];
 }
+
+// Near the top of the file, add this mapping
+const blockInputsMap: Record<string, Record<string, string>> = {
+  'logic_compare': {
+    'left': 'A',
+    'right': 'B'
+  },
+  'console_log': {
+    'value': 'TEXT'
+  },
+  'math_arithmetic': {
+    'left': 'A',
+    'right': 'B'
+  }
+  // Add other blocks with inputs as needed
+};
 
 export function parseHighLevelCode(jsonString: string): ComponentNode[] {
     try {
@@ -124,12 +141,27 @@ function createComponentBlock(
             }
         }
         
-        // Set properties - this is now the primary way we handle all properties
-        if (component.properties) {
+        // Try using a custom block handler first
+        const customHandled = processCustomBlock(workspace, block, component);
+        
+        // Only proceed with default property handling if not handled by a custom handler
+        if (!customHandled && component.properties) {
+            // Handle input properties first based on the inputs map
+            const inputsMap = blockInputsMap[blockType];
+            if (inputsMap) {
+                Object.entries(inputsMap).forEach(([propName, inputName]) => {
+                    if (component.properties && component.properties[propName]) {
+                        handleValueInput(workspace, block, inputName, component.properties[propName]);
+                    }
+                });
+            }
+            
             // Create a filtered properties object that excludes properties already handled
             const filteredProperties = Object.fromEntries(
                 Object.entries(component.properties)
-                    .filter(([key, _]) => !shouldSkipProperty(blockType, key))
+                    .filter(([key, _]) => 
+                        !shouldSkipProperty(blockType, key) && 
+                        !(inputsMap && key in inputsMap))
             );
             
             // Only call setBlockFields if there are properties to set
@@ -716,35 +748,53 @@ function handleValueInput(workspace: WorkspaceSvg, block: any, inputName: string
         const valueBlock = workspace.newBlock(valueData.type);
         valueBlock.initSvg();
         
-        // Set field values from properties if specified
+        // Handle input properties first based on the inputs map
+        const inputsMap = blockInputsMap[valueData.type];
+        if (valueData.properties && inputsMap) {
+            Object.entries(inputsMap).forEach(([propName, blockInputName]) => {
+                if (valueData.properties[propName]) {
+                    handleValueInput(workspace, valueBlock, blockInputName, valueData.properties[propName]);
+                }
+            });
+        }
+        
+        // Set field values from properties if specified (only for properties not handled as inputs)
         if (valueData.properties) {
+            // Create filtered properties - exclude input properties
+            const filteredProperties = Object.fromEntries(
+                Object.entries(valueData.properties)
+                    .filter(([key, _]) => 
+                        !shouldSkipProperty(valueData.type, key) && 
+                        !(inputsMap && key in inputsMap))
+            );
+            
             // For text blocks, use TEXT field
-            if (valueData.type === 'text' && valueData.properties.value !== undefined) {
-                valueBlock.setFieldValue(String(valueData.properties.value), 'TEXT');
-                console.log(`Set text value to: ${valueData.properties.value}`);
+            if (valueData.type === 'text' && filteredProperties.value !== undefined) {
+                valueBlock.setFieldValue(String(filteredProperties.value), 'TEXT');
+                console.log(`Set text value to: ${filteredProperties.value}`);
             }
             // For number blocks, use NUM field
-            else if (valueData.type === 'math_number' && valueData.properties.value !== undefined) {
-                valueBlock.setFieldValue(String(valueData.properties.value), 'NUM');
-                console.log(`Set number value to: ${valueData.properties.value}`);
+            else if (valueData.type === 'math_number' && filteredProperties.value !== undefined) {
+                valueBlock.setFieldValue(String(filteredProperties.value), 'NUM');
+                console.log(`Set number value to: ${filteredProperties.value}`);
             }
             // For boolean blocks, use BOOL field
-            else if (valueData.type === 'logic_boolean' && valueData.properties.value !== undefined) {
+            else if (valueData.type === 'logic_boolean' && filteredProperties.value !== undefined) {
                 valueBlock.setFieldValue(
-                    valueData.properties.value === true || valueData.properties.value === 'TRUE' ? 'TRUE' : 'FALSE', 
+                    filteredProperties.value === true || filteredProperties.value === 'TRUE' ? 'TRUE' : 'FALSE', 
                     'BOOL'
                 );
-                console.log(`Set boolean value to: ${valueData.properties.value}`);
+                console.log(`Set boolean value to: ${filteredProperties.value}`);
             }
-            // For other blocks, try to set all properties as fields
-            else {
-                setBlockFields(valueBlock, valueData.properties);
+            // For other blocks, try to set remaining fields
+            else if (Object.keys(filteredProperties).length > 0) {
+                setBlockFields(valueBlock, filteredProperties);
             }
         }
         // Backward compatibility: direct value property
         else if (valueData.value !== undefined) {
             const fieldName = valueData.type === 'math_number' ? 'NUM' : 
-                              valueData.type === 'logic_boolean' ? 'BOOL' : 'TEXT';
+                             valueData.type === 'logic_boolean' ? 'BOOL' : 'TEXT';
             valueBlock.setFieldValue(String(valueData.value), fieldName);
             console.log(`Set ${valueData.type} value to: ${valueData.value} using field ${fieldName}`);
         }
@@ -763,3 +813,9 @@ function handleValueInput(workspace: WorkspaceSvg, block: any, inputName: string
         console.error(`Error handling value input:`, e);
     }
 }
+
+// Export these functions so they can be used in customParser.ts
+export {
+    handleValueInput,
+    createComponentBlock
+};

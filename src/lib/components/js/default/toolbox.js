@@ -3,6 +3,36 @@
 
 export const toolboxXml = `<category name="Standard Blocks" colour="210">
   <category name="Logic" colour="210">
+
+
+    <block type="controls_if">
+      <value name="IF0">
+        <block type="logic_compare">
+          <field name="OP">EQ</field>
+          <value name="A">
+            <block type="math_number">
+              <field name="NUM">1</field>
+            </block>
+          </value>
+          <value name="B">
+            <block type="math_number">
+              <field name="NUM">1</field>
+            </block>
+          </value>
+        </block>
+      </value>
+      <statement name="DO0">
+        <block type="console_log">
+          <value name="TEXT">
+            <block type="text">
+              <field name="TEXT">action</field>
+            </block>
+          </value>
+        </block>
+      </statement>
+    </block>
+
+
     <block type="controls_if"></block>
     <block type="logic_compare">
       <field name="OP">EQ</field>
