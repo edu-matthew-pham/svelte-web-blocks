@@ -129,6 +129,17 @@ export const toolboxXml = `
           <field name="NUM">10</field>
         </shadow>
       </value>
+      <statement name="DO">
+        <block type="console_log">
+          <value name="TEXT">
+            <block type="text">
+              <field name="TEXT">Hello, world!</field>
+            </block>
+          </value>
+        </block>
+      </statement>
+    </block>
+
     </block>
     
     <block type="controls_whileUntil">

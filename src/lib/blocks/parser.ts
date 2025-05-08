@@ -31,6 +31,12 @@ const blockInputsMap: Record<string, Record<string, string>> = {
   },
   'logic_boolean': {
     'value': 'BOOL'
+  },
+  'controls_repeat_ext': {
+    'times': 'TIMES'
+  },
+  'controls_whileUntil': {
+    'condition': 'BOOL'
   }
   // Add other blocks with inputs as needed
 };
@@ -43,6 +49,9 @@ const blockFieldsMap: Record<string, Record<string, string>> = {
   'logic_operation': {
     'operator': 'OP'
   },
+  'controls_whileUntil': {
+    'mode': 'MODE'
+  }
   // Add other field mappings as needed
 };
 
@@ -81,6 +90,16 @@ function shouldSkipProperty(blockType: string, propertyName: string): boolean {
     // Properties that should be skipped for variables_set blocks
     if (blockType === 'variables_set') {
         return ['variableName', 'variableId', 'isDeclared', 'value'].includes(propertyName);
+    }
+    
+    // Properties that should be skipped for controls_repeat_ext blocks
+    if (blockType === 'controls_repeat_ext') {
+        return ['children', 'scripts', 'styles', 'onloadScripts', 'times', 'statements'].includes(propertyName);
+    }
+    
+    // Properties that should be skipped for controls_whileUntil blocks
+    if (blockType === 'controls_whileUntil') {
+        return ['children', 'scripts', 'styles', 'onloadScripts', 'condition', 'statements'].includes(propertyName);
     }
     
     // Properties that should be skipped for all blocks
@@ -185,6 +204,27 @@ function createComponentBlock(
             // Only call setBlockFields if there are properties to set
             if (Object.keys(filteredProperties).length > 0) {
                 setBlockFields(block, filteredProperties);
+            }
+            
+            // Special handling for loop statement blocks
+            if (blockType === 'controls_repeat_ext' || blockType === 'controls_whileUntil') {
+                if (component.properties.statements && Array.isArray(component.properties.statements)) {
+                    const statementInput = blockType === 'controls_repeat_ext' ? 'DO' : 'DO';
+                    let previousBlock: any = null;
+                    
+                    component.properties.statements.forEach(statementComponent => {
+                        const statementBlock = createComponentBlock(
+                            workspace, 
+                            statementComponent,
+                            previousBlock || block,
+                            previousBlock ? 'NEXT' : statementInput
+                        );
+                        
+                        if (statementBlock) {
+                            previousBlock = statementBlock;
+                        }
+                    });
+                }
             }
         }
         
