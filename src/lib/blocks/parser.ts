@@ -51,6 +51,9 @@ const blockFieldsMap: Record<string, Record<string, string>> = {
   },
   'controls_whileUntil': {
     'mode': 'MODE'
+  },
+  'math_arithmetic': {
+    'operator': 'OP'
   }
   // Add other field mappings as needed
 };
@@ -121,62 +124,6 @@ function createComponentBlock(
     try {
         // Create the block
         const block = workspace.newBlock(blockType);
-        
-        // Handle variable blocks
-        if (component.type === 'variables_set') {
-            //console.log("PROCESSING VARIABLES_SET BLOCK", component);
-            try {
-                // Always check properties first, following our standardized approach
-                const variableId = component.properties?.variableId;
-                const variableName = component.properties?.variableName || 'item';
-                
-                console.log("Variable details:", { 
-                    variableId, 
-                    variableName
-                });
-                
-                if (variableName) {
-                    // First check if variable already exists in workspace by name
-                    let variable = workspace.getVariable(variableName);
-                    
-                    // If variable doesn't exist, create it
-                    if (!variable) {
-                        //console.log(`Creating new variable: ${variableName}`);
-                        // Create with original ID if possible
-                        try {
-                            variable = workspace.createVariable(variableName, undefined, variableId);
-                        } catch (e) {
-                            // If ID conflict, create with auto-generated ID
-                            //console.log(`Could not create with specified ID, using auto ID: ${e}`);
-                            variable = workspace.createVariable(variableName);
-                        }
-                    } else {
-                        //console.log(`Using existing variable: ${variableName} with ID: ${variable.getId()}`);
-                    }
-                    
-                    // Set the variable field
-                    const variableField = block.getField('VAR');
-                    
-                    if (variableField) {
-                        variableField.setValue(variable.getId());
-                        //console.log(`Set variable field to: ${variable.getId()}`);
-                    }
-                    
-                    // Handle the value input - now consistently in properties
-                    const valueData = component.properties?.value;
-                    
-                    if (valueData && typeof valueData === 'object') {
-                        //console.log("Handling value input for variable");
-                        // This is critical - use the VALUE input, not trying to set a field
-                        handleValueInput(workspace, block, 'VALUE', valueData);
-                    }
-                } else {
-                    console.warn("No variable name found for variables_set block");
-                }
-            } catch (e) {
-                console.warn('Error handling variables_set block:', e);
-            }
-        }
         
         // Try using a custom block handler first
         const customHandled = processCustomBlock(workspace, block, component);
@@ -773,55 +720,60 @@ function handleValueInput(workspace: WorkspaceSvg, block: any, inputName: string
         valueBlock.setOutput(true);
         valueBlock.initSvg();
         
-        // Handle input properties first based on the inputs map
-        const inputsMap = blockInputsMap[valueData.type];
-        if (valueData.properties && inputsMap) {
-            Object.entries(inputsMap).forEach(([propName, blockInputName]) => {
-                if (valueData.properties[propName]) {
-                    handleValueInput(workspace, valueBlock, blockInputName, valueData.properties[propName]);
-                }
-            });
-        }
+        // Handle custom blocks - like variables_get
+        const customHandled = processCustomBlock(workspace, valueBlock, valueData);
         
-        // Set field values from properties if specified (only for properties not handled as inputs)
-        if (valueData.properties) {
-            // Create filtered properties - exclude input properties
-            const filteredProperties = Object.fromEntries(
-                Object.entries(valueData.properties)
-                    .filter(([key, _]) => 
-                        !shouldSkipProperty(valueData.type, key) && 
-                        !(inputsMap && key in inputsMap))
-            );
+        if (!customHandled) {
+            // Handle input properties first based on the inputs map
+            const inputsMap = blockInputsMap[valueData.type];
+            if (valueData.properties && inputsMap) {
+                Object.entries(inputsMap).forEach(([propName, blockInputName]) => {
+                    if (valueData.properties[propName]) {
+                        handleValueInput(workspace, valueBlock, blockInputName, valueData.properties[propName]);
+                    }
+                });
+            }
             
-            // For text blocks, use TEXT field
-            if (valueData.type === 'text' && filteredProperties.value !== undefined) {
-                valueBlock.setFieldValue(String(filteredProperties.value), 'TEXT');
-                console.log(`Set text value to: ${filteredProperties.value}`);
-            }
-            // For number blocks, use NUM field
-            else if (valueData.type === 'math_number' && filteredProperties.value !== undefined) {
-                valueBlock.setFieldValue(String(filteredProperties.value), 'NUM');
-                console.log(`Set number value to: ${filteredProperties.value}`);
-            }
-            // For boolean blocks, use BOOL field
-            else if (valueData.type === 'logic_boolean' && filteredProperties.value !== undefined) {
-                valueBlock.setFieldValue(
-                    filteredProperties.value === true || filteredProperties.value === 'TRUE' ? 'TRUE' : 'FALSE', 
-                    'BOOL'
+            // Set field values from properties if specified (only for properties not handled as inputs)
+            if (valueData.properties) {
+                // Create filtered properties - exclude input properties
+                const filteredProperties = Object.fromEntries(
+                    Object.entries(valueData.properties)
+                        .filter(([key, _]) => 
+                            !shouldSkipProperty(valueData.type, key) && 
+                            !(inputsMap && key in inputsMap))
                 );
-                console.log(`Set boolean value to: ${filteredProperties.value}`);
+                
+                // For text blocks, use TEXT field
+                if (valueData.type === 'text' && filteredProperties.value !== undefined) {
+                    valueBlock.setFieldValue(String(filteredProperties.value), 'TEXT');
+                    console.log(`Set text value to: ${filteredProperties.value}`);
+                }
+                // For number blocks, use NUM field
+                else if (valueData.type === 'math_number' && filteredProperties.value !== undefined) {
+                    valueBlock.setFieldValue(String(filteredProperties.value), 'NUM');
+                    console.log(`Set number value to: ${filteredProperties.value}`);
+                }
+                // For boolean blocks, use BOOL field
+                else if (valueData.type === 'logic_boolean' && filteredProperties.value !== undefined) {
+                    valueBlock.setFieldValue(
+                        filteredProperties.value === true || filteredProperties.value === 'TRUE' ? 'TRUE' : 'FALSE', 
+                        'BOOL'
+                    );
+                    console.log(`Set boolean value to: ${filteredProperties.value}`);
+                }
+                // For other blocks, try to set remaining fields
+                else if (Object.keys(filteredProperties).length > 0) {
+                    setBlockFields(valueBlock, filteredProperties);
+                }
             }
-            // For other blocks, try to set remaining fields
-            else if (Object.keys(filteredProperties).length > 0) {
-                setBlockFields(valueBlock, filteredProperties);
+            // Backward compatibility: direct value property
+            else if (valueData.value !== undefined) {
+                const fieldName = valueData.type === 'math_number' ? 'NUM' : 
+                                valueData.type === 'logic_boolean' ? 'BOOL' : 'TEXT';
+                valueBlock.setFieldValue(String(valueData.value), fieldName);
+                console.log(`Set ${valueData.type} value to: ${valueData.value} using field ${fieldName}`);
             }
-        }
-        // Backward compatibility: direct value property
-        else if (valueData.value !== undefined) {
-            const fieldName = valueData.type === 'math_number' ? 'NUM' : 
-                             valueData.type === 'logic_boolean' ? 'BOOL' : 'TEXT';
-            valueBlock.setFieldValue(String(valueData.value), fieldName);
-            console.log(`Set ${valueData.type} value to: ${valueData.value} using field ${fieldName}`);
         }
         
         // Connect to parent block

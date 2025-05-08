@@ -84,29 +84,19 @@ export const toolboxXml = `
       </statement>
     </block>
 
-    <block type="controls_whileUntil">
-      <field name="MODE">WHILE</field>
-      <value name="BOOL">
-        <block type="logic_compare">
-          <field name="OP">LT</field>
-          <value name="A">
-            <block type="variables_get">
-              <field name="VAR">i</field>
-            </block>
-          </value>
-          <value name="B">
-            <block type="math_number">
-              <field name="NUM">5</field>
-            </block>
-          </value>
+     <block type="variables_set">
+      <field name="VAR">i</field>
+      <value name="VALUE">
+        <block type="math_number">
+          <field name="NUM">0</field>
         </block>
       </value>
-      <statement name="DO">
-        <block type="variables_set">
-          <field name="VAR">i</field>
-          <value name="VALUE">
-            <block type="math_arithmetic">
-              <field name="OP">ADD</field>
+      <next>
+        <block type="controls_whileUntil">
+          <field name="MODE">WHILE</field>
+          <value name="BOOL">
+            <block type="logic_compare">
+              <field name="OP">LT</field>
               <value name="A">
                 <block type="variables_get">
                   <field name="VAR">i</field>
@@ -114,13 +104,33 @@ export const toolboxXml = `
               </value>
               <value name="B">
                 <block type="math_number">
-                  <field name="NUM">1</field>
+                  <field name="NUM">5</field>
                 </block>
               </value>
             </block>
           </value>
+          <statement name="DO">
+            <block type="variables_set">
+              <field name="VAR">i</field>
+              <value name="VALUE">
+                <block type="math_arithmetic">
+                  <field name="OP">ADD</field>
+                  <value name="A">
+                    <block type="variables_get">
+                      <field name="VAR">i</field>
+                    </block>
+                  </value>
+                  <value name="B">
+                    <block type="math_number">
+                      <field name="NUM">1</field>
+                    </block>
+                  </value>
+                </block>
+              </value>
+            </block>
+          </statement>
         </block>
-      </statement>
+      </next>
     </block>
 
     <block type="controls_repeat_ext">

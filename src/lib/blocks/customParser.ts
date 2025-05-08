@@ -11,7 +11,12 @@ type CustomBlockHandler = (
 // Map of block types to their custom handlers
 const customBlockHandlers: Record<string, CustomBlockHandler> = {
     'controls_if': handleControlsIf,
-    'logic_compare': handleLogicCompare  // Add handler for logic_compare
+    'logic_compare': handleLogicCompare,
+    'variables_set': handleVariablesSet,
+    'variables_get': handleVariablesGet,
+    'math_arithmetic': handleMathArithmetic,
+    'controls_repeat_ext': handleLoopBlock,
+    'controls_whileUntil': handleLoopBlock
 };
 
 /**
@@ -152,6 +157,210 @@ function handleLogicCompare(
         return true;
     } catch (e) {
         console.error("Error handling logic_compare block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for variables_set blocks
+ */
+function handleVariablesSet(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        //console.log("PROCESSING VARIABLES_SET BLOCK", component);
+        
+        // Always check properties first, following our standardized approach
+        const variableId = component.properties?.variableId;
+        const variableName = component.properties?.variableName || 'item';
+        
+        console.log("Variable details:", { 
+            variableId, 
+            variableName
+        });
+        
+        if (variableName) {
+            // First check if variable already exists in workspace by name
+            let variable = workspace.getVariable(variableName);
+            
+            // If variable doesn't exist, create it
+            if (!variable) {
+                //console.log(`Creating new variable: ${variableName}`);
+                // Create with original ID if possible
+                try {
+                    variable = workspace.createVariable(variableName, undefined, variableId);
+                } catch (e) {
+                    // If ID conflict, create with auto-generated ID
+                    //console.log(`Could not create with specified ID, using auto ID: ${e}`);
+                    variable = workspace.createVariable(variableName);
+                }
+            } else {
+                //console.log(`Using existing variable: ${variableName} with ID: ${variable.getId()}`);
+            }
+            
+            // Set the variable field
+            const variableField = block.getField('VAR');
+            
+            if (variableField) {
+                variableField.setValue(variable.getId());
+                //console.log(`Set variable field to: ${variable.getId()}`);
+            }
+            
+            // Handle the value input - now consistently in properties
+            const valueData = component.properties?.value;
+            
+            if (valueData && typeof valueData === 'object') {
+                //console.log("Handling value input for variable");
+                // This is critical - use the VALUE input, not trying to set a field
+                handleValueInput(workspace, block, 'VALUE', valueData);
+            }
+        } else {
+            console.warn("No variable name found for variables_set block");
+        }
+        
+        return true;
+    } catch (e) {
+        console.warn('Error handling variables_set block:', e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for variables_get blocks
+ */
+function handleVariablesGet(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        const variableName = component.properties?.variableName || 'item';
+        const variableId = component.properties?.variableId;
+        
+        if (variableName) {
+            // Check if variable exists by name or ID
+            let variable = variableId ? workspace.getVariableById(variableId) : null;
+            if (!variable) {
+                variable = workspace.getVariable(variableName);
+            }
+            
+            // If variable doesn't exist, create it
+            if (!variable) {
+                try {
+                    // Try to create with original ID if provided
+                    variable = variableId ? 
+                        workspace.createVariable(variableName, undefined, variableId) : 
+                        workspace.createVariable(variableName);
+                } catch (e) {
+                    // If ID conflict, create with auto-generated ID
+                    variable = workspace.createVariable(variableName);
+                }
+            }
+            
+            // Set the variable field
+            const variableField = block.getField('VAR');
+            if (variableField && variable) {
+                variableField.setValue(variable.getId());
+                console.log(`Set variables_get VAR field to: ${variable.name} (${variable.getId()})`);
+            }
+        }
+        
+        return true;
+    } catch (e) {
+        console.warn('Error handling variables_get block:', e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for math_arithmetic blocks
+ */
+function handleMathArithmetic(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set operator if present
+        if (component.properties?.operator) {
+            const opField = block.getField('OP');
+            if (opField) {
+                opField.setValue(component.properties.operator);
+                console.log(`Set math_arithmetic operator to ${component.properties.operator}`);
+            }
+        }
+        
+        // Handle left input
+        if (component.properties?.left) {
+            handleValueInput(workspace, block, 'A', component.properties.left);
+        }
+        
+        // Handle right input
+        if (component.properties?.right) {
+            handleValueInput(workspace, block, 'B', component.properties.right);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling math_arithmetic block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for loop blocks (controls_repeat_ext, controls_whileUntil)
+ */
+function handleLoopBlock(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Handle specific input fields for each block type
+        if (block.type === 'controls_repeat_ext') {
+            // Handle TIMES input
+            if (component.properties?.times) {
+                handleValueInput(workspace, block, 'TIMES', component.properties.times);
+            }
+        } else if (block.type === 'controls_whileUntil') {
+            // Set mode (WHILE/UNTIL)
+            if (component.properties?.mode) {
+                const modeField = block.getField('MODE');
+                if (modeField) {
+                    modeField.setValue(component.properties.mode);
+                }
+            }
+            
+            // Handle condition input
+            if (component.properties?.condition) {
+                handleValueInput(workspace, block, 'BOOL', component.properties.condition);
+            }
+        }
+        
+        // Handle statements for loop body
+        if (component.properties?.statements && Array.isArray(component.properties.statements)) {
+            const statementInput = 'DO';
+            let previousBlock: any = null;
+            
+            component.properties.statements.forEach(statementComponent => {
+                const statementBlock = createComponentBlock(
+                    workspace, 
+                    statementComponent,
+                    previousBlock || block,
+                    previousBlock ? 'NEXT' : statementInput
+                );
+                
+                if (statementBlock) {
+                    previousBlock = statementBlock;
+                }
+            });
+        }
+        
+        return true;
+    } catch (e) {
+        console.error(`Error handling loop block (${block.type}):`, e);
         return false;
     }
 }
