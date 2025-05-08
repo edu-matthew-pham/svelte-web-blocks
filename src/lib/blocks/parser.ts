@@ -24,6 +24,13 @@ const blockInputsMap: Record<string, Record<string, string>> = {
   'math_arithmetic': {
     'left': 'A',
     'right': 'B'
+  },
+  'logic_operation': {
+    'left': 'A',
+    'right': 'B'
+  },
+  'logic_boolean': {
+    'value': 'BOOL'
   }
   // Add other blocks with inputs as needed
 };
@@ -31,6 +38,9 @@ const blockInputsMap: Record<string, Record<string, string>> = {
 // Near the top of the file, add this mapping alongside blockInputsMap
 const blockFieldsMap: Record<string, Record<string, string>> = {
   'logic_compare': {
+    'operator': 'OP'
+  },
+  'logic_operation': {
     'operator': 'OP'
   },
   // Add other field mappings as needed
