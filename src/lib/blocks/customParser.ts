@@ -16,7 +16,8 @@ const customBlockHandlers: Record<string, CustomBlockHandler> = {
     'variables_get': handleVariablesGet,
     'math_arithmetic': handleMathArithmetic,
     'controls_repeat_ext': handleLoopBlock,
-    'controls_whileUntil': handleLoopBlock
+    'controls_whileUntil': handleLoopBlock,
+    'controls_for': handleControlsFor
 };
 
 /**
@@ -361,6 +362,88 @@ function handleLoopBlock(
         return true;
     } catch (e) {
         console.error(`Error handling loop block (${block.type}):`, e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for controls_for blocks
+ */
+function handleControlsFor(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Handle variable field
+        const variableName = component.properties?.variableName || 'i';
+        const variableId = component.properties?.variableId;
+        
+        if (variableName) {
+            // Check if variable exists by name or ID
+            let variable = variableId ? workspace.getVariableById(variableId) : null;
+            if (!variable) {
+                variable = workspace.getVariable(variableName);
+            }
+            
+            // If variable doesn't exist, create it
+            if (!variable) {
+                try {
+                    // Try to create with original ID if provided
+                    variable = variableId ? 
+                        workspace.createVariable(variableName, undefined, variableId) : 
+                        workspace.createVariable(variableName);
+                } catch (e) {
+                    // If ID conflict, create with auto-generated ID
+                    variable = workspace.createVariable(variableName);
+                }
+            }
+            
+            // Set the variable field
+            const variableField = block.getField('VAR');
+            if (variableField && variable) {
+                variableField.setValue(variable.getId());
+                console.log(`Set controls_for VAR field to: ${variable.name} (${variable.getId()})`);
+            }
+        }
+        
+        // Handle FROM input
+        if (component.properties?.from) {
+            handleValueInput(workspace, block, 'FROM', component.properties.from);
+        }
+        
+        // Handle TO input
+        if (component.properties?.to) {
+            handleValueInput(workspace, block, 'TO', component.properties.to);
+        }
+        
+        // Handle BY input
+        if (component.properties?.by) {
+            handleValueInput(workspace, block, 'BY', component.properties.by);
+        }
+        
+        // Handle statements for loop body
+        if (component.properties?.statements && Array.isArray(component.properties.statements)) {
+            const statementInput = 'DO';
+            let previousBlock: any = null;
+            
+            component.properties.statements.forEach(statementComponent => {
+                const statementBlock = createComponentBlock(
+                    workspace, 
+                    statementComponent,
+                    previousBlock || block,
+                    previousBlock ? 'NEXT' : statementInput
+                );
+                
+                if (statementBlock) {
+                    previousBlock = statementBlock;
+                }
+            });
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling controls_for block:", e);
         return false;
     }
 }

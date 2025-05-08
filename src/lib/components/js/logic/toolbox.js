@@ -152,9 +152,7 @@ export const toolboxXml = `
 
     </block>
     
-    <block type="controls_whileUntil">
-      <field name="MODE">WHILE</field>
-    </block>
+
     
     <block type="controls_for">
       <field name="VAR" id="control_for_var">i</field>
@@ -173,6 +171,19 @@ export const toolboxXml = `
           <field name="NUM">1</field>
         </shadow>
       </value>
+      <statement name="DO">
+        <block type="console_log">
+          <value name="TEXT">
+            <shadow type="text">
+              <field name="TEXT">Hello world</field>
+            </shadow>
+          </value>
+        </block>
+      </statement>
+    </block>
+
+    <block type="controls_whileUntil">
+      <field name="MODE">WHILE</field>
     </block>
     
     <block type="controls_forEach">
