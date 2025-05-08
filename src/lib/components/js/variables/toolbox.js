@@ -11,6 +11,24 @@ export const toolboxXml = `<category name="Variables & Functions" colour="290">
       </value>
     </block>
 
+    <block type="variables_set">
+      <field name="VAR">number</field>
+      <value name="VALUE">
+        <block type="math_number">
+          <field name="NUM">123</field>
+        </block>
+      </value>
+      <next>
+        <block type="console_log">
+          <value name="TEXT">
+            <block type="variables_get">
+              <field name="VAR" id="control_for_var">i</field>
+            </block>
+          </value>
+        </block>
+      </next>
+    </block>
+
     <label text="Variables" web-class="toolboxLabel"></label>
 
     <button text="Create Variable..." callbackKey="CREATE_VARIABLE"></button>
@@ -47,7 +65,7 @@ export const toolboxXml = `<category name="Variables & Functions" colour="290">
         <field name="VAR">item</field>
     </block>
     <block type="variables_get">
-        <field name="VAR">item</field>
+        <field name="VAR" id="control_for_var">i</field>
     </block>
 
       <label text="Text & Numbers" web-class="toolboxLabel"></label>

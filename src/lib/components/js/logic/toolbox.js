@@ -174,9 +174,9 @@ export const toolboxXml = `
       <statement name="DO">
         <block type="console_log">
           <value name="TEXT">
-            <shadow type="text">
-              <field name="TEXT">Hello world</field>
-            </shadow>
+            <block type="variables_get">
+              <field name="VAR" id="control_for_var">i</field>
+            </block>
           </value>
         </block>
       </statement>
