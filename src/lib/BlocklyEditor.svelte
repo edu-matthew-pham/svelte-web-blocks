@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, createEventDispatcher, afterUpdate } from 'svelte';
+  import { onMount, createEventDispatcher, afterUpdate, onDestroy } from 'svelte';
   import * as Blockly from 'blockly';
   import { webBlocks } from '$lib/blocks/definitions.js';
   import { webGenerators } from '$lib/blocks/generators.js';
@@ -7,6 +7,8 @@
   import { WorkspaceSvg } from 'blockly';
   import { createBlocksFromJson } from '$lib/blocks/parser.js';
   import { javascriptGenerator } from 'blockly/javascript';
+  import { createPreviewSafety } from '$lib/utils/preview-safety.js';
+  import type { ConsoleMessage } from '$lib/utils/preview-safety.js';
   
   // Import Prism for syntax highlighting
   import Prism from 'prismjs';
@@ -27,7 +29,11 @@
   // Add state for code display
   let generatedCode = '';
   let jsonCode = '';
-  let activeTab = 'blocks'; // 'blocks', 'json', or 'code'
+  let safetyWrapperCode = '';
+  let activeTab = 'blocks'; // 'blocks', 'json', 'code', 'safety-code', or 'preview'
+
+  // Add state for preview safety
+  let previewSafety = createPreviewSafety();
 
   // Before the forEach loop, add this type definition
   type GeneratorFunction = Function & {
@@ -130,10 +136,24 @@
     });
     resizeObserver.observe(blocklyDiv);
 
+    // Set up preview safety event listeners
+    previewSafety.addEventListeners((event) => {
+      if ('type' in event) {
+        if (event.type === 'error' || event.type === 'timeout' || event.type === 'infiniteLoop') {
+          console.error('Preview error:', event.message);
+        }
+      } else {
+        // Type assertion to let TypeScript know this is a ConsoleMessage
+        const consoleEvent = event as ConsoleMessage; 
+        console.log(`Preview console [${consoleEvent.type}]:`, consoleEvent.message);
+      }
+    });
+
     return () => {
       // Clean up on component unmount
       workspace.dispose();
       resizeObserver.disconnect();
+      previewSafety.cleanup();
     };
   });
 
@@ -166,6 +186,11 @@
   // Function to switch between tabs
   function setActiveTab(tab: string) {
     activeTab = tab;
+    
+    // When switching to safety code tab, generate the safety wrapper code
+    if (tab === 'safety-code') {
+      safetyWrapperCode = previewSafety.wrapCode(generatedCode);
+    }
     
     // When switching back to blocks tab, resize the workspace
     if (tab === 'blocks' && workspace) {
@@ -230,6 +255,11 @@
       }
     }
   });
+
+  // Clean up when component is destroyed
+  onDestroy(() => {
+    previewSafety.cleanup();
+  });
 </script>
 
 <div class="blockly-container">
@@ -249,6 +279,11 @@
       class="tab-button {activeTab === 'code' ? 'active' : ''}" 
       on:click={() => setActiveTab('code')}>
       HTML
+    </button>
+    <button 
+      class="tab-button {activeTab === 'safety-code' ? 'active' : ''}" 
+      on:click={() => setActiveTab('safety-code')}>
+      Safety Code
     </button>
     <button 
       class="tab-button {activeTab === 'preview' ? 'active' : ''}" 
@@ -279,14 +314,38 @@
       </div>
     {/if}
 
-    <!-- Preview view -->
+    <!-- Safety Code view -->
+    {#if activeTab === 'safety-code'}
+      <div class="code-container">
+        <pre class="code-display"><code class="language-html">{safetyWrapperCode}</code></pre>
+      </div>
+    {/if}
+
+    <!-- Preview view with safety features -->
     {#if activeTab === 'preview'}
       <div class="preview-container">
+        {#if previewSafety.isLoading}
+          <div class="preview-loading">
+            <p>Loading preview...</p>
+          </div>
+        {/if}
+        
+        {#if previewSafety.hasError}
+          <div class="preview-error">
+            <p>Error: {previewSafety.currentError?.message}</p>
+            <button on:click={() => {
+              const iframe = document.querySelector('.preview-iframe') as HTMLIFrameElement;
+              if (iframe) previewSafety.resetPreview(iframe);
+            }}>Reset Preview</button>
+          </div>
+        {/if}
+        
         <iframe
           class="preview-iframe"
-          srcdoc={generatedCode}
-          sandbox="allow-scripts"
+          srcdoc={previewSafety.wrapCode(generatedCode)}
+          sandbox="allow-scripts allow-same-origin"
           title="Component Preview"
+          on:load={previewSafety.handlePreviewLoad}
         ></iframe>
       </div>
     {/if}
@@ -367,5 +426,34 @@
     width: 100%;
     height: 100%;
     border: none;
+  }
+
+  /* Preview error and loading styles */
+  .preview-loading,
+  .preview-error {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .preview-error {
+    background: rgba(255, 220, 220, 0.9);
+    color: #e00;
+  }
+  
+  .preview-error button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
   }
 </style> 

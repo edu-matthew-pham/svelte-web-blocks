@@ -6,6 +6,7 @@ export { webGenerators } from './blocks/generators.js';
 export { defaultToolbox } from './toolbox/default-toolbox.js';
 export { createBlocksFromJson } from './blocks/parser.js';
 export { convertHTMLToPug } from './blocks/pugTemplates.js';
+export { createPreviewSafety } from './utils/preview-safety.js';
 
 // Export core functionality
 export { initializeBlocks } from './components/blocks/index.js';

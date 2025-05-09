@@ -16,6 +16,8 @@
     import 'prismjs/plugins/normalize-whitespace/prism-normalize-whitespace';
     // Import Prism CSS themes
     import 'prismjs/themes/prism.css';
+    import { createPreviewSafety } from '$lib/utils/preview-safety.js';
+    import type { ConsoleMessage } from '$lib/utils/preview-safety.js';
   
     // Props with defaults
     export let initialXml = '';
@@ -23,7 +25,7 @@
     export let workspaceOptions = {}; 
     export let showCodeView = true;
     export let showJsonView = true;
-    export let initialTab: 'blocks'|'json'|'code'|'preview'|'dom' = 'blocks'; // 'blocks', 'json', or 'code' or 'preview' or 'dom'
+    export let initialTab: 'blocks'|'json'|'code'|'preview'|'dom'|'safety-code' = 'blocks'; // 'blocks', 'json', or 'code' or 'preview' or 'dom' or 'safety-code'
   
     // Internal state
     let blocklyDiv: HTMLElement;
@@ -32,7 +34,7 @@
     
     let generatedCode = '';
     let jsonCode = '';
-    let activeTab = initialTab;
+    let activeTab: 'blocks'|'json'|'code'|'preview'|'dom'|'safety-code' = initialTab;
     let componentsLoaded = false;
     let modifiedDomString = '';
     
@@ -53,6 +55,12 @@
       const func = this.forBlock[block.type]?.highLevel;
       return func ? func(block) : null;
     };
+  
+    // Add state for preview safety
+    let previewSafety = createPreviewSafety({
+      showErrorOverlay: true  // Enable the visual error overlay
+    });
+    let safetyWrapperCode = '';
   
     onMount(() => {
       if (!blocklyDiv) return;
@@ -137,6 +145,16 @@
 
       initializeBlocklyOverrides(workspace);
       
+      // Set up preview safety event listeners
+      previewSafety.addEventListeners((event) => {
+        if ('type' in event && (event.type === 'error' || event.type === 'timeout' || event.type === 'infiniteLoop')) {
+          console.error('Preview error:', event.message);
+        } else {
+          const consoleEvent = event as ConsoleMessage;
+          console.log(`Preview console [${consoleEvent.type}]:`, consoleEvent.message);
+        }
+      });
+      
       // Return the cleanup function directly (not in the Promise chain)
       return () => {
         if (workspace) {
@@ -146,6 +164,7 @@
           const resizeObserver = new ResizeObserver(() => {});
           resizeObserver.disconnect();
         }
+        previewSafety.cleanup();
       };
 
  
@@ -345,6 +364,25 @@
       applyHighlighting();
     });
 
+    // Initialize safetyWrapperCode when needed
+    function updateSafetyCode() {
+      if (!generatedCode) return;
+      safetyWrapperCode = previewSafety?.wrapCode(generatedCode) || '';
+    }
+
+    // Update setActiveTab function
+    function setActiveTab(tab: 'blocks'|'json'|'code'|'preview'|'dom'|'safety-code') {
+      activeTab = tab;
+      
+      if (tab === 'safety-code') {
+        updateSafetyCode();
+      }
+      
+      if (tab === 'blocks' && workspace) {
+        resize();
+      }
+    }
+
 </script>
   
   <div class="blockly-container">
@@ -376,7 +414,12 @@
         <!-- NEW: Preview tab -->
         <button 
           class="tab-button {activeTab === 'preview' ? 'active' : ''}" 
-          on:click={() => activeTab = 'preview'}>
+          on:click={() => {
+            activeTab = 'preview';
+            // Reset the preview iframe when switching to preview tab
+            const iframe = document.querySelector('.preview-iframe') as HTMLIFrameElement;
+            if (iframe) previewSafety.resetPreview(iframe);
+          }}>
           Preview
         </button>
 
@@ -385,6 +428,13 @@
           class="tab-button {activeTab === 'dom' ? 'active' : ''}" 
           on:click={() => { activeTab = 'dom'; captureModifiedDom(); }}> 
           DOM
+        </button>
+
+        <!-- Update tab button to ensure it's visible and properly styled -->
+        <button 
+          class="tab-button {activeTab === 'safety-code' ? 'active' : ''}" 
+          on:click={() => setActiveTab('safety-code')}>
+          Safety Code
         </button>
 
       </div>
@@ -426,17 +476,39 @@
 
       <!-- Preview view - always present but hidden when not active -->
       <div class="preview-container" style="display: {activeTab === 'preview' ? 'block' : 'none'}">
+        <div class="preview-controls">
+          <button class="refresh-button" on:click={() => {
+            const iframe = document.querySelector('.preview-iframe') as HTMLIFrameElement;
+            if (iframe) previewSafety.resetPreview(iframe);
+          }}>
+            Refresh Preview
+          </button>
+          {#if previewSafety.hasError}
+            <div class="preview-error-indicator">
+              Error: {previewSafety.currentError?.message}
+            </div>
+          {/if}
+        </div>
         <iframe
           class="preview-iframe"
-          srcdoc={generatedCode}
-          sandbox="allow-scripts allow-same-origin"
+          srcdoc={previewSafety.wrapCode(generatedCode)}
+          sandbox="allow-scripts" 
           title="Component Preview"
+          on:load={previewSafety.handlePreviewLoad}
         ></iframe>
       </div>
 
       <!-- DOM view without refresh button -->
       <div class="code-container" style="display: {activeTab === 'dom' ? 'block' : 'none'}">
         <pre class="code-display"><code bind:this={domContainer} class="language-html"></code></pre>
+      </div>
+
+      <!-- Make sure the safety code container is properly added -->
+      <div class="code-container" style="display: {activeTab === 'safety-code' ? 'block' : 'none'}">
+        <div class="action-buttons">
+          <button on:click={() => copyToClipboard(safetyWrapperCode)}>Copy Safety Code</button>
+        </div>
+        <pre class="code-display"><code class="language-html">{safetyWrapperCode || 'Click to generate safety code'}</code></pre>
       </div>
     </div>
   </div>
@@ -525,11 +597,40 @@
       height: 100%;
       border: 1px solid #ddd;
       box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
     }
     .preview-iframe {
       width: 100%;
-      height: 100%;
+      flex: 1;
       border: none;
+    }
+    .preview-controls {
+      padding: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f5f5f5;
+      border-bottom: 1px solid #ddd;
+    }
+    .refresh-button {
+      padding: 6px 12px;
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .refresh-button:hover {
+      background: #e0e0e0;
+    }
+    .preview-error-indicator {
+      color: #d32f2f;
+      font-size: 14px;
+      margin-left: 10px;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .action-buttons {

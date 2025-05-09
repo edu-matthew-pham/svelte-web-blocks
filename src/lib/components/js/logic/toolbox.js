@@ -127,6 +127,15 @@ export const toolboxXml = `
                   </value>
                 </block>
               </value>
+              <next>
+                <block type="console_log">
+                  <value name="TEXT">
+                    <block type="variables_get">
+                      <field name="VAR">i</field>
+                    </block>
+                  </value>
+                </block>
+              </next>
             </block>
           </statement>
         </block>
