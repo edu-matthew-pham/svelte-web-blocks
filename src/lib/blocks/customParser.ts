@@ -19,7 +19,16 @@ const customBlockHandlers: Record<string, CustomBlockHandler> = {
     'controls_whileUntil': handleLoopBlock,
     'controls_for': handleControlsFor,
     'controls_forEach': handleControlsForEach,
-    'lists_create_with': handleListsCreateWith
+    'lists_create_with': handleListsCreateWith,
+    // Add math block handlers
+    'math_round': handleMathRound,
+    'math_on_list': handleMathOnList,
+    'math_constant': handleMathConstant,
+    'math_modulo': handleMathModulo,
+    'math_constrain': handleMathConstrain,
+    'math_random_int': handleMathRandomInt,
+    'math_number_property': handleMathNumberProperty,
+    'math_random_float': handleMathRandomFloat
 };
 
 /**
@@ -562,4 +571,219 @@ function handleListsCreateWith(
         console.error("Error handling lists_create_with block:", e);
         return false;
     }
+}
+
+/**
+ * Custom handler for math_round blocks
+ */
+function handleMathRound(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set the operation type (ROUND, ROUNDUP, ROUNDDOWN, ROOT, SIN, COS, etc.)
+        if (component.properties?.operator) {
+            const opField = block.getField('OP');
+            if (opField) {
+                opField.setValue(component.properties.operator);
+                console.log(`Set math_round operation to ${component.properties.operator}`);
+            }
+        }
+        
+        // Handle the NUM input
+        if (component.properties?.value) {
+            handleValueInput(workspace, block, 'NUM', component.properties.value);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling math_round block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for math_on_list blocks
+ */
+function handleMathOnList(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set the operation type (SUM, MIN, MAX, AVERAGE, MEDIAN, etc.)
+        if (component.properties?.operator) {
+            const opField = block.getField('OP');
+            if (opField) {
+                opField.setValue(component.properties.operator);
+                console.log(`Set math_on_list operation to ${component.properties.operator}`);
+            }
+        }
+        
+        // Handle the LIST input
+        if (component.properties?.list) {
+            handleValueInput(workspace, block, 'LIST', component.properties.list);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling math_on_list block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for math_constant blocks
+ */
+function handleMathConstant(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set the constant type (PI, E, etc.)
+        if (component.properties?.constant) {
+            const constantField = block.getField('CONSTANT');
+            if (constantField) {
+                constantField.setValue(component.properties.constant);
+                console.log(`Set math_constant to ${component.properties.constant}`);
+            }
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling math_constant block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for math_modulo blocks
+ */
+function handleMathModulo(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Handle DIVIDEND input
+        if (component.properties?.dividend) {
+            handleValueInput(workspace, block, 'DIVIDEND', component.properties.dividend);
+        }
+        
+        // Handle DIVISOR input
+        if (component.properties?.divisor) {
+            handleValueInput(workspace, block, 'DIVISOR', component.properties.divisor);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling math_modulo block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for math_constrain blocks
+ */
+function handleMathConstrain(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Handle VALUE input
+        if (component.properties?.value) {
+            handleValueInput(workspace, block, 'VALUE', component.properties.value);
+        }
+        
+        // Handle LOW input
+        if (component.properties?.low) {
+            handleValueInput(workspace, block, 'LOW', component.properties.low);
+        }
+        
+        // Handle HIGH input
+        if (component.properties?.high) {
+            handleValueInput(workspace, block, 'HIGH', component.properties.high);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling math_constrain block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for math_random_int blocks
+ */
+function handleMathRandomInt(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Handle FROM input
+        if (component.properties?.from) {
+            handleValueInput(workspace, block, 'FROM', component.properties.from);
+        }
+        
+        // Handle TO input
+        if (component.properties?.to) {
+            handleValueInput(workspace, block, 'TO', component.properties.to);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling math_random_int block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for math_number_property blocks
+ */
+function handleMathNumberProperty(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set the property type (EVEN, ODD, POSITIVE, etc.)
+        if (component.properties?.property) {
+            const propertyField = block.getField('PROPERTY');
+            if (propertyField) {
+                propertyField.setValue(component.properties.property);
+                console.log(`Set math_number_property to ${component.properties.property}`);
+            }
+        }
+        
+        // Handle NUMBER input
+        if (component.properties?.number) {
+            handleValueInput(workspace, block, 'NUMBER_TO_CHECK', component.properties.number);
+        }
+        
+        // Handle DIVISOR input for DIVISIBLE_BY property
+        if (component.properties?.property === 'DIVISIBLE_BY' && component.properties?.divisor) {
+            handleValueInput(workspace, block, 'DIVISOR', component.properties.divisor);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling math_number_property block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for math_random_float blocks
+ */
+function handleMathRandomFloat(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    // This block doesn't need any special handling as it has no inputs or fields to set
+    return true;
 }

@@ -469,6 +469,219 @@ function registerMathBlockGenerators() {
       }
     };
   };
+  
+  // math_single (sqrt, abs, etc.)
+  javascriptGenerator.forBlock['math_single'].highLevel = function(block: Blockly.Block) {
+    const operator = block.getFieldValue('OP');
+    
+    // Get input value
+    const valueBlock = block.getInputTargetBlock('NUM');
+    let value = null;
+    if (valueBlock) {
+      value = javascriptGenerator.blockToHighLevel(valueBlock);
+    }
+    
+    return {
+      type: 'math_single',
+      properties: {
+        operator: operator,
+        value: value
+      }
+    };
+  };
+  
+  // math_trig (sin, cos, tan, etc.)
+  javascriptGenerator.forBlock['math_trig'].highLevel = function(block: Blockly.Block) {
+    const operator = block.getFieldValue('OP');
+    
+    // Get input value
+    const valueBlock = block.getInputTargetBlock('NUM');
+    let value = null;
+    if (valueBlock) {
+      value = javascriptGenerator.blockToHighLevel(valueBlock);
+    }
+    
+    return {
+      type: 'math_trig',
+      properties: {
+        operator: operator,
+        value: value
+      }
+    };
+  };
+  
+  // math_constant (PI, E, etc.)
+  javascriptGenerator.forBlock['math_constant'].highLevel = function(block: Blockly.Block) {
+    const constant = block.getFieldValue('CONSTANT');
+    
+    return {
+      type: 'math_constant',
+      properties: {
+        constant: constant
+      }
+    };
+  };
+  
+  // math_round (round, ceil, floor)
+  javascriptGenerator.forBlock['math_round'].highLevel = function(block: Blockly.Block) {
+    const operator = block.getFieldValue('OP');
+    
+    // Get input value
+    const valueBlock = block.getInputTargetBlock('NUM');
+    let value = null;
+    if (valueBlock) {
+      value = javascriptGenerator.blockToHighLevel(valueBlock);
+    }
+    
+    return {
+      type: 'math_round',
+      properties: {
+        operator: operator,
+        value: value
+      }
+    };
+  };
+  
+  // math_on_list (sum, min, max, average, etc.)
+  javascriptGenerator.forBlock['math_on_list'].highLevel = function(block: Blockly.Block) {
+    const operator = block.getFieldValue('OP');
+    
+    // Get list
+    const listBlock = block.getInputTargetBlock('LIST');
+    let list = null;
+    if (listBlock) {
+      list = javascriptGenerator.blockToHighLevel(listBlock);
+    }
+    
+    return {
+      type: 'math_on_list',
+      properties: {
+        operator: operator,
+        list: list
+      }
+    };
+  };
+  
+  // math_modulo
+  javascriptGenerator.forBlock['math_modulo'].highLevel = function(block: Blockly.Block) {
+    // Get dividend
+    const dividendBlock = block.getInputTargetBlock('DIVIDEND');
+    let dividend = null;
+    if (dividendBlock) {
+      dividend = javascriptGenerator.blockToHighLevel(dividendBlock);
+    }
+    
+    // Get divisor
+    const divisorBlock = block.getInputTargetBlock('DIVISOR');
+    let divisor = null;
+    if (divisorBlock) {
+      divisor = javascriptGenerator.blockToHighLevel(divisorBlock);
+    }
+    
+    return {
+      type: 'math_modulo',
+      properties: {
+        dividend: dividend,
+        divisor: divisor
+      }
+    };
+  };
+  
+  // math_constrain
+  javascriptGenerator.forBlock['math_constrain'].highLevel = function(block: Blockly.Block) {
+    // Get value
+    const valueBlock = block.getInputTargetBlock('VALUE');
+    let value = null;
+    if (valueBlock) {
+      value = javascriptGenerator.blockToHighLevel(valueBlock);
+    }
+    
+    // Get low bound
+    const lowBlock = block.getInputTargetBlock('LOW');
+    let low = null;
+    if (lowBlock) {
+      low = javascriptGenerator.blockToHighLevel(lowBlock);
+    }
+    
+    // Get high bound
+    const highBlock = block.getInputTargetBlock('HIGH');
+    let high = null;
+    if (highBlock) {
+      high = javascriptGenerator.blockToHighLevel(highBlock);
+    }
+    
+    return {
+      type: 'math_constrain',
+      properties: {
+        value: value,
+        low: low,
+        high: high
+      }
+    };
+  };
+  
+  // math_random_int
+  javascriptGenerator.forBlock['math_random_int'].highLevel = function(block: Blockly.Block) {
+    // Get from value
+    const fromBlock = block.getInputTargetBlock('FROM');
+    let from = null;
+    if (fromBlock) {
+      from = javascriptGenerator.blockToHighLevel(fromBlock);
+    }
+    
+    // Get to value
+    const toBlock = block.getInputTargetBlock('TO');
+    let to = null;
+    if (toBlock) {
+      to = javascriptGenerator.blockToHighLevel(toBlock);
+    }
+    
+    return {
+      type: 'math_random_int',
+      properties: {
+        from: from,
+        to: to
+      }
+    };
+  };
+  
+  // math_random_float
+  javascriptGenerator.forBlock['math_random_float'].highLevel = function(block: Blockly.Block) {
+    return {
+      type: 'math_random_float',
+      properties: {}
+    };
+  };
+  
+  // math_number_property (even, odd, prime, etc.)
+  javascriptGenerator.forBlock['math_number_property'].highLevel = function(block: Blockly.Block) {
+    const property = block.getFieldValue('PROPERTY');
+    
+    // Get number to check
+    const numberBlock = block.getInputTargetBlock('NUMBER_TO_CHECK');
+    let number = null;
+    if (numberBlock) {
+      number = javascriptGenerator.blockToHighLevel(numberBlock);
+    }
+    
+    // Get divisor for "divisible by" property, if applicable
+    let divisor = null;
+    if (property === 'DIVISIBLE_BY') {
+      const divisorBlock = block.getInputTargetBlock('DIVISOR');
+      if (divisorBlock) {
+        divisor = javascriptGenerator.blockToHighLevel(divisorBlock);
+      }
+    }
+    
+    return {
+      type: 'math_number_property',
+      properties: {
+        property: property,
+        number: number,
+        divisor: divisor
+      }
+    };
+  };
 }
 
 // ===== Text Blocks =====

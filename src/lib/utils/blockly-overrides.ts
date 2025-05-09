@@ -2,6 +2,7 @@ import * as Blockly from 'blockly/core';
 import { javascriptGenerator } from 'blockly/javascript';
 import { safeProcedureGeneration } from './procedure-generators.js';
 import { registerHighLevelGenerators } from './jsHighLevelGenerator.js';
+import { overrideMathGenerators } from './math-generators.js';
 
 // ======== Variable Tracking ========
 export const VariableTracker = {
@@ -336,6 +337,7 @@ export function initializeBlocklyOverrides(workspace: Blockly.Workspace) {
     applyWebCompatibilityToProcedureBlocks();
     overrideProcedureGenerators();
     overrideVariableGenerators();
+    overrideMathGenerators();
     
     // Register high-level generators
     registerHighLevelGenerators();
