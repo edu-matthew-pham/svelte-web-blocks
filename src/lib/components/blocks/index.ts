@@ -22,6 +22,7 @@ const componentModules = [
   import('$lib/components/js/variables/index.js'),
   import('$lib/components/js/logic/index.js'),
   import('$lib/components/js/math/index.js'),
+  import('$lib/components/js/text/index.js'),
   import('../custom/index.js'),
   import('$lib/components/js/default/index.js'),
   

@@ -3,6 +3,7 @@ import { javascriptGenerator } from 'blockly/javascript';
 import { safeProcedureGeneration } from './procedure-generators.js';
 import { registerHighLevelGenerators } from './jsHighLevelGenerator.js';
 import { overrideMathGenerators } from './math-generators.js';
+import { overrideTextGenerators } from './text-generators.js';
 
 // ======== Variable Tracking ========
 export const VariableTracker = {
@@ -332,12 +333,15 @@ export function initializeBlocklyOverrides(workspace: Blockly.Workspace) {
   }
   
   try {
+
+    
     // Initialize all extensions
     initWebComponentExtensions();
     applyWebCompatibilityToProcedureBlocks();
     overrideProcedureGenerators();
     overrideVariableGenerators();
     overrideMathGenerators();
+    overrideTextGenerators();
     
     // Register high-level generators
     registerHighLevelGenerators();

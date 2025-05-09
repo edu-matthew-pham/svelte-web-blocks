@@ -28,7 +28,12 @@ const customBlockHandlers: Record<string, CustomBlockHandler> = {
     'math_constrain': handleMathConstrain,
     'math_random_int': handleMathRandomInt,
     'math_number_property': handleMathNumberProperty,
-    'math_random_float': handleMathRandomFloat
+    'math_random_float': handleMathRandomFloat,
+    // Add text block handlers
+    'text_join': handleTextJoin,
+    'text_length': handleTextLength,
+    'text_isEmpty': handleTextIsEmpty,
+    'text_indexOf': handleTextIndexOf
 };
 
 /**
@@ -786,4 +791,123 @@ function handleMathRandomFloat(
 ): boolean {
     // This block doesn't need any special handling as it has no inputs or fields to set
     return true;
+}
+
+/**
+ * Custom handler for text_join blocks
+ */
+function handleTextJoin(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Check if items property exists
+        if (!component.properties?.items || !Array.isArray(component.properties.items)) {
+            return false;
+        }
+
+        const items = component.properties.items;
+        console.log(`Processing text_join with ${items.length} items`);
+        
+        // Adjust the number of inputs based on the items count
+        // Create a mutation element to set the items count
+        if (items.length > 0) {
+            const mutation = document.createElement('mutation');
+            mutation.setAttribute('items', String(items.length));
+            block.domToMutation(mutation);
+        }
+        
+        // Process each item
+        items.forEach((itemComponent: any, index: number) => {
+            if (itemComponent) {
+                console.log(`Processing text item ${index}:`, itemComponent);
+                // The input names for text_join are ADD0, ADD1, ADD2, etc.
+                const inputName = `ADD${index}`;
+                handleValueInput(workspace, block, inputName, itemComponent);
+            }
+        });
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling text_join block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for text_length blocks
+ */
+function handleTextLength(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Handle the VALUE input
+        if (component.properties?.value) {
+            handleValueInput(workspace, block, 'VALUE', component.properties.value);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling text_length block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for text_isEmpty blocks
+ */
+function handleTextIsEmpty(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Handle the VALUE input
+        if (component.properties?.value) {
+            handleValueInput(workspace, block, 'VALUE', component.properties.value);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling text_isEmpty block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for text_indexOf blocks
+ */
+function handleTextIndexOf(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set the operation (FIRST or LAST)
+        if (component.properties?.end) {
+            const endField = block.getField('END');
+            if (endField) {
+                endField.setValue(component.properties.end);
+                console.log(`Set text_indexOf operation to ${component.properties.end}`);
+            }
+        }
+        
+        // Handle the VALUE input (text to search in)
+        if (component.properties?.value) {
+            handleValueInput(workspace, block, 'VALUE', component.properties.value);
+        }
+        
+        // Handle the FIND input (text to find)
+        if (component.properties?.find) {
+            handleValueInput(workspace, block, 'FIND', component.properties.find);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling text_indexOf block:", e);
+        return false;
+    }
 }

@@ -721,6 +721,216 @@ function registerTextBlockGenerators() {
     };
   };
   
+  // text_length
+  javascriptGenerator.forBlock['text_length'].highLevel = function(block: Blockly.Block) {
+    // Get text value
+    const valueBlock = block.getInputTargetBlock('VALUE');
+    let value = null;
+    if (valueBlock) {
+      value = javascriptGenerator.blockToHighLevel(valueBlock);
+    }
+    
+    return {
+      type: 'text_length',
+      properties: {
+        value: value
+      }
+    };
+  };
+  
+  // text_isEmpty
+  javascriptGenerator.forBlock['text_isEmpty'].highLevel = function(block: Blockly.Block) {
+    // Get text value
+    const valueBlock = block.getInputTargetBlock('VALUE');
+    let value = null;
+    if (valueBlock) {
+      value = javascriptGenerator.blockToHighLevel(valueBlock);
+    }
+    
+    return {
+      type: 'text_isEmpty',
+      properties: {
+        value: value
+      }
+    };
+  };
+  
+  // text_indexOf
+  javascriptGenerator.forBlock['text_indexOf'].highLevel = function(block: Blockly.Block) {
+    const end = block.getFieldValue('END');
+    
+    // Get text to search in
+    const valueBlock = block.getInputTargetBlock('VALUE');
+    let value = null;
+    if (valueBlock) {
+      value = javascriptGenerator.blockToHighLevel(valueBlock);
+    }
+    
+    // Get text to find
+    const findBlock = block.getInputTargetBlock('FIND');
+    let find = null;
+    if (findBlock) {
+      find = javascriptGenerator.blockToHighLevel(findBlock);
+    }
+    
+    return {
+      type: 'text_indexOf',
+      properties: {
+        end: end,
+        value: value,
+        find: find
+      }
+    };
+  };
+  
+  // text_charAt
+  javascriptGenerator.forBlock['text_charAt'].highLevel = function(block: Blockly.Block) {
+    const where = block.getFieldValue('WHERE');
+    
+    // Get text value
+    const valueBlock = block.getInputTargetBlock('VALUE');
+    let value = null;
+    if (valueBlock) {
+      value = javascriptGenerator.blockToHighLevel(valueBlock);
+    }
+    
+    // Get position (if applicable)
+    let at = null;
+    if (where === 'FROM_START' || where === 'FROM_END') {
+      const atBlock = block.getInputTargetBlock('AT');
+      if (atBlock) {
+        at = javascriptGenerator.blockToHighLevel(atBlock);
+      }
+    }
+    
+    return {
+      type: 'text_charAt',
+      properties: {
+        where: where,
+        value: value,
+        at: at
+      }
+    };
+  };
+  
+  // text_getSubstring
+  javascriptGenerator.forBlock['text_getSubstring'].highLevel = function(block: Blockly.Block) {
+    const where1 = block.getFieldValue('WHERE1');
+    const where2 = block.getFieldValue('WHERE2');
+    
+    // Get text value
+    const stringBlock = block.getInputTargetBlock('STRING');
+    let string = null;
+    if (stringBlock) {
+      string = javascriptGenerator.blockToHighLevel(stringBlock);
+    }
+    
+    // Get start position (if applicable)
+    let at1 = null;
+    if (where1 === 'FROM_START' || where1 === 'FROM_END') {
+      const at1Block = block.getInputTargetBlock('AT1');
+      if (at1Block) {
+        at1 = javascriptGenerator.blockToHighLevel(at1Block);
+      }
+    }
+    
+    // Get end position (if applicable)
+    let at2 = null;
+    if (where2 === 'FROM_START' || where2 === 'FROM_END') {
+      const at2Block = block.getInputTargetBlock('AT2');
+      if (at2Block) {
+        at2 = javascriptGenerator.blockToHighLevel(at2Block);
+      }
+    }
+    
+    return {
+      type: 'text_getSubstring',
+      properties: {
+        where1: where1,
+        where2: where2,
+        string: string,
+        at1: at1,
+        at2: at2
+      }
+    };
+  };
+  
+  // text_changeCase
+  javascriptGenerator.forBlock['text_changeCase'].highLevel = function(block: Blockly.Block) {
+    const caseType = block.getFieldValue('CASE');
+    
+    // Get text value
+    const textBlock = block.getInputTargetBlock('TEXT');
+    let text = null;
+    if (textBlock) {
+      text = javascriptGenerator.blockToHighLevel(textBlock);
+    }
+    
+    return {
+      type: 'text_changeCase',
+      properties: {
+        case: caseType,
+        text: text
+      }
+    };
+  };
+  
+  // text_trim
+  javascriptGenerator.forBlock['text_trim'].highLevel = function(block: Blockly.Block) {
+    const mode = block.getFieldValue('MODE');
+    
+    // Get text value
+    const textBlock = block.getInputTargetBlock('TEXT');
+    let text = null;
+    if (textBlock) {
+      text = javascriptGenerator.blockToHighLevel(textBlock);
+    }
+    
+    return {
+      type: 'text_trim',
+      properties: {
+        mode: mode,
+        text: text
+      }
+    };
+  };
+  
+  // text_print
+  javascriptGenerator.forBlock['text_print'].highLevel = function(block: Blockly.Block) {
+    // Get text value
+    const textBlock = block.getInputTargetBlock('TEXT');
+    let text = null;
+    if (textBlock) {
+      text = javascriptGenerator.blockToHighLevel(textBlock);
+    }
+    
+    return {
+      type: 'text_print',
+      properties: {
+        text: text
+      }
+    };
+  };
+  
+  // text_prompt_ext
+  javascriptGenerator.forBlock['text_prompt_ext'].highLevel = function(block: Blockly.Block) {
+    const type = block.getFieldValue('TYPE');
+    
+    // Get prompt text
+    const textBlock = block.getInputTargetBlock('TEXT');
+    let text = null;
+    if (textBlock) {
+      text = javascriptGenerator.blockToHighLevel(textBlock);
+    }
+    
+    return {
+      type: 'text_prompt_ext',
+      properties: {
+        type: type,
+        text: text
+      }
+    };
+  };
 }
 
 // ===== List Blocks =====
