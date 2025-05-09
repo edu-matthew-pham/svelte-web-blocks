@@ -33,7 +33,12 @@ const customBlockHandlers: Record<string, CustomBlockHandler> = {
     'text_join': handleTextJoin,
     'text_length': handleTextLength,
     'text_isEmpty': handleTextIsEmpty,
-    'text_indexOf': handleTextIndexOf
+    'text_indexOf': handleTextIndexOf,
+    'text_charAt': handleTextCharAt,
+    'text_getSubstring': handleTextGetSubstring,
+    'text_changeCase': handleTextChangeCase,
+    'text_trim': handleTextTrim,
+    'lists_split': handleListsSplit
 };
 
 /**
@@ -908,6 +913,190 @@ function handleTextIndexOf(
         return true;
     } catch (e) {
         console.error("Error handling text_indexOf block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for text_charAt blocks
+ */
+function handleTextCharAt(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set the "where" property (FROM_START, FROM_END, FIRST, LAST, RANDOM)
+        if (component.properties?.where) {
+            const whereField = block.getField('WHERE');
+            if (whereField) {
+                whereField.setValue(component.properties.where);
+                console.log(`Set text_charAt where to ${component.properties.where}`);
+            }
+        }
+        
+        // Handle the VALUE input (text to get character from)
+        if (component.properties?.value) {
+            handleValueInput(workspace, block, 'VALUE', component.properties.value);
+        }
+        
+        // Handle the AT input (position) if where is FROM_START or FROM_END
+        if (component.properties?.at && 
+            (component.properties.where === 'FROM_START' || component.properties.where === 'FROM_END')) {
+            handleValueInput(workspace, block, 'AT', component.properties.at);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling text_charAt block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for text_getSubstring blocks
+ */
+function handleTextGetSubstring(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set the "where1" property (FROM_START, FROM_END, FIRST)
+        if (component.properties?.where1) {
+            const where1Field = block.getField('WHERE1');
+            if (where1Field) {
+                where1Field.setValue(component.properties.where1);
+                console.log(`Set text_getSubstring where1 to ${component.properties.where1}`);
+            }
+        }
+        
+        // Set the "where2" property (FROM_START, FROM_END, LAST)
+        if (component.properties?.where2) {
+            const where2Field = block.getField('WHERE2');
+            if (where2Field) {
+                where2Field.setValue(component.properties.where2);
+                console.log(`Set text_getSubstring where2 to ${component.properties.where2}`);
+            }
+        }
+        
+        // Handle the STRING input (text to get substring from)
+        if (component.properties?.string) {
+            handleValueInput(workspace, block, 'STRING', component.properties.string);
+        }
+        
+        // Handle the AT1 input (start position) if where1 is FROM_START or FROM_END
+        if (component.properties?.at1 && 
+            (component.properties.where1 === 'FROM_START' || component.properties.where1 === 'FROM_END')) {
+            handleValueInput(workspace, block, 'AT1', component.properties.at1);
+        }
+        
+        // Handle the AT2 input (end position) if where2 is FROM_START or FROM_END
+        if (component.properties?.at2 && 
+            (component.properties.where2 === 'FROM_START' || component.properties.where2 === 'FROM_END')) {
+            handleValueInput(workspace, block, 'AT2', component.properties.at2);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling text_getSubstring block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for text_changeCase blocks
+ */
+function handleTextChangeCase(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set the case type (UPPERCASE, LOWERCASE, TITLECASE)
+        if (component.properties?.case) {
+            const caseField = block.getField('CASE');
+            if (caseField) {
+                caseField.setValue(component.properties.case);
+                console.log(`Set text_changeCase to ${component.properties.case}`);
+            }
+        }
+        
+        // Handle the TEXT input
+        if (component.properties?.text) {
+            handleValueInput(workspace, block, 'TEXT', component.properties.text);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling text_changeCase block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for text_trim blocks
+ */
+function handleTextTrim(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set the trim mode (BOTH, LEFT, RIGHT)
+        if (component.properties?.mode) {
+            const modeField = block.getField('MODE');
+            if (modeField) {
+                modeField.setValue(component.properties.mode);
+                console.log(`Set text_trim mode to ${component.properties.mode}`);
+            }
+        }
+        
+        // Handle the TEXT input
+        if (component.properties?.text) {
+            handleValueInput(workspace, block, 'TEXT', component.properties.text);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling text_trim block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for lists_split blocks
+ */
+function handleListsSplit(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set the mode (SPLIT, JOIN)
+        if (component.properties?.mode) {
+            const modeField = block.getField('MODE');
+            if (modeField) {
+                modeField.setValue(component.properties.mode);
+                console.log(`Set lists_split mode to ${component.properties.mode}`);
+            }
+        }
+        
+        // Handle the INPUT input (text to split or list to join)
+        if (component.properties?.input) {
+            // The input name changes based on the mode
+            const inputName = component.properties.mode === 'SPLIT' ? 'INPUT' : 'LIST';
+            handleValueInput(workspace, block, inputName, component.properties.input);
+        }
+        
+        // Handle the DELIMITER input
+        if (component.properties?.delimiter) {
+            handleValueInput(workspace, block, 'DELIM', component.properties.delimiter);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling lists_split block:", e);
         return false;
     }
 }
