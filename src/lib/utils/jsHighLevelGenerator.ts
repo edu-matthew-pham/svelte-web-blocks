@@ -940,6 +940,237 @@ function registerTextBlockGenerators() {
 
 // ===== List Blocks =====
 function registerListBlockGenerators() {
+  // lists_create_empty
+  javascriptGenerator.forBlock['lists_create_empty'].highLevel = function(block: Blockly.Block) {
+    return {
+      type: 'lists_create_empty',
+      properties: {}
+    };
+  };
+  
+  // lists_repeat
+  javascriptGenerator.forBlock['lists_repeat'].highLevel = function(block: Blockly.Block) {
+    // Get item to repeat
+    const itemBlock = block.getInputTargetBlock('ITEM');
+    let item = null;
+    if (itemBlock) {
+      item = javascriptGenerator.blockToHighLevel(itemBlock);
+    }
+    
+    // Get number of repetitions
+    const timesBlock = block.getInputTargetBlock('NUM');
+    let times = null;
+    if (timesBlock) {
+      times = javascriptGenerator.blockToHighLevel(timesBlock);
+    }
+    
+    return {
+      type: 'lists_repeat',
+      properties: {
+        item: item,
+        times: times
+      }
+    };
+  };
+  
+  // lists_length
+  javascriptGenerator.forBlock['lists_length'].highLevel = function(block: Blockly.Block) {
+    // Get list
+    const valueBlock = block.getInputTargetBlock('VALUE');
+    let value = null;
+    if (valueBlock) {
+      value = javascriptGenerator.blockToHighLevel(valueBlock);
+    }
+    
+    return {
+      type: 'lists_length',
+      properties: {
+        list: value
+      }
+    };
+  };
+  
+  // lists_isEmpty
+  javascriptGenerator.forBlock['lists_isEmpty'].highLevel = function(block: Blockly.Block) {
+    // Get list
+    const valueBlock = block.getInputTargetBlock('VALUE');
+    let value = null;
+    if (valueBlock) {
+      value = javascriptGenerator.blockToHighLevel(valueBlock);
+    }
+    
+    return {
+      type: 'lists_isEmpty',
+      properties: {
+        list: value
+      }
+    };
+  };
+  
+  // lists_indexOf
+  javascriptGenerator.forBlock['lists_indexOf'].highLevel = function(block: Blockly.Block) {
+    const end = block.getFieldValue('END'); // 'FIRST' or 'LAST'
+    
+    // Get list
+    const valueBlock = block.getInputTargetBlock('VALUE');
+    let value = null;
+    if (valueBlock) {
+      value = javascriptGenerator.blockToHighLevel(valueBlock);
+    }
+    
+    // Get item to find
+    const findBlock = block.getInputTargetBlock('FIND');
+    let find = null;
+    if (findBlock) {
+      find = javascriptGenerator.blockToHighLevel(findBlock);
+    }
+    
+    return {
+      type: 'lists_indexOf',
+      properties: {
+        end: end,
+        list: value,
+        item: find
+      }
+    };
+  };
+  
+  // lists_getIndex
+  javascriptGenerator.forBlock['lists_getIndex'].highLevel = function(block: Blockly.Block) {
+    const mode = block.getFieldValue('MODE'); // 'GET', 'GET_REMOVE', or 'REMOVE'
+    const where = block.getFieldValue('WHERE'); // 'FROM_START', 'FROM_END', 'FIRST', 'LAST', 'RANDOM'
+    
+    // Get list
+    const valueBlock = block.getInputTargetBlock('VALUE');
+    let value = null;
+    if (valueBlock) {
+      value = javascriptGenerator.blockToHighLevel(valueBlock);
+    }
+    
+    // Get index if applicable
+    let at = null;
+    if (where === 'FROM_START' || where === 'FROM_END') {
+      const atBlock = block.getInputTargetBlock('AT');
+      if (atBlock) {
+        at = javascriptGenerator.blockToHighLevel(atBlock);
+      }
+    }
+    
+    return {
+      type: 'lists_getIndex',
+      properties: {
+        mode: mode,
+        where: where,
+        list: value,
+        at: at
+      }
+    };
+  };
+  
+  // lists_setIndex
+  javascriptGenerator.forBlock['lists_setIndex'].highLevel = function(block: Blockly.Block) {
+    const mode = block.getFieldValue('MODE'); // 'SET' or 'INSERT'
+    const where = block.getFieldValue('WHERE'); // 'FROM_START', 'FROM_END', 'FIRST', 'LAST', 'RANDOM'
+    
+    // Get list
+    const listBlock = block.getInputTargetBlock('LIST');
+    let list = null;
+    if (listBlock) {
+      list = javascriptGenerator.blockToHighLevel(listBlock);
+    }
+    
+    // Get index if applicable
+    let at = null;
+    if (where === 'FROM_START' || where === 'FROM_END') {
+      const atBlock = block.getInputTargetBlock('AT');
+      if (atBlock) {
+        at = javascriptGenerator.blockToHighLevel(atBlock);
+      }
+    }
+    
+    // Get item to set or insert
+    const toBlock = block.getInputTargetBlock('TO');
+    let to = null;
+    if (toBlock) {
+      to = javascriptGenerator.blockToHighLevel(toBlock);
+    }
+    
+    return {
+      type: 'lists_setIndex',
+      properties: {
+        mode: mode,
+        where: where,
+        list: list,
+        at: at,
+        to: to
+      }
+    };
+  };
+  
+  // lists_getSublist
+  javascriptGenerator.forBlock['lists_getSublist'].highLevel = function(block: Blockly.Block) {
+    const where1 = block.getFieldValue('WHERE1'); // Start position: 'FROM_START', 'FROM_END', 'FIRST'
+    const where2 = block.getFieldValue('WHERE2'); // End position: 'FROM_START', 'FROM_END', 'LAST'
+    
+    // Get list
+    const listBlock = block.getInputTargetBlock('LIST');
+    let list = null;
+    if (listBlock) {
+      list = javascriptGenerator.blockToHighLevel(listBlock);
+    }
+    
+    // Get start position if applicable
+    let at1 = null;
+    if (where1 === 'FROM_START' || where1 === 'FROM_END') {
+      const at1Block = block.getInputTargetBlock('AT1');
+      if (at1Block) {
+        at1 = javascriptGenerator.blockToHighLevel(at1Block);
+      }
+    }
+    
+    // Get end position if applicable
+    let at2 = null;
+    if (where2 === 'FROM_START' || where2 === 'FROM_END') {
+      const at2Block = block.getInputTargetBlock('AT2');
+      if (at2Block) {
+        at2 = javascriptGenerator.blockToHighLevel(at2Block);
+      }
+    }
+    
+    return {
+      type: 'lists_getSublist',
+      properties: {
+        where1: where1,
+        where2: where2,
+        list: list,
+        at1: at1,
+        at2: at2
+      }
+    };
+  };
+  
+  // lists_sort
+  javascriptGenerator.forBlock['lists_sort'].highLevel = function(block: Blockly.Block) {
+    const type = block.getFieldValue('TYPE'); // 'NUMERIC', 'TEXT', or 'IGNORE_CASE'
+    const direction = parseInt(block.getFieldValue('DIRECTION')); // 1 for ascending, -1 for descending
+    
+    // Get list to sort
+    const listBlock = block.getInputTargetBlock('LIST');
+    let list = null;
+    if (listBlock) {
+      list = javascriptGenerator.blockToHighLevel(listBlock);
+    }
+    
+    return {
+      type: 'lists_sort',
+      properties: {
+        type: type,
+        direction: direction,
+        list: list
+      }
+    };
+  };
+  
   // lists_create_with
   if (javascriptGenerator.forBlock['lists_create_with']) {
     javascriptGenerator.forBlock['lists_create_with'].highLevel = function(block: Blockly.Block) {

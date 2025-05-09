@@ -386,25 +386,10 @@ export const toolboxXml = `<category name="Text" colour="160">
   </value>
 </block>
 
-<block type="text_print">
+<block type="console_log">
   <value name="TEXT">
     <block type="text">
       <field name="TEXT">Hello World</field>
-    </block>
-  </value>
-</block>
-
-<block type="variables_set">
-  <field name="VAR">promptResult</field>
-  <value name="VALUE">
-    <block type="text_prompt_ext">
-      <mutation type="TEXT"></mutation>
-      <field name="TYPE">TEXT</field>
-      <value name="TEXT">
-        <block type="text">
-          <field name="TEXT">Please enter your name</field>
-        </block>
-      </value>
     </block>
   </value>
 </block>

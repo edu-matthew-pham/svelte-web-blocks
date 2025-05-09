@@ -20,6 +20,17 @@ const customBlockHandlers: Record<string, CustomBlockHandler> = {
     'controls_for': handleControlsFor,
     'controls_forEach': handleControlsForEach,
     'lists_create_with': handleListsCreateWith,
+    // Add list block handlers
+    'lists_create_empty': handleListsCreateEmpty,
+    'lists_repeat': handleListsRepeat,
+    'lists_length': handleListsLength,
+    'lists_isEmpty': handleListsIsEmpty,
+    'lists_getIndex': handleListsGetIndex,
+    'lists_setIndex': handleListsSetIndex,
+    'lists_getSublist': handleListsGetSublist,
+    'lists_sort': handleListsSort,
+    'lists_indexOf': handleListsIndexOf,
+    'lists_split': handleListsSplit,
     // Add math block handlers
     'math_round': handleMathRound,
     'math_on_list': handleMathOnList,
@@ -38,7 +49,6 @@ const customBlockHandlers: Record<string, CustomBlockHandler> = {
     'text_getSubstring': handleTextGetSubstring,
     'text_changeCase': handleTextChangeCase,
     'text_trim': handleTextTrim,
-    'lists_split': handleListsSplit
 };
 
 /**
@@ -1073,7 +1083,7 @@ function handleListsSplit(
     component: ComponentNode
 ): boolean {
     try {
-        // Set the mode (SPLIT, JOIN)
+        // Set the mode (SPLIT, JOIN, PACK)
         if (component.properties?.mode) {
             const modeField = block.getField('MODE');
             if (modeField) {
@@ -1082,14 +1092,12 @@ function handleListsSplit(
             }
         }
         
-        // Handle the INPUT input (text to split or list to join)
+        // Handle the INPUT input - could be text for SPLIT or list for JOIN
         if (component.properties?.input) {
-            // The input name changes based on the mode
-            const inputName = component.properties.mode === 'SPLIT' ? 'INPUT' : 'LIST';
-            handleValueInput(workspace, block, inputName, component.properties.input);
+            handleValueInput(workspace, block, 'INPUT', component.properties.input);
         }
         
-        // Handle the DELIMITER input
+        // Handle the delimiter input
         if (component.properties?.delimiter) {
             handleValueInput(workspace, block, 'DELIM', component.properties.delimiter);
         }
@@ -1097,6 +1105,314 @@ function handleListsSplit(
         return true;
     } catch (e) {
         console.error("Error handling lists_split block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for lists_create_empty blocks
+ */
+function handleListsCreateEmpty(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    // This block doesn't need any special handling as it has no inputs or fields to set
+    return true;
+}
+
+/**
+ * Custom handler for lists_repeat blocks
+ */
+function handleListsRepeat(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Handle ITEM input (the item to repeat)
+        if (component.properties?.item) {
+            handleValueInput(workspace, block, 'ITEM', component.properties.item);
+        }
+        
+        // Handle NUM or TIMES input (number of times to repeat)
+        if (component.properties?.times) {
+            handleValueInput(workspace, block, 'NUM', component.properties.times);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling lists_repeat block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for lists_length blocks
+ */
+function handleListsLength(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Handle the VALUE or LIST input
+        if (component.properties?.list) {
+            handleValueInput(workspace, block, 'VALUE', component.properties.list);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling lists_length block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for lists_isEmpty blocks
+ */
+function handleListsIsEmpty(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Handle the VALUE or LIST input
+        if (component.properties?.list) {
+            handleValueInput(workspace, block, 'VALUE', component.properties.list);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling lists_isEmpty block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for lists_getIndex blocks
+ */
+function handleListsGetIndex(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set the mode (GET, GET_REMOVE, REMOVE)
+        if (component.properties?.mode) {
+            const modeField = block.getField('MODE');
+            if (modeField) {
+                modeField.setValue(component.properties.mode);
+                console.log(`Set lists_getIndex mode to ${component.properties.mode}`);
+            }
+        }
+        
+        // Set the position (FROM_START, FROM_END, FIRST, LAST, RANDOM)
+        if (component.properties?.where) {
+            const whereField = block.getField('WHERE');
+            if (whereField) {
+                whereField.setValue(component.properties.where);
+                console.log(`Set lists_getIndex where to ${component.properties.where}`);
+            }
+        }
+        
+        // Handle the LIST input
+        if (component.properties?.list) {
+            handleValueInput(workspace, block, 'VALUE', component.properties.list);
+        }
+        
+        // Handle the AT input if using FROM_START or FROM_END
+        if (component.properties?.at && 
+            (component.properties.where === 'FROM_START' || component.properties.where === 'FROM_END')) {
+            handleValueInput(workspace, block, 'AT', component.properties.at);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling lists_getIndex block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for lists_setIndex blocks
+ */
+function handleListsSetIndex(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set the mode (SET, INSERT)
+        if (component.properties?.mode) {
+            const modeField = block.getField('MODE');
+            if (modeField) {
+                modeField.setValue(component.properties.mode);
+                console.log(`Set lists_setIndex mode to ${component.properties.mode}`);
+            }
+        }
+        
+        // Set the position (FROM_START, FROM_END, FIRST, LAST, RANDOM)
+        if (component.properties?.where) {
+            const whereField = block.getField('WHERE');
+            if (whereField) {
+                whereField.setValue(component.properties.where);
+                console.log(`Set lists_setIndex where to ${component.properties.where}`);
+            }
+        }
+        
+        // Handle the LIST input
+        if (component.properties?.list) {
+            handleValueInput(workspace, block, 'LIST', component.properties.list);
+        }
+        
+        // Handle the AT input if using FROM_START or FROM_END
+        if (component.properties?.at && 
+            (component.properties.where === 'FROM_START' || component.properties.where === 'FROM_END')) {
+            handleValueInput(workspace, block, 'AT', component.properties.at);
+        }
+        
+        // Handle the TO input (the value to set or insert)
+        if (component.properties?.to) {
+            handleValueInput(workspace, block, 'TO', component.properties.to);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling lists_setIndex block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for lists_getSublist blocks
+ */
+function handleListsGetSublist(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set the where1 property (start position: FROM_START, FROM_END, FIRST)
+        if (component.properties?.where1) {
+            const where1Field = block.getField('WHERE1');
+            if (where1Field) {
+                where1Field.setValue(component.properties.where1);
+                console.log(`Set lists_getSublist where1 to ${component.properties.where1}`);
+            }
+        }
+        
+        // Set the where2 property (end position: FROM_START, FROM_END, LAST)
+        if (component.properties?.where2) {
+            const where2Field = block.getField('WHERE2');
+            if (where2Field) {
+                where2Field.setValue(component.properties.where2);
+                console.log(`Set lists_getSublist where2 to ${component.properties.where2}`);
+            }
+        }
+        
+        // Handle the LIST input
+        if (component.properties?.list) {
+            handleValueInput(workspace, block, 'LIST', component.properties.list);
+        }
+        
+        // Handle the AT1 input (start position) if where1 is FROM_START or FROM_END
+        if (component.properties?.at1 && 
+            (component.properties.where1 === 'FROM_START' || component.properties.where1 === 'FROM_END')) {
+            handleValueInput(workspace, block, 'AT1', component.properties.at1);
+        }
+        
+        // Handle the AT2 input (end position) if where2 is FROM_START or FROM_END
+        if (component.properties?.at2 && 
+            (component.properties.where2 === 'FROM_START' || component.properties.where2 === 'FROM_END')) {
+            handleValueInput(workspace, block, 'AT2', component.properties.at2);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling lists_getSublist block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for lists_sort blocks
+ */
+function handleListsSort(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set the sort type (NUMERIC, TEXT, ALPHABETIC)
+        if (component.properties?.type) {
+            const typeField = block.getField('TYPE');
+            if (typeField) {
+                typeField.setValue(component.properties.type);
+                console.log(`Set lists_sort type to ${component.properties.type}`);
+            }
+        }
+        
+        // Set the direction (1 for ascending, -1 for descending)
+        if (component.properties?.direction !== undefined) {
+            const directionField = block.getField('DIRECTION');
+            if (directionField) {
+                // Use the internal value directly (1 or -1)
+                const isAscending = component.properties.direction >= 0;
+                const internalValue = isAscending ? "1" : "-1";
+                
+                try {
+                    directionField.setValue(internalValue);
+                    console.log(`Set lists_sort direction to ${internalValue} (${isAscending ? "ascending" : "descending"})`);
+                } catch (e) {
+                    console.warn(`Failed to set direction for lists_sort:`, e);
+                }
+            }
+        }
+        
+        // Handle the LIST input
+        if (component.properties?.list) {
+            handleValueInput(workspace, block, 'LIST', component.properties.list);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling lists_sort block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for lists_indexOf blocks
+ */
+function handleListsIndexOf(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Set the operation (FIRST or LAST)
+        if (component.properties?.end) {
+            const endField = block.getField('END');
+            if (endField) {
+                endField.setValue(component.properties.end);
+                console.log(`Set lists_indexOf end to ${component.properties.end}`);
+            }
+        }
+        
+        // Handle the LIST input
+        if (component.properties?.list) {
+            handleValueInput(workspace, block, 'VALUE', component.properties.list);
+        }
+        
+        // Handle the FIND or ITEM input
+        if (component.properties?.item) {
+            handleValueInput(workspace, block, 'FIND', component.properties.item);
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling lists_indexOf block:", e);
         return false;
     }
 }
