@@ -25,7 +25,7 @@
     export let workspaceOptions = {}; 
     export let showCodeView = true;
     export let showJsonView = true;
-    export let initialTab: 'blocks'|'json'|'code'|'preview'|'dom'|'safety-code' = 'blocks'; // 'blocks', 'json', or 'code' or 'preview' or 'dom' or 'safety-code'
+    export let initialTab: 'blocks'|'json'|'code'|'preview'|'dom' = 'blocks'; // 'blocks', 'json', or 'code' or 'preview' or 'dom'
   
     // Internal state
     let blocklyDiv: HTMLElement;
@@ -34,7 +34,7 @@
     
     let generatedCode = '';
     let jsonCode = '';
-    let activeTab: 'blocks'|'json'|'code'|'preview'|'dom'|'safety-code' = initialTab;
+    let activeTab: 'blocks'|'json'|'code'|'preview'|'dom' = initialTab;
     let componentsLoaded = false;
     let modifiedDomString = '';
     
@@ -60,7 +60,6 @@
     let previewSafety = createPreviewSafety({
       showErrorOverlay: true  // Enable the visual error overlay
     });
-    let safetyWrapperCode = '';
   
     onMount(() => {
       if (!blocklyDiv) return;
@@ -167,8 +166,6 @@
         previewSafety.cleanup();
       };
 
- 
-
     });
   
     // Function to generate JSON representation of the workspace
@@ -252,30 +249,40 @@
       if (workspace) Blockly.svgResize(workspace);
     }
 
-    // Add a function to get the current DOM from the iframe
+    // Updated captureModifiedDom function
     function captureModifiedDom() {
       try {
         const iframe = document.querySelector('.preview-iframe') as HTMLIFrameElement;
-        if (iframe?.contentDocument) {
-          modifiedDomString = iframe.contentDocument.documentElement.outerHTML;
+        if (iframe?.contentWindow) {
+          // Request the DOM from the iframe
+          iframe.contentWindow.postMessage({ type: 'requestDOM' }, '*');
         }
       } catch (e) {
-        console.error('Error capturing DOM:', e);
+        console.error('Error requesting DOM:', e);
         modifiedDomString = '<!-- Error capturing DOM -->';
       }
     }
 
-    // Handle messages from iframe
+    // Update the event listener to handle DOM messages
     onMount(() => {
-      window.addEventListener('message', (event) => {
+      const messageHandler = (event: MessageEvent) => {
         if (event.data?.source === 'preview-console') {
           const { type, message, timestamp } = event.data;
           console.log('Console captured:', type, message);
+        } else if (event.data?.type === 'domContent') {
+          // Receive the DOM content sent from iframe
+          modifiedDomString = event.data.content;
+          // Apply highlighting if DOM tab is active
+          if (activeTab === 'dom') {
+            applyHighlighting();
+          }
         }
-      });
+      };
+
+      window.addEventListener('message', messageHandler);
       
       return () => {
-        window.removeEventListener('message', () => {});
+        window.removeEventListener('message', messageHandler);
       };
     });
 
@@ -364,19 +371,9 @@
       applyHighlighting();
     });
 
-    // Initialize safetyWrapperCode when needed
-    function updateSafetyCode() {
-      if (!generatedCode) return;
-      safetyWrapperCode = previewSafety?.wrapCode(generatedCode) || '';
-    }
-
     // Update setActiveTab function
-    function setActiveTab(tab: 'blocks'|'json'|'code'|'preview'|'dom'|'safety-code') {
+    function setActiveTab(tab: 'blocks'|'json'|'code'|'preview'|'dom') {
       activeTab = tab;
-      
-      if (tab === 'safety-code') {
-        updateSafetyCode();
-      }
       
       if (tab === 'blocks' && workspace) {
         resize();
@@ -427,14 +424,7 @@
         <button 
           class="tab-button {activeTab === 'dom' ? 'active' : ''}" 
           on:click={() => { activeTab = 'dom'; captureModifiedDom(); }}> 
-          DOM
-        </button>
-
-        <!-- Update tab button to ensure it's visible and properly styled -->
-        <button 
-          class="tab-button {activeTab === 'safety-code' ? 'active' : ''}" 
-          on:click={() => setActiveTab('safety-code')}>
-          Safety Code
+          Live HTML
         </button>
 
       </div>
@@ -491,7 +481,20 @@
         </div>
         <iframe
           class="preview-iframe"
-          srcdoc={previewSafety.wrapCode(generatedCode)}
+          srcdoc={previewSafety.wrapCode(generatedCode + `
+            <script>
+              // Add listener for DOM request
+              window.addEventListener('message', (event) => {
+                if (event.data?.type === 'requestDOM') {
+                  // Send the DOM content back to parent
+                  window.parent.postMessage({
+                    type: 'domContent',
+                    content: document.documentElement.outerHTML
+                  }, '*');
+                }
+              });
+            </script>
+          `)}
           sandbox="allow-scripts" 
           title="Component Preview"
           on:load={previewSafety.handlePreviewLoad}
@@ -501,14 +504,6 @@
       <!-- DOM view without refresh button -->
       <div class="code-container" style="display: {activeTab === 'dom' ? 'block' : 'none'}">
         <pre class="code-display"><code bind:this={domContainer} class="language-html"></code></pre>
-      </div>
-
-      <!-- Make sure the safety code container is properly added -->
-      <div class="code-container" style="display: {activeTab === 'safety-code' ? 'block' : 'none'}">
-        <div class="action-buttons">
-          <button on:click={() => copyToClipboard(safetyWrapperCode)}>Copy Safety Code</button>
-        </div>
-        <pre class="code-display"><code class="language-html">{safetyWrapperCode || 'Click to generate safety code'}</code></pre>
       </div>
     </div>
   </div>
