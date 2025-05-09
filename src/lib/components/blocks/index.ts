@@ -25,7 +25,7 @@ const componentModules = [
   import('$lib/components/js/text/index.js'),
   import('$lib/components/js/lists/index.js'),
   import('$lib/components/js/default/index.js'),
-  
+  import('$lib/components/custom/index.js'),
   
   //import('$lib/components/js/operations/index.js'),
   // Add new components here
@@ -48,6 +48,7 @@ export async function initializeBlocks(): Promise<BlocksBundle> {
   const parsers: Record<string, any> = {};
   const htmlToolboxCategories: string[] = [];
   const jsToolboxCategories: string[] = [];
+  const customToolboxCategories: string[] = [];
   
   // Combine all exports generically
   modules.forEach((module, index) => {
@@ -60,12 +61,13 @@ export async function initializeBlocks(): Promise<BlocksBundle> {
       } else if (key.includes('Parser')) { // Handles both 'Parser' and 'Parsers'
         Object.assign(parsers, module[key]);
       } else if (key.endsWith('Toolbox')) {
-        // Separate HTML and JS toolbox categories
-        // The first 8 imports are HTML-related components
+        // Use simple index-based categorization
         if (index < 9) {
           htmlToolboxCategories.push(module[key]);
-        } else {
+        } else if (index < 17) { // Index of custom component
           jsToolboxCategories.push(module[key]);
+        } else {
+          customToolboxCategories.push(module[key]);
         }
       }
     });
@@ -83,6 +85,12 @@ export async function initializeBlocks(): Promise<BlocksBundle> {
   <category name="JavaScript" expanded="true" colour="#9fa55b">
     ${jsToolboxCategories.join('\n')}
   </category>
+
+  <sep></sep>
+  
+
+    ${customToolboxCategories.join('\n')}
+
 </xml>
   `;
   

@@ -1,35 +1,9 @@
 // Auto-generated from toolbox.xml
 // Do not edit directly - use the XML file instead
 
-export const toolboxXml = `<category name="Variables & Functions" colour="290">
+export const toolboxXml = `<category name="Variables, Inputs & Logging" colour="290">
 
-    <block type="console_log">
-      <value name="TEXT">
-        <shadow type="text">
-          <field name="TEXT">Hello world</field>
-        </shadow>
-      </value>
-    </block>
-
-    <block type="variables_set">
-      <field name="VAR">number</field>
-      <value name="VALUE">
-        <block type="math_number">
-          <field name="NUM">123</field>
-        </block>
-      </value>
-      <next>
-        <block type="console_log">
-          <value name="TEXT">
-            <block type="variables_get">
-              <field name="VAR" id="control_for_var">i</field>
-            </block>
-          </value>
-        </block>
-      </next>
-    </block>
-
-    <label text="Variables" web-class="toolboxLabel"></label>
+        <label text="Variables" web-class="toolboxLabel"></label>
 
     <button text="Create Variable..." callbackKey="CREATE_VARIABLE"></button>
 
@@ -80,6 +54,36 @@ export const toolboxXml = `<category name="Variables & Functions" colour="290">
         <field name="NUM">123</field>
     </block>
 
+    <label text="Logging" web-class="toolboxLabel"></label>
+
+    <block type="console_log">
+      <value name="TEXT">
+        <shadow type="text">
+          <field name="TEXT">Hello world</field>
+        </shadow>
+      </value>
+    </block>
+
+    <block type="variables_set">
+      <field name="VAR">number</field>
+      <value name="VALUE">
+        <block type="math_number">
+          <field name="NUM">123</field>
+        </block>
+      </value>
+      <next>
+        <block type="console_log">
+          <value name="TEXT">
+            <block type="variables_get">
+              <field name="VAR" id="control_for_var">i</field>
+            </block>
+          </value>
+        </block>
+      </next>
+    </block>
+</category>
+
+<category name="Functions" colour="290">
     <label text="Functions" web-class="toolboxLabel"></label>
     <sep gap="8"></sep>
     

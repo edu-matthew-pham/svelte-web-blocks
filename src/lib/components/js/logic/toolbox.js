@@ -2,34 +2,7 @@
 // Do not edit directly - use the XML file instead
 
 export const toolboxXml = `
- <category name="Logic & Loops" colour="210">
-
-    
-
-    <block type="variables_set">
-      <value name="VALUE">
-        <block type="text">
-          <field name="TEXT">abc</field>
-        </block>
-      </value>
-      <next>
-            <block type="controls_if">
-      <value name="IF0">
-        <block type="expression_compare">
-          <field name="EXPRESSION">item == "abc"</field>
-        </block>
-      </value>
-      <statement name="DO0">
-        <block type="console_log">
-          <value name="TEXT">
-            <block type="text">
-              <field name="TEXT">item is abc</field>
-            </block>
-          </value>
-        </block>
-      </next>
-    </block>
-
+<category name="Logic" colour="210">
     <block type="controls_if">
       <value name="IF0">
         <block type="expression_compare">
@@ -51,6 +24,34 @@ export const toolboxXml = `
       <field name="EXPRESSION">1==1 && 1<=2</field>
     </block>
 
+    <block type="variables_set">
+      <value name="VALUE">
+        <block type="text">
+          <field name="TEXT">abc</field>
+        </block>
+      </value>
+      <next>
+        <block type="controls_if">
+          <value name="IF0">
+            <block type="expression_compare">
+              <field name="EXPRESSION">item == "abc"</field>
+            </block>
+          </value>
+          <statement name="DO0">
+            <block type="console_log">
+              <value name="TEXT">
+                <block type="text">
+                  <field name="TEXT">item is abc</field>
+                </block>
+              </value>
+            </block>
+          </statement>
+        </block>
+      </next>
+    </block>
+</category>
+
+<category name="Loops" colour="120">
     <block type="controls_forEach">
       <field name="VAR" id="control_foreach_var">item</field>
       <value name="LIST">
@@ -84,7 +85,7 @@ export const toolboxXml = `
       </statement>
     </block>
 
-     <block type="variables_set">
+    <block type="variables_set">
       <field name="VAR">i</field>
       <value name="VALUE">
         <block type="math_number">
@@ -148,10 +149,6 @@ export const toolboxXml = `
         </block>
       </statement>
     </block>
-
-    </block>
-    
-
     
     <block type="controls_for">
       <field name="VAR" id="control_for_var">i</field>
@@ -195,8 +192,6 @@ export const toolboxXml = `
       </statement>
     </block>
 
-    
-
     <block type="controls_whileUntil">
       <field name="MODE">WHILE</field>
     </block>
@@ -208,5 +203,4 @@ export const toolboxXml = `
     <block type="controls_flow_statements">
       <field name="FLOW">BREAK</field>
     </block>
-
 </category>`; 

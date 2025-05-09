@@ -455,7 +455,12 @@ function mapComponentTypeToBlockType(componentType: string, component?: Componen
         'dom_event': 'js_event_handler',
         'dom_modify': 'js_modify_element',
         'dom_delete': 'js_delete_element',
-        'dom_clone': 'js_clone_element'
+        'dom_clone': 'js_clone_element',
+        // Add mappings for custom code blocks
+        'custom_html': 'custom_content_html',
+        'custom_css': 'custom_style_css',
+        'custom_javascript': 'custom_script_js',
+        'custom_onload_javascript': 'custom_onload_js'
     };
     
     // No transformation needed for CSS and script components
