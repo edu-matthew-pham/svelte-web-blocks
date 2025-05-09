@@ -21,6 +21,9 @@ export function registerHighLevelGenerators() {
   // Text blocks
   registerTextBlockGenerators();
   
+  // List blocks
+  registerListBlockGenerators();
+  
   // Function/Procedure blocks
   registerFunctionBlockGenerators();
 }
@@ -505,6 +508,167 @@ function registerTextBlockGenerators() {
     };
   };
   
+}
+
+// ===== List Blocks =====
+function registerListBlockGenerators() {
+  // lists_create_with
+  if (javascriptGenerator.forBlock['lists_create_with']) {
+    javascriptGenerator.forBlock['lists_create_with'].highLevel = function(block: Blockly.Block) {
+      // Number of items in the list
+      const itemCount = (block as any).itemCount_ || 0;
+      
+      // Get all list items
+      const items = [];
+      for (let i = 0; i < itemCount; i++) {
+        const itemBlock = block.getInputTargetBlock('ADD' + i);
+        let item = null;
+        if (itemBlock) {
+          item = javascriptGenerator.blockToHighLevel(itemBlock);
+        }
+        items.push(item);
+      }
+      
+      return {
+        type: 'lists_create_with',
+        properties: {
+          items: items
+        }
+      };
+    };
+  }
+  
+  // list_create - check if this block type exists first
+  if (javascriptGenerator.forBlock['list_create']) {
+    javascriptGenerator.forBlock['list_create'].highLevel = function(block: Blockly.Block) {
+      const data = block.getFieldValue('DATA') || '';
+      const items = data.split(',').map((item: string) => item.trim());
+      
+      return {
+        type: 'list_create',
+        properties: {
+          items: items.map((item: string) => ({
+            type: 'text',
+            properties: {
+              value: item
+            }
+          }))
+        }
+      };
+    };
+  }
+  
+  // list_operation - check if this block type exists first
+  if (javascriptGenerator.forBlock['list_operation']) {
+    javascriptGenerator.forBlock['list_operation'].highLevel = function(block: Blockly.Block) {
+      const operation = block.getFieldValue('OPERATION');
+      
+      // Get list
+      const listBlock = block.getInputTargetBlock('LIST');
+      let list = null;
+      if (listBlock) {
+        list = javascriptGenerator.blockToHighLevel(listBlock);
+      }
+      
+      // Get index if present
+      const indexBlock = block.getInputTargetBlock('INDEX');
+      let index = null;
+      if (indexBlock) {
+        index = javascriptGenerator.blockToHighLevel(indexBlock);
+      }
+      
+      // Get item if present
+      const itemBlock = block.getInputTargetBlock('ITEM');
+      let item = null;
+      if (itemBlock) {
+        item = javascriptGenerator.blockToHighLevel(itemBlock);
+      }
+      
+      return {
+        type: 'list_operation',
+        properties: {
+          operation: operation,
+          list: list,
+          index: index,
+          item: item
+        }
+      };
+    };
+  }
+  
+  // list_query - check if this block type exists first
+  if (javascriptGenerator.forBlock['list_query']) {
+    javascriptGenerator.forBlock['list_query'].highLevel = function(block: Blockly.Block) {
+      const query = block.getFieldValue('QUERY');
+      
+      // Get list
+      const listBlock = block.getInputTargetBlock('LIST');
+      let list = null;
+      if (listBlock) {
+        list = javascriptGenerator.blockToHighLevel(listBlock);
+      }
+      
+      // Get item if present (for queries like 'indexOf')
+      const itemBlock = block.getInputTargetBlock('ITEM');
+      let item = null;
+      if (itemBlock) {
+        item = javascriptGenerator.blockToHighLevel(itemBlock);
+      }
+      
+      return {
+        type: 'list_query',
+        properties: {
+          query: query,
+          list: list,
+          item: item
+        }
+      };
+    };
+  }
+  
+  // list_join - check if this block type exists first
+  if (javascriptGenerator.forBlock['list_join']) {
+    javascriptGenerator.forBlock['list_join'].highLevel = function(block: Blockly.Block) {
+      const separator = block.getFieldValue('SEPARATOR');
+      
+      // Get list
+      const listBlock = block.getInputTargetBlock('LIST');
+      let list = null;
+      if (listBlock) {
+        list = javascriptGenerator.blockToHighLevel(listBlock);
+      }
+      
+      return {
+        type: 'list_join',
+        properties: {
+          separator: separator,
+          list: list
+        }
+      };
+    };
+  }
+  
+  // list_sort - check if this block type exists first
+  if (javascriptGenerator.forBlock['list_sort']) {
+    javascriptGenerator.forBlock['list_sort'].highLevel = function(block: Blockly.Block) {
+      const order = block.getFieldValue('ORDER');
+      
+      // Get list
+      const listBlock = block.getInputTargetBlock('LIST');
+      let list = null;
+      if (listBlock) {
+        list = javascriptGenerator.blockToHighLevel(listBlock);
+      }
+      
+      return {
+        type: 'list_sort',
+        properties: {
+          order: order,
+          list: list
+        }
+      };
+    };
+  }
 }
 
 // ===== Function/Procedure Blocks =====

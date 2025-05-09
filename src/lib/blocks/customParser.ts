@@ -17,7 +17,9 @@ const customBlockHandlers: Record<string, CustomBlockHandler> = {
     'math_arithmetic': handleMathArithmetic,
     'controls_repeat_ext': handleLoopBlock,
     'controls_whileUntil': handleLoopBlock,
-    'controls_for': handleControlsFor
+    'controls_for': handleControlsFor,
+    'controls_forEach': handleControlsForEach,
+    'lists_create_with': handleListsCreateWith
 };
 
 /**
@@ -444,6 +446,120 @@ function handleControlsFor(
         return true;
     } catch (e) {
         console.error("Error handling controls_for block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for controls_forEach blocks
+ */
+function handleControlsForEach(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Handle variable field
+        const variableName = component.properties?.variableName || 'item';
+        const variableId = component.properties?.variableId;
+        
+        if (variableName) {
+            // Check if variable exists by name or ID
+            let variable = variableId ? workspace.getVariableById(variableId) : null;
+            if (!variable) {
+                variable = workspace.getVariable(variableName);
+            }
+            
+            // If variable doesn't exist, create it
+            if (!variable) {
+                try {
+                    // Try to create with original ID if provided
+                    variable = variableId ? 
+                        workspace.createVariable(variableName, undefined, variableId) : 
+                        workspace.createVariable(variableName);
+                } catch (e) {
+                    // If ID conflict, create with auto-generated ID
+                    variable = workspace.createVariable(variableName);
+                }
+            }
+            
+            // Set the variable field
+            const variableField = block.getField('VAR');
+            if (variableField && variable) {
+                variableField.setValue(variable.getId());
+                console.log(`Set controls_forEach VAR field to: ${variable.name} (${variable.getId()})`);
+            }
+        }
+        
+        // Handle LIST input (the collection to iterate over)
+        if (component.properties?.list) {
+            handleValueInput(workspace, block, 'LIST', component.properties.list);
+        }
+        
+        // Handle statements for loop body
+        if (component.properties?.statements && Array.isArray(component.properties.statements)) {
+            const statementInput = 'DO';
+            let previousBlock: any = null;
+            
+            component.properties.statements.forEach(statementComponent => {
+                const statementBlock = createComponentBlock(
+                    workspace, 
+                    statementComponent,
+                    previousBlock || block,
+                    previousBlock ? 'NEXT' : statementInput
+                );
+                
+                if (statementBlock) {
+                    previousBlock = statementBlock;
+                }
+            });
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling controls_forEach block:", e);
+        return false;
+    }
+}
+
+/**
+ * Custom handler for lists_create_with blocks
+ */
+function handleListsCreateWith(
+    workspace: WorkspaceSvg,
+    block: any,
+    component: ComponentNode
+): boolean {
+    try {
+        // Check if items property exists
+        if (!component.properties?.items || !Array.isArray(component.properties.items)) {
+            return false;
+        }
+
+        const items = component.properties.items;
+        console.log(`Processing lists_create_with with ${items.length} items`);
+        
+        // Adjust the number of inputs based on the items count
+        // Create a mutation element to set the items count
+        if (items.length > 0) {
+            const mutation = document.createElement('mutation');
+            mutation.setAttribute('items', String(items.length));
+            block.domToMutation(mutation);
+        }
+        
+        // Process each item
+        items.forEach((itemComponent: any, index: number) => {
+            if (itemComponent) {
+                console.log(`Processing item ${index}:`, itemComponent);
+                // The input names for lists_create_with are ADD0, ADD1, ADD2, etc.
+                const inputName = `ADD${index}`;
+                handleValueInput(workspace, block, inputName, itemComponent);
+            }
+        });
+        
+        return true;
+    } catch (e) {
+        console.error("Error handling lists_create_with block:", e);
         return false;
     }
 }

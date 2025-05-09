@@ -178,9 +178,25 @@ export const toolboxXml = `
               <field name="VAR" id="control_for_var">i</field>
             </block>
           </value>
+          <next>
+            <block type="controls_if">
+              <value name="IF0">
+                <block type="expression_compare">
+                  <field name="EXPRESSION">i == 5</field>
+                </block>
+              </value>
+              <statement name="DO0">
+                <block type="controls_flow_statements">
+                  <field name="FLOW">BREAK</field>
+                </block>
+              </statement>
+            </block>
+          </next>
         </block>
       </statement>
     </block>
+
+    
 
     <block type="controls_whileUntil">
       <field name="MODE">WHILE</field>
