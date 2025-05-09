@@ -8,11 +8,12 @@ const logicConfigs: WebBlockConfigs = {
     type: 'expression_compare',
     category: 'logic',
     color: 210,
-    tooltip: "Evaluate a JavaScript comparison expression",
+    tooltip: "Evaluate a JavaScript condition",
     helpUrl: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators#comparison_operators",
     inputs: [
       { type: "row", children: [
-        { type: "field_multiline", name: "EXPRESSION", default: "x > 0 && y < 10" }
+        { type: "label", text: "condition:" },
+        { type: "field_text", name: "EXPRESSION", default: "x > 0 && y < 10" }
       ]}
     ],
     connections: { output: "Boolean" },

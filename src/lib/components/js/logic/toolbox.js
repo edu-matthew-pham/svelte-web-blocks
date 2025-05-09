@@ -95,18 +95,8 @@ export const toolboxXml = `
         <block type="controls_whileUntil">
           <field name="MODE">WHILE</field>
           <value name="BOOL">
-            <block type="logic_compare">
-              <field name="OP">LT</field>
-              <value name="A">
-                <block type="variables_get">
-                  <field name="VAR">i</field>
-                </block>
-              </value>
-              <value name="B">
-                <block type="math_number">
-                  <field name="NUM">5</field>
-                </block>
-              </value>
+            <block type="expression_compare">
+              <field name="EXPRESSION">i < 5</field>
             </block>
           </value>
           <statement name="DO">

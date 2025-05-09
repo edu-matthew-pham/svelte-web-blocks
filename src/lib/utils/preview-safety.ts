@@ -23,6 +23,8 @@ export interface PreviewSafetyOptions {
   showAlertsInPreview?: boolean;
   /** Whether to add visual error overlay in the preview (default: false) */
   showErrorOverlay?: boolean;
+  /** Custom CSS styles to inject into the preview */
+  customStyles?: string;
 }
 
 export interface PreviewError {
@@ -49,6 +51,7 @@ export interface PreviewSafety {
   hasError: boolean;
   isLoading: boolean;
   currentError: PreviewError | null;
+  analyzeCode: (code: string) => string;
 }
 
 /**
