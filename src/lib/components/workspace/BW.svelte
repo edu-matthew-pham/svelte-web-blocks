@@ -96,21 +96,22 @@
   
       // Use an immediately invoked async function for initialization
       (async () => {
-        // Load components using the new structure
-        const { definitions, generators, parsers, toolboxXml } = await initializeBlocks();
-        
-        // Store parsers for later use
-        window.__blocklyParsers = parsers;
-        
-        // Register custom blocks
-        Object.entries(definitions).forEach(([type, blockDef]) => {
-          Blockly.Blocks[type] = blockDef;
-        });
-        
-        // Initialize visibility extensions after blocks are registered
-        import('$lib/utils/blockly-extensions.js').then(({ initializeVisibilityExtensions }) => {
-          initializeVisibilityExtensions();
-        });
+        try {
+          // Load components using the new structure
+          const { definitions, generators, parsers, toolboxXml } = await initializeBlocks();
+          
+          // Store parsers for later use
+          window.__blocklyParsers = parsers;
+          
+          // Register custom blocks
+          Object.entries(definitions).forEach(([type, blockDef]) => {
+            Blockly.Blocks[type] = blockDef;
+          });
+          
+          // Initialize visibility extensions after blocks are registered
+          import('$lib/utils/blockly-extensions.js').then(({ initializeVisibilityExtensions }) => {
+            initializeVisibilityExtensions();
+          });
   
         // Register custom generators
         Object.entries(generators).forEach(([name, generator]) => {
@@ -169,16 +170,20 @@
           dispatch('change', { code: generatedCode, json: jsonCode, xml: xmlText, event });
         });
   
-        // Handle resize
-        const resizeObserver = new ResizeObserver(() => {
-          Blockly.svgResize(workspace!);
-        });
-        resizeObserver.observe(blocklyDiv);
-        
-        componentsLoaded = true;
+          // Handle resize
+          const resizeObserver = new ResizeObserver(() => {
+            Blockly.svgResize(workspace!);
+          });
+          resizeObserver.observe(blocklyDiv);
+          
+          // Initialize blockly overrides
+          initializeBlocklyOverrides(workspace);
+          
+          componentsLoaded = true;
+        } catch (error) {
+          console.error('Error initializing Blockly workspace:', error);
+        }
       })();
-
-      initializeBlocklyOverrides(workspace!);
       
       // Set up preview safety event listeners
       previewSafety.addEventListeners((event) => {
@@ -189,6 +194,23 @@
           console.log(`Preview console [${consoleEvent.type}]:`, consoleEvent.message);
         }
       });
+      
+      // Set up DOM content message listener
+      const messageHandler = (event: MessageEvent) => {
+        if (event.data?.source === 'preview-console') {
+          const { type, message } = event.data;
+          console.log('Console captured:', type, message);
+        } else if (event.data?.type === 'domContent') {
+          // Receive the DOM content sent from iframe
+          modifiedDomString = event.data.content;
+          // Apply highlighting if DOM tab is active
+          if (activeTab === 'dom') {
+            applyHighlighting();
+          }
+        }
+      };
+
+      window.addEventListener('message', messageHandler);
       
       // Return the cleanup function
       return () => {
@@ -201,14 +223,14 @@
         }
         previewSafety.cleanup();
         cleanupEditors();
+        window.removeEventListener('message', messageHandler);
       };
     });
     
     // Function to clean up editor instances
     function cleanupEditors() {
-      if (jsonEditor) jsonEditor.destroy();
-      if (htmlEditor) htmlEditor.destroy();
-      if (domEditor) domEditor.destroy();
+      // The Svelte CodeMirror components will be cleaned up automatically
+      // This is only kept for API compatibility with code that might call it
     }
     
     // Function to resize the Blockly workspace
@@ -243,7 +265,7 @@
     }
 
     // Function to load workspace from JSON
-    function loadFromJson(jsonString: string): void {
+    export function loadFromJson(jsonString: string): void {
       if (!workspace) return;
       
       try {
@@ -291,69 +313,33 @@
       
       if (tab === 'blocks' && workspace) {
         resize();
-      } else if (tab === 'json' || tab === 'code' || tab === 'dom') {
-        // Apply highlighting to the editors
-        setTimeout(() => {
+      }
+      
+      // Give editors time to render then refresh them
+      setTimeout(() => {
+        if (tab === 'json' || tab === 'code' || tab === 'dom') {
           applyHighlighting();
           if (tab === 'code' || tab === 'dom') {
             applyCommentHighlighting();
           }
-        }, 10);
+        }
         
         // Handle DOM tab special case
         if (tab === 'dom') {
           captureModifiedDom();
+        } else if (tab === 'preview') {
+          // Reset the preview iframe when switching to preview tab
+          const iframe = document.querySelector('.preview-iframe') as HTMLIFrameElement;
+          if (iframe) previewSafety.resetPreview(iframe);
         }
-      } else if (tab === 'preview') {
-        // Reset the preview iframe when switching to preview tab
-        const iframe = document.querySelector('.preview-iframe') as HTMLIFrameElement;
-        if (iframe) previewSafety.resetPreview(iframe);
-      }
+      }, 10);
     }
 
     // Function to apply syntax highlighting to the editors
     function applyHighlighting() {
-      if (jsonContainer && jsonCode && !jsonEditor) {
-        jsonEditor = new EditorView({
-          state: EditorState.create({
-            doc: jsonCode,
-            extensions: [basicSetup, json(), drawSelection()]
-          }),
-          parent: jsonContainer
-        });
-      } else if (jsonEditor && jsonCode) {
-        jsonEditor.dispatch({
-          changes: { from: 0, to: jsonEditor.state.doc.length, insert: jsonCode }
-        });
-      }
-      
-      if (htmlContainer && generatedCode && !htmlEditor) {
-        htmlEditor = new EditorView({
-          state: EditorState.create({
-            doc: generatedCode,
-            extensions: [basicSetup, html(), drawSelection()]
-          }),
-          parent: htmlContainer
-        });
-      } else if (htmlEditor && generatedCode) {
-        htmlEditor.dispatch({
-          changes: { from: 0, to: htmlEditor.state.doc.length, insert: generatedCode }
-        });
-      }
-      
-      if (domContainer && modifiedDomString && !domEditor) {
-        domEditor = new EditorView({
-          state: EditorState.create({
-            doc: modifiedDomString,
-            extensions: [basicSetup, html(), drawSelection()]
-          }),
-          parent: domContainer
-        });
-      } else if (domEditor && modifiedDomString) {
-        domEditor.dispatch({
-          changes: { from: 0, to: domEditor.state.doc.length, insert: modifiedDomString }
-        });
-      }
+      // We can remove this function's implementation since we're using Svelte CodeMirror components
+      // The syntax highlighting is now handled by the components automatically
+      // This is only kept for API compatibility with code that might call it
     }
     
     // Ensure highlighting is applied when components update
@@ -585,9 +571,17 @@
     <!-- Preview view -->
     <div class="preview-container" style="display: {activeTab === 'preview' ? 'block' : 'none'}">
       <div class="preview-controls">
-        <button class="refresh-button">
+        <button class="refresh-button" on:click={() => {
+          const iframe = document.querySelector('.preview-iframe') as HTMLIFrameElement;
+          if (iframe) previewSafety.resetPreview(iframe);
+        }}>
           Refresh Preview
         </button>
+        {#if previewSafety.hasError}
+          <div class="preview-error-indicator">
+            Error: {previewSafety.currentError?.message}
+          </div>
+        {/if}
       </div>
       <iframe
         class="preview-iframe"

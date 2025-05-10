@@ -1,8 +1,8 @@
 <script lang="ts">
-    import BlocklyEditor from '$lib/components/workspace/BlocklyEditor.svelte';
+    import BW from '$lib/components/workspace/BW.svelte';
     import { onMount } from 'svelte';
     
-    let editor: BlocklyEditor;
+    let editor: BW;
     let jsonInput = '';
     
     function handleEditorChange(event: CustomEvent<{json: string, code?: string, xml?: string}>) {
@@ -29,10 +29,8 @@
     
     <main>
         <div class="editor-container">
-            <BlocklyEditor 
+            <BW 
                 bind:this={editor}
-                showCodeView={true}
-                showJsonView={true}
                 on:change={handleEditorChange}
             />
         </div>
