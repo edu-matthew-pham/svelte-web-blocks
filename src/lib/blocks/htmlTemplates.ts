@@ -117,35 +117,40 @@ export function createDocumentHTML(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title}</title>
-  <!-- Bootstrap CSS -->
+  <!-- Bootstrap Stylesheet and Theme -->
   ${cssLink}
   ${isBootstrapTheme ? `<meta name="theme" content="${theme}">` : ''}
   
-  <!-- Custom styles -->
+  <!-- @BEGIN: STYLE_BLOCKS -->
   <style>
     ${styles}
   </style>
+  <!-- @END: STYLE_BLOCKS -->
 </head>
 <body${bodyId}${bodyClass}${bodyData} ${isBootstrapTheme ? `data-bs-theme="${theme}"` : ''}>
-  <div>
+  
+    <!-- @BEGIN: CONTENT_BLOCKS -->
     ${content}
-  </div>
+    <!-- @END: CONTENT_BLOCKS -->
+  
   
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Regular scripts -->
+  <!-- @BEGIN: SCRIPT_BLOCKS -->
   <script>
     ${scripts}
   </script>
+  <!-- @END: SCRIPT_BLOCKS -->
 
-  <!-- OnLoad scripts -->
+  <!-- @BEGIN: ONLOAD_SCRIPTS -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded');
     ${onloadScripts}
   });
   </script>
+  <!-- @END: ONLOAD_SCRIPTS -->
 
 </body>
 </html>`;

@@ -456,4 +456,12 @@
     border-radius: 4px;
     cursor: pointer;
   }
+
+  :global(.cm-content) {
+    font-size: 14px;
+    font-family: monospace;
+    line-height: 1.5;
+    font-weight: normal;
+    background-color: #f0f0f0;
+  }
 </style> 

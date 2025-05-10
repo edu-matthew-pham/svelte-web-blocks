@@ -398,8 +398,14 @@
       // Give editors time to render then refresh them
       setTimeout(() => {
         if (tab === 'json' && jsonEditor) jsonEditor.requestMeasure();
-        if (tab === 'code' && htmlEditor) htmlEditor.requestMeasure();
-        if (tab === 'dom' && domEditor) domEditor.requestMeasure();
+        if (tab === 'code' && htmlEditor) {
+          htmlEditor.requestMeasure();
+          applyCommentHighlighting();
+        }
+        if (tab === 'dom' && domEditor) {
+          domEditor.requestMeasure();
+          applyCommentHighlighting();
+        }
       }, 10);
     }
 
@@ -409,6 +415,53 @@
       if (htmlEditor) htmlEditor.destroy();
       if (domEditor) domEditor.destroy();
     }
+
+    // Replace the applyCommentHighlighting function with this improved version
+    function applyCommentHighlighting() {
+      // Do the initial highlighting
+      setTimeout(() => {
+        const commentSpans = document.querySelectorAll('.cm-content .ͼm');
+        
+        commentSpans.forEach(span => {
+          const text = span.textContent.trim();
+          
+          // Add data attributes based on content
+          if (text.includes('@BEGIN: STYLE_BLOCKS') || text.includes('@END: STYLE_BLOCKS')) {
+            span.setAttribute('data-comment-type', 'style');
+          } else if (text.includes('@BEGIN: CONTENT_BLOCKS') || text.includes('@END: CONTENT_BLOCKS')) {
+            span.setAttribute('data-comment-type', 'content');
+          } else if (text.includes('@BEGIN: SCRIPT_BLOCKS') || text.includes('@END: SCRIPT_BLOCKS')) {
+            span.setAttribute('data-comment-type', 'script');
+          } else if (text.includes('@BEGIN: ONLOAD_SCRIPTS') || text.includes('@END: ONLOAD_SCRIPTS')) {
+            span.setAttribute('data-comment-type', 'onload');
+          } else if (text.includes('Bootstrap')) {
+            span.setAttribute('data-comment-type', 'bootstrap');
+          }
+        });
+      }, 100);
+    }
+
+    // Instead of attaching event listeners directly to the editor,
+    // use Svelte's lifecycle hooks and components to manage interaction
+    afterUpdate(() => {
+      if (activeTab === 'code' || activeTab === 'dom') {
+        applyCommentHighlighting();
+      }
+    });
+
+    // Use onMount to set up a mutation observer that watches for editor changes
+    onMount(() => {
+      const observer = new MutationObserver((mutations) => {
+        if (activeTab === 'code' || activeTab === 'dom') {
+          applyCommentHighlighting();
+        }
+      });
+      
+      // Start observing the document with the configured parameters
+      observer.observe(document.body, { childList: true, subtree: true });
+      
+      return () => observer.disconnect(); // Clean up on component unmount
+    });
 
 </script>
   
@@ -869,5 +922,56 @@
     }
 
     /* Remove the CodeMirror-specific global styles since the component handles this */
+    :global(.cm-content) {
+      font-size: 14px;
+      font-family: monospace;
+      line-height: 1.5;
+      font-weight: normal;
+      background-color: #fefefe;
+    }
+
+ /*
+    :global(.ͼm) {
+      font-style: italic;
+      padding: 0 2px;
+      border-radius: 2px;
+      box-sizing: border-box;
+      color: #008000; 
+      
+    }
+      */
+
+    /* Keep your existing .ͼm styling */
+    :global(.ͼm[data-comment-type="style"]) {
+      color: #9c27b0; /* Purple */
+      background-color: rgba(237, 231, 246, 0.8);
+      border: 1px solid #9c27b0;
+    }
+    
+    :global(.ͼm[data-comment-type="content"]) {
+      color: #2e7d32; /* Green */
+      background-color: rgba(232, 245, 233, 0.8);
+      border: 1px solid #2e7d32;
+    }
+    
+    :global(.ͼm[data-comment-type="script"]) {
+      color: #0277bd; /* Blue */
+      background-color: rgba(227, 242, 253, 0.8);
+      border: 1px solid #0277bd;
+    }
+    
+    :global(.ͼm[data-comment-type="onload"]) {
+      color: #ef6c00; /* Orange */
+      background-color: rgba(255, 243, 224, 0.8);
+      border: 1px solid #ef6c00;
+    }
+    
+    /*
+    :global(.ͼm[data-comment-type="bootstrap"]) {
+      color: #800000; 
+      background-color: rgba(255, 240, 240, 0.8);
+      border: 1px solid #800000;
+    }
+      */
 
   </style> 
