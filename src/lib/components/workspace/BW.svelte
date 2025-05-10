@@ -226,6 +226,78 @@
       
       // We'll add more tab-specific logic later
     }
+
+    // Function to copy text to clipboard
+    async function copyToClipboard(text: string): Promise<void> {
+      try {
+        await navigator.clipboard.writeText(text);
+        alert('Copied to clipboard');
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+        alert('Failed to copy to clipboard');
+      }
+    }
+
+    // Function to download text as a file
+    function downloadFile(content: string, defaultFilename: string): void {
+      // Prompt user for filename
+      const filename = prompt('Enter a filename:', defaultFilename) || defaultFilename;
+      
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Function to import JSON files
+    function importJsonFile(): void {
+      // Create a file input element
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = '.json,application/json';
+      
+      fileInput.onchange = (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const contents = event.target?.result as string;
+          if (contents) {
+            loadFromJson(contents);
+          }
+        };
+        reader.readAsText(file);
+      };
+      
+      fileInput.click();
+    }
+
+    // Method to load from JSON
+    function loadFromJson(jsonString: string): void {
+      if (!workspace) return;
+      
+      try {
+        // Use the createBlocksFromJson function
+        createBlocksFromJson(workspace, jsonString);
+        
+        // Trigger an update after loading
+        generatedCode = javascriptGenerator.workspaceToCode(workspace);
+        jsonCode = generateJsonCode(workspace);
+        
+        // Dispatch change event
+        const xml = Blockly.Xml.workspaceToDom(workspace);
+        const xmlText = Blockly.Xml.domToText(xml);
+        dispatch('change', { code: generatedCode, json: jsonCode, xml: xmlText });
+      } catch (e) {
+        console.error('Error loading from JSON', e);
+      }
+    }
 </script>
 
 <div class="blockly-container">
@@ -283,6 +355,16 @@
     <div class="blockly-editor" 
          bind:this={blocklyDiv} 
          style="display: {activeTab === 'blocks' ? 'block' : 'none'}">
+    </div>
+    
+    <!-- JSON view -->
+    <div class="code-container" style="display: {activeTab === 'json' ? 'block' : 'none'}">
+      <div class="action-buttons">
+        <button on:click={() => copyToClipboard(jsonCode)}>Copy JSON</button>
+        <button on:click={() => downloadFile(jsonCode, 'component.json')}>Download JSON</button>
+        <button on:click={importJsonFile}>Import JSON</button>
+      </div>
+      <div class="editor-wrapper" bind:this={jsonContainer}></div>
     </div>
   </div>
 </div>
