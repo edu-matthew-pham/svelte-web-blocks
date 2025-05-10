@@ -346,66 +346,50 @@
       }
       
       if (htmlContainer && generatedCode) {
+        console.log('Applying HTML highlighting. Original code length:', generatedCode.length);
+        
         // First highlight as markup
         const highlighted = Prism.highlight(generatedCode, Prism.languages.markup, 'markup');
+        console.log('Highlighted HTML code length:', highlighted.length);
         htmlContainer.innerHTML = highlighted;
         
         // Let Prism highlight any script and style elements
+        console.log('Before additional highlighting:', htmlContainer.innerHTML.substring(0, 100) + '...');
         Prism.highlightAllUnder(htmlContainer);
+        console.log('After additional highlighting:', htmlContainer.innerHTML.substring(0, 100) + '...');
         
         // Add classes to script and style tags
         const tagElements = htmlContainer.querySelectorAll('.token.tag');
+        console.log('Found tag elements:', tagElements.length);
         tagElements.forEach(tag => {
           if (tag.textContent.includes('<script') || tag.textContent.includes('</script')) {
             tag.classList.add('script-tag');
+            console.log('Added script-tag class to:', tag.textContent);
           }
           if (tag.textContent.includes('<style') || tag.textContent.includes('</style')) {
             tag.classList.add('style-tag');
+            console.log('Added style-tag class to:', tag.textContent);
           }
         });
         
-        // Find body start and Bootstrap script
+        // Find body start and content div
         let bodyStart = null;
-        let bootstrapScript = null;
+        let contentDiv = null;
+        let foundBody = false;
         
-        // Find the specific tags
+        // Find body tag and then the first div after it
         tagElements.forEach(tag => {
           if (tag.textContent.includes('<body')) {
             bodyStart = tag;
-          }
-          if (tag.textContent.includes('bootstrap.bundle.min.js')) {
-            bootstrapScript = tag;
+            foundBody = true;
+            console.log('Found body tag:', tag.textContent);
+          } else if (foundBody && tag.textContent.includes('<div') && !contentDiv) {
+            // This will be the first div after body
+            contentDiv = tag;
+            contentDiv.classList.add('main-content');
+            console.log('Found and styled main content div:', tag.textContent);
           }
         });
-        
-        // If we found both elements, mark everything in between
-        if (bodyStart && bootstrapScript) {
-          // Mark the body tag as start
-          bodyStart.classList.add('main-content-start');
-          
-          // Better approach: mark all elements between bodyStart and bootstrapScript
-          let insideMainContent = false;
-          // Get all tokens, not just tag tokens
-          const allTokens = htmlContainer.querySelectorAll('.token');
-          
-          allTokens.forEach(token => {
-            // If we found the body start, we're now inside the main content
-            if (token === bodyStart) {
-              insideMainContent = true;
-            }
-            
-            // If we're inside and not at the end yet, add the class
-            if (insideMainContent && token !== bodyStart && token !== bootstrapScript) {
-              token.classList.add('main-content-area');
-            }
-            
-            // If we found the bootstrap script, we're now outside the main content
-            if (token === bootstrapScript) {
-              insideMainContent = false;
-              token.classList.add('main-content-end');
-            }
-          });
-        }
       }
       
       if (domContainer && modifiedDomString) {
@@ -814,6 +798,14 @@
       border-bottom: 2px solid #4caf50;
       margin-bottom: 8px;
       padding-bottom: 8px;
+    }
+
+    /* Main content div highlighting */
+    :global(.code-display .main-content) {
+      border-left: 3px solid #4caf50;
+      padding-left: 8px;
+      background-color: rgba(76, 175, 80, 0.05);
+      display: block;
     }
 
   </style> 
