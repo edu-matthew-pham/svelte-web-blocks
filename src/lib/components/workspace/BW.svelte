@@ -216,7 +216,76 @@
       if (workspace) Blockly.svgResize(workspace);
     }
 
-    // Update setActiveTab function with editor handling
+    // Function to handle importing JSON files
+    function importJsonFile(): void {
+      // Create a file input element
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = '.json,application/json';
+      
+      // Set up event handling for when a file is selected
+      fileInput.onchange = (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const contents = event.target?.result as string;
+          if (contents) {
+            loadFromJson(contents);
+          }
+        };
+        reader.readAsText(file);
+      };
+      
+      // Trigger file selection dialog
+      fileInput.click();
+    }
+
+    // Function to load workspace from JSON
+    function loadFromJson(jsonString: string): void {
+      if (!workspace) return;
+      
+      try {
+        // Use the existing parser function that correctly handles children
+        createBlocksFromJson(workspace, jsonString);
+        
+        // Trigger an update after loading
+        generatedCode = javascriptGenerator.workspaceToCode(workspace);
+        jsonCode = generateJsonCode(workspace);
+        
+        // Dispatch change event
+        const xml = Blockly.Xml.workspaceToDom(workspace);
+        const xmlText = Blockly.Xml.domToText(xml);
+        dispatch('change', { code: generatedCode, json: jsonCode, xml: xmlText });
+      } catch (e) {
+        console.error('Error loading from JSON', e);
+      }
+    }
+
+    // Function to apply comment highlighting
+    function applyCommentHighlighting(): void {
+      setTimeout(() => {
+        const commentSpans = document.querySelectorAll('.cm-content .ͼm');
+        
+        commentSpans.forEach(span => {
+          const text = span.textContent?.trim() || '';
+          
+          // Add data attributes based on content
+          if (text.includes('@BEGIN: STYLE_BLOCKS') || text.includes('@END: STYLE_BLOCKS')) {
+            span.setAttribute('data-comment-type', 'style');
+          } else if (text.includes('@BEGIN: CONTENT_BLOCKS') || text.includes('@END: CONTENT_BLOCKS')) {
+            span.setAttribute('data-comment-type', 'content');
+          } else if (text.includes('@BEGIN: SCRIPT_BLOCKS') || text.includes('@END: SCRIPT_BLOCKS')) {
+            span.setAttribute('data-comment-type', 'script');
+          } else if (text.includes('@BEGIN: ONLOAD_SCRIPTS') || text.includes('@END: ONLOAD_SCRIPTS')) {
+            span.setAttribute('data-comment-type', 'onload');
+          }
+        });
+      }, 100);
+    }
+
+    // Update the setActiveTab function to also handle comment highlighting
     function setActiveTab(tab: 'blocks'|'json'|'code'|'preview'|'dom'): void {
       activeTab = tab;
       
@@ -224,7 +293,21 @@
         resize();
       } else if (tab === 'json' || tab === 'code' || tab === 'dom') {
         // Apply highlighting to the editors
-        setTimeout(() => applyHighlighting(), 10);
+        setTimeout(() => {
+          applyHighlighting();
+          if (tab === 'code' || tab === 'dom') {
+            applyCommentHighlighting();
+          }
+        }, 10);
+        
+        // Handle DOM tab special case
+        if (tab === 'dom') {
+          captureModifiedDom();
+        }
+      } else if (tab === 'preview') {
+        // Reset the preview iframe when switching to preview tab
+        const iframe = document.querySelector('.preview-iframe') as HTMLIFrameElement;
+        if (iframe) previewSafety.resetPreview(iframe);
       }
     }
 
@@ -279,6 +362,116 @@
         applyHighlighting();
       }
     });
+
+    // Function to capture modified DOM from the preview
+    function captureModifiedDom(): void {
+      try {
+        const iframe = document.querySelector('.preview-iframe') as HTMLIFrameElement;
+        if (iframe?.contentWindow) {
+          // Request the DOM from the iframe
+          iframe.contentWindow.postMessage({ type: 'requestDOM' }, '*');
+        }
+      } catch (e) {
+        console.error('Error requesting DOM:', e);
+        modifiedDomString = '<!-- Error capturing DOM -->';
+      }
+    }
+
+    // Setup message listener for DOM capture
+    onMount(() => {
+      const messageHandler = (event: MessageEvent) => {
+        if (event.data?.source === 'preview-console') {
+          const { type, message } = event.data;
+          console.log('Console captured:', type, message);
+        } else if (event.data?.type === 'domContent') {
+          // Receive the DOM content sent from iframe
+          modifiedDomString = event.data.content;
+          // Apply highlighting if DOM tab is active
+          if (activeTab === 'dom') {
+            applyHighlighting();
+          }
+        }
+      };
+
+      window.addEventListener('message', messageHandler);
+      
+      return () => {
+        window.removeEventListener('message', messageHandler);
+      };
+    });
+
+    // Function to copy text to clipboard
+    async function copyToClipboard(text: string): Promise<void> {
+      try {
+        await navigator.clipboard.writeText(text);
+        alert('Copied to clipboard');
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+        alert('Failed to copy to clipboard');
+      }
+    }
+    
+    // Function to download text as a file
+    function downloadFile(content: string, defaultFilename: string): void {
+      // Prompt user for filename
+      const filename = prompt('Enter a filename:', defaultFilename) || defaultFilename;
+      
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Set up a mutation observer to watch for editor changes
+    onMount(() => {
+      const observer = new MutationObserver(() => {
+        if (activeTab === 'code' || activeTab === 'dom') {
+          applyCommentHighlighting();
+        }
+      });
+      
+      // Start observing the document with the configured parameters
+      observer.observe(document.body, { childList: true, subtree: true });
+      
+      return () => observer.disconnect(); // Clean up on component unmount
+    });
+
+    // Export methods for public API
+    export function getCode(): string {
+      if (!workspace) return '';
+      return javascriptGenerator.workspaceToCode(workspace);
+    }
+  
+    export function getJson(): string {
+      if (!workspace) return '';
+      return generateJsonCode(workspace);
+    }
+  
+    export function getXml(): string {
+      if (!workspace) return '';
+      const xml = Blockly.Xml.workspaceToDom(workspace);
+      return Blockly.Xml.domToText(xml);
+    }
+  
+    export function setXml(xmlText: string): void {
+      if (!workspace) return;
+      try {
+        workspace.clear();
+        const xml = Blockly.utils.xml.textToDom(xmlText);
+        Blockly.Xml.domToWorkspace(xml, workspace);
+      } catch (e) {
+        console.error('Error setting XML', e);
+      }
+    }
+
+    export function clearWorkspace(): void {
+      if (workspace) workspace.clear();
+    }
 </script>
 
 <div class="blockly-container">
