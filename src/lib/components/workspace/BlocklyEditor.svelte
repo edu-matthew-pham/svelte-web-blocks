@@ -346,17 +346,20 @@
       }
       
       if (htmlContainer && generatedCode) {
-        // Pre-process the HTML to ensure embedded languages are highlighted
-        Prism.hooks.add('before-highlight', function(env) {
-          env.element.innerHTML = env.code;
-        });
-        
         // First highlight as markup
         const highlighted = Prism.highlight(generatedCode, Prism.languages.markup, 'markup');
         htmlContainer.innerHTML = highlighted;
         
         // Let Prism highlight any script and style elements inside the container
         Prism.highlightAllUnder(htmlContainer);
+        
+        // Add classes to script tags
+        const scriptTags = htmlContainer.querySelectorAll('.token.tag');
+        scriptTags.forEach(tag => {
+          if (tag.textContent.includes('<script') || tag.textContent.includes('</script')) {
+            tag.classList.add('script-tag');
+          }
+        });
       }
       
       if (domContainer && modifiedDomString) {
@@ -573,7 +576,33 @@
       white-space: pre-wrap;
       font-family: monospace;
       font-size: 14px;
+      background-color: white;
     }
+    
+    /* Add custom styling for script sections */
+    :global(.code-display .token.tag.script-tag),
+    :global(.code-display .language-javascript) {
+      background-color: rgba(255, 240, 200, 0.2); /* Light yellow background */
+    }
+
+    :global(.code-display .token.tag.script-tag .token.tag) {
+      color: #905; /* Reddish color for the actual script tag */
+    }
+   
+    :global(.code-display code.language-html) {
+      background-color: #f8f8f8;
+    }
+
+/* Style only script tags with the left border, not all tags 
+
+:global(.code-display .token.tag.script-tag),
+:global(.code-display .token.tag:has(.token.tag[content="script"])),
+:global(.code-display .token.script) {
+  border-left: 4px solid #f0db4f;
+  margin-left: 2px;
+  padding-left: 8px;
+
+*/
     
     .loading-container {
       display: flex;
@@ -656,6 +685,70 @@
       white-space: pre-wrap;
       font-family: monospace;
       font-size: 14px;
+    }
+
+    /* Target script sections */
+    
+    :global(.code-display .token.script) {
+      background-color: rgba(255, 240, 200, 0.3);
+      display: block;
+      border-left: 4px solid #f0db4f;
+      padding-left: 8px;
+      margin: 4px 0;
+    }
+
+    /* Style tags and content - using purple theme */
+:global(.code-display .token.style) {
+  background-color: rgba(240, 200, 255, 0.2);
+  display: block;
+  border-left: 4px solid #9c27b0;
+  padding-left: 8px;
+  margin: 4px 0;
+}
+
+/* Body section - using a subtle blue-green theme */
+:global(.code-display .body-tag) {
+  border-left: 4px solid #4caf50;
+  padding-left: 8px;
+  background-color: rgba(200, 255, 240, 0.1);
+}
+
+/* Between the body tags, we want a subtle indicator */
+:global(.code-display .body-tag:first-of-type) ~ :global(.token):not(:global(.body-tag)) {
+  border-left: 1px solid rgba(76, 175, 80, 0.3);
+  padding-left: 8px;
+  margin-left: 3px;
+}
+      
+
+    /* Target script opening and closing tags */
+    :global(.code-display .token.tag .token.tag) {
+      /* Basic styling for all tags */
+      display: inline-block;
+    }
+
+    /* Special styling for script tags */
+    :global(.code-display .token.tag .token.tag:first-child + .token.punctuation) {
+      /* This gets the closing > of the tag */
+      display: inline-block;
+    }
+
+    /* Style JavaScript tokens inside script */
+    :global(.code-display .token.script .token.string) {
+      color: #690; /* Strings in green */
+    }
+
+    :global(.code-display .token.script .token.keyword) {
+      color: #07a; /* Keywords in blue */
+    }
+
+    :global(.code-display .token.script .token.function) {
+      color: #dd4a68; /* Functions in pink */
+    }
+
+    /* Style script tags */
+    :global(.code-display .script-tag) {
+      background-color: rgba(255, 240, 200, 0.3);
     }
 
   </style> 
