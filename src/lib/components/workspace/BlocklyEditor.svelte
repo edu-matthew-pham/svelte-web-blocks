@@ -14,6 +14,8 @@
     import { EditorState } from '@codemirror/state';
     import { createPreviewSafety } from '$lib/utils/preview-safety.js';
     import type { ConsoleMessage } from '$lib/utils/preview-safety.js';
+    import { basicSetup } from '@codemirror/basic-setup';
+    import { drawSelection } from '@codemirror/view';
   
     // Props with defaults
     export let initialXml = '';
@@ -348,7 +350,7 @@
         jsonEditor = new EditorView({
           state: EditorState.create({
             doc: jsonCode,
-            extensions: [basicSetup, json()]
+            extensions: [basicSetup, json(), drawSelection()]
           }),
           parent: jsonContainer
         });
@@ -362,7 +364,7 @@
         htmlEditor = new EditorView({
           state: EditorState.create({
             doc: generatedCode,
-            extensions: [basicSetup, html()]
+            extensions: [basicSetup, html(), drawSelection()]
           }),
           parent: htmlContainer
         });
@@ -376,7 +378,7 @@
         domEditor = new EditorView({
           state: EditorState.create({
             doc: modifiedDomString,
-            extensions: [basicSetup, html()]
+            extensions: [basicSetup, html(), drawSelection()]
           }),
           parent: domContainer
         });
@@ -539,15 +541,8 @@
           <CodeMirror
             bind:value={jsonCode}
             lang={json()}
-            readonly={true}
-            styles={{
-              "&": {
-                height: "100%",
-              },
-              ".cm-scroller": {
-                overflow: "auto"
-              }
-            }}
+            readonly={false}
+            extensions={[drawSelection()]}
           />
         </div>
       </div>
@@ -562,15 +557,8 @@
           <CodeMirror
             bind:value={generatedCode}
             lang={html()}
-            readonly={true}
-            styles={{
-              "&": {
-                height: "100%",
-              },
-              ".cm-scroller": {
-                overflow: "auto"
-              }
-            }}
+            readonly={false}
+            extensions={[drawSelection()]}
           />
         </div>
       </div>
@@ -627,6 +615,7 @@
                 overflow: "auto"
               }
             }}
+            extensions={[drawSelection()]}
           />
         </div>
       </div>
