@@ -6,16 +6,12 @@
     import { initializeBlocks } from '../blocks/index.js';
     import { createBlocksFromJson } from '$lib/blocks/parser.js';
     import { initializeBlocklyOverrides } from '$lib/utils/blockly-overrides.js';
-    // Import Prism and language support
-    import Prism from 'prismjs';
-    import 'prismjs/components/prism-json';
-    import 'prismjs/components/prism-markup';  // For HTML
-    import 'prismjs/components/prism-javascript';  // For JavaScript
-    import 'prismjs/components/prism-css';  // For CSS in style tags
-    // Enable language embedding in markup
-    import 'prismjs/plugins/normalize-whitespace/prism-normalize-whitespace';
-    // Import Prism CSS themes
-    import 'prismjs/themes/prism.css';
+    // Replace CodeMirror imports with svelte-codemirror-editor
+    import CodeMirror from 'svelte-codemirror-editor';
+    import { javascript } from '@codemirror/lang-javascript';
+    import { json } from '@codemirror/lang-json';
+    import { html } from '@codemirror/lang-html';
+    import { EditorState } from '@codemirror/state';
     import { createPreviewSafety } from '$lib/utils/preview-safety.js';
     import type { ConsoleMessage } from '$lib/utils/preview-safety.js';
   
@@ -32,12 +28,17 @@
     let workspace: Blockly.WorkspaceSvg;
     const dispatch = createEventDispatcher();
     
-    let generatedCode = '';
     let jsonCode = '';
+    let generatedCode = '';
     let activeTab: 'blocks'|'json'|'code'|'preview'|'dom' = initialTab;
     let componentsLoaded = false;
     let modifiedDomString = '';
     
+    // CodeMirror editor instances
+    let jsonEditor: EditorView;
+    let htmlEditor: EditorView;
+    let domEditor: EditorView;
+  
     // Refs for code containers
     let jsonContainer: HTMLElement;
     let htmlContainer: HTMLElement;
@@ -164,6 +165,7 @@
           resizeObserver.disconnect();
         }
         previewSafety.cleanup();
+        cleanupEditors();
       };
 
     });
@@ -274,6 +276,7 @@
           modifiedDomString = event.data.content;
           // Apply highlighting if DOM tab is active
           if (activeTab === 'dom') {
+            console.log('Applying highlighting');
             applyHighlighting();
           }
         }
@@ -339,78 +342,72 @@
       fileInput.click();
     }
 
-    // Apply syntax highlighting
+    // Update applyHighlighting function to use CodeMirror instead of Prism
     function applyHighlighting() {
-      if (jsonContainer && jsonCode) {
-        jsonContainer.innerHTML = Prism.highlight(jsonCode, Prism.languages.json, 'json');
-      }
-      
-      if (htmlContainer && generatedCode) {
-        console.log('Applying HTML highlighting. Original code length:', generatedCode.length);
-        
-        // First highlight as markup
-        const highlighted = Prism.highlight(generatedCode, Prism.languages.markup, 'markup');
-        console.log('Highlighted HTML code length:', highlighted.length);
-        htmlContainer.innerHTML = highlighted;
-        
-        // Let Prism highlight any script and style elements
-        console.log('Before additional highlighting:', htmlContainer.innerHTML.substring(0, 100) + '...');
-        Prism.highlightAllUnder(htmlContainer);
-        console.log('After additional highlighting:', htmlContainer.innerHTML.substring(0, 100) + '...');
-        
-        // Add classes to script and style tags
-        const tagElements = htmlContainer.querySelectorAll('.token.tag');
-        console.log('Found tag elements:', tagElements.length);
-        tagElements.forEach(tag => {
-          if (tag.textContent.includes('<script') || tag.textContent.includes('</script')) {
-            tag.classList.add('script-tag');
-            console.log('Added script-tag class to:', tag.textContent);
-          }
-          if (tag.textContent.includes('<style') || tag.textContent.includes('</style')) {
-            tag.classList.add('style-tag');
-            console.log('Added style-tag class to:', tag.textContent);
-          }
+      if (jsonContainer && jsonCode && !jsonEditor) {
+        jsonEditor = new EditorView({
+          state: EditorState.create({
+            doc: jsonCode,
+            extensions: [basicSetup, json()]
+          }),
+          parent: jsonContainer
         });
-        
-        // Find body start and content div
-        let bodyStart = null;
-        let contentDiv = null;
-        let foundBody = false;
-        
-        // Find body tag and then the first div after it
-        tagElements.forEach(tag => {
-          if (tag.textContent.includes('<body')) {
-            bodyStart = tag;
-            foundBody = true;
-            console.log('Found body tag:', tag.textContent);
-          } else if (foundBody && tag.textContent.includes('<div') && !contentDiv) {
-            // This will be the first div after body
-            contentDiv = tag;
-            contentDiv.classList.add('main-content');
-            console.log('Found and styled main content div:', tag.textContent);
-          }
+      } else if (jsonEditor && jsonCode) {
+        jsonEditor.dispatch({
+          changes: { from: 0, to: jsonEditor.state.doc.length, insert: jsonCode }
         });
       }
       
-      if (domContainer && modifiedDomString) {
-        const highlighted = Prism.highlight(modifiedDomString, Prism.languages.markup, 'markup');
-        domContainer.innerHTML = highlighted;
-        Prism.highlightAllUnder(domContainer);
+      if (htmlContainer && generatedCode && !htmlEditor) {
+        htmlEditor = new EditorView({
+          state: EditorState.create({
+            doc: generatedCode,
+            extensions: [basicSetup, html()]
+          }),
+          parent: htmlContainer
+        });
+      } else if (htmlEditor && generatedCode) {
+        htmlEditor.dispatch({
+          changes: { from: 0, to: htmlEditor.state.doc.length, insert: generatedCode }
+        });
+      }
+      
+      if (domContainer && modifiedDomString && !domEditor) {
+        domEditor = new EditorView({
+          state: EditorState.create({
+            doc: modifiedDomString,
+            extensions: [basicSetup, html()]
+          }),
+          parent: domContainer
+        });
+      } else if (domEditor && modifiedDomString) {
+        domEditor.dispatch({
+          changes: { from: 0, to: domEditor.state.doc.length, insert: modifiedDomString }
+        });
       }
     }
     
-    // Update highlighting after the component updates
-    afterUpdate(() => {
-      applyHighlighting();
-    });
-
-    // Update setActiveTab function
+    // Update setActiveTab function to handle editor resize
     function setActiveTab(tab: 'blocks'|'json'|'code'|'preview'|'dom') {
       activeTab = tab;
       
       if (tab === 'blocks' && workspace) {
         resize();
       }
+      
+      // Give editors time to render then refresh them
+      setTimeout(() => {
+        if (tab === 'json' && jsonEditor) jsonEditor.requestMeasure();
+        if (tab === 'code' && htmlEditor) htmlEditor.requestMeasure();
+        if (tab === 'dom' && domEditor) domEditor.requestMeasure();
+      }, 10);
+    }
+
+    // Cleanup function to destroy editor instances
+    function cleanupEditors() {
+      if (jsonEditor) jsonEditor.destroy();
+      if (htmlEditor) htmlEditor.destroy();
+      if (domEditor) domEditor.destroy();
     }
 
 </script>
@@ -485,7 +482,21 @@
           <button on:click={() => downloadFile(jsonCode, 'component.json')}>Download JSON File</button>
           <button on:click={importJsonFile}>Import JSON File</button>
         </div>
-        <pre class="code-display"><code bind:this={jsonContainer} class="language-json"></code></pre>
+        <div class="editor-wrapper">
+          <CodeMirror
+            bind:value={jsonCode}
+            lang={json()}
+            readonly={true}
+            styles={{
+              "&": {
+                height: "100%",
+              },
+              ".cm-scroller": {
+                overflow: "auto"
+              }
+            }}
+          />
+        </div>
       </div>
       
       <!-- HTML view -->
@@ -494,7 +505,21 @@
           <button on:click={() => copyToClipboard(generatedCode)}>Copy HTML Code</button>
           <button on:click={() => downloadFile(generatedCode, 'component.html')}>Download HTML File</button>
         </div>
-        <pre class="code-display"><code bind:this={htmlContainer} class="language-html"></code></pre>
+        <div class="editor-wrapper">
+          <CodeMirror
+            bind:value={generatedCode}
+            lang={html()}
+            readonly={true}
+            styles={{
+              "&": {
+                height: "100%",
+              },
+              ".cm-scroller": {
+                overflow: "auto"
+              }
+            }}
+          />
+        </div>
       </div>
 
       <!-- Preview view - always present but hidden when not active -->
@@ -536,7 +561,21 @@
 
       <!-- DOM view without refresh button -->
       <div class="code-container" style="display: {activeTab === 'dom' ? 'block' : 'none'}">
-        <pre class="code-display"><code bind:this={domContainer} class="language-html"></code></pre>
+        <div class="editor-wrapper">
+          <CodeMirror
+            bind:value={modifiedDomString}
+            lang={html()}
+            readonly={true}
+            styles={{
+              "&": {
+                height: "100%",
+              },
+              ".cm-scroller": {
+                overflow: "auto"
+              }
+            }}
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -807,5 +846,28 @@
       background-color: rgba(76, 175, 80, 0.05);
       display: block;
     }
+
+    :global(.code-display .main-content-parent) {
+      border-left: 3px solid #4caf50;
+      padding-left: 8px;
+      background-color: rgba(76, 175, 80, 0.05);
+      display: block;
+    }
+
+    /* Replace editor-container with editor-wrapper */
+    .editor-wrapper {
+      width: 100%;
+      height: calc(100% - 40px); /* Account for action buttons */
+      overflow: hidden;
+      background-color: white;
+      border: 1px solid #ddd;
+    }
+
+    /* Target the code container that doesn't have buttons */
+    .code-container:has(.editor-wrapper:only-child) .editor-wrapper {
+      height: 100%;
+    }
+
+    /* Remove the CodeMirror-specific global styles since the component handles this */
 
   </style> 
