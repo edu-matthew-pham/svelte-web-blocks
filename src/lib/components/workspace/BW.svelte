@@ -472,6 +472,24 @@
     export function clearWorkspace(): void {
       if (workspace) workspace.clear();
     }
+
+    // Function to generate the DOM capture script
+    function getDomCaptureScript(): string {
+      return `
+        <script>
+          // Add listener for DOM request
+          window.addEventListener('message', (event) => {
+            if (event.data?.type === 'requestDOM') {
+              // Send the DOM content back to parent
+              window.parent.postMessage({
+                type: 'domContent',
+                content: document.documentElement.outerHTML
+              }, '*');
+            }
+          });
+        </` + `script>
+      `;
+    }
 </script>
 
 <div class="blockly-container">
@@ -533,12 +551,35 @@
     
     <!-- JSON view -->
     <div class="code-container" style="display: {activeTab === 'json' ? 'block' : 'none'}">
-      <div class="editor-wrapper" bind:this={jsonContainer}></div>
+      <div class="action-buttons">
+        <button on:click={() => copyToClipboard(jsonCode)}>Copy JSON Code</button>
+        <button on:click={() => downloadFile(jsonCode, 'component.json')}>Download JSON File</button>
+        <button on:click={importJsonFile}>Import JSON File</button>
+      </div>
+      <div class="editor-wrapper">
+        <CodeMirror
+          bind:value={jsonCode}
+          lang={json()}
+          readonly={false}
+          extensions={[drawSelection()]}
+        />
+      </div>
     </div>
     
     <!-- HTML view -->
     <div class="code-container" style="display: {activeTab === 'code' ? 'block' : 'none'}">
-      <div class="editor-wrapper" bind:this={htmlContainer}></div>
+      <div class="action-buttons">
+        <button on:click={() => copyToClipboard(generatedCode)}>Copy HTML Code</button>
+        <button on:click={() => downloadFile(generatedCode, 'component.html')}>Download HTML File</button>
+      </div>
+      <div class="editor-wrapper">
+        <CodeMirror
+          bind:value={generatedCode}
+          lang={html()}
+          readonly={false}
+          extensions={[drawSelection()]}
+        />
+      </div>
     </div>
 
     <!-- Preview view -->
@@ -550,13 +591,31 @@
       </div>
       <iframe
         class="preview-iframe"
+        srcdoc={previewSafety.wrapCode(generatedCode + getDomCaptureScript())}
+        sandbox="allow-scripts" 
         title="Component Preview"
+        on:load={() => previewSafety.handlePreviewLoad()}
       ></iframe>
     </div>
 
     <!-- DOM view -->
     <div class="code-container" style="display: {activeTab === 'dom' ? 'block' : 'none'}">
-      <div class="editor-wrapper" bind:this={domContainer}></div>
+      <div class="editor-wrapper">
+        <CodeMirror
+          bind:value={modifiedDomString}
+          lang={html()}
+          readonly={true}
+          styles={{
+            "&": {
+              height: "100%",
+            },
+            ".cm-scroller": {
+              overflow: "auto"
+            }
+          }}
+          extensions={[drawSelection()]}
+        />
+      </div>
     </div>
   </div>
 </div>
