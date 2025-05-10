@@ -216,88 +216,69 @@
       if (workspace) Blockly.svgResize(workspace);
     }
 
-    // Function to set active tab
+    // Update setActiveTab function with editor handling
     function setActiveTab(tab: 'blocks'|'json'|'code'|'preview'|'dom'): void {
       activeTab = tab;
       
       if (tab === 'blocks' && workspace) {
         resize();
-      }
-      
-      // We'll add more tab-specific logic later
-    }
-
-    // Function to copy text to clipboard
-    async function copyToClipboard(text: string): Promise<void> {
-      try {
-        await navigator.clipboard.writeText(text);
-        alert('Copied to clipboard');
-      } catch (err) {
-        console.error('Failed to copy text: ', err);
-        alert('Failed to copy to clipboard');
+      } else if (tab === 'json' || tab === 'code' || tab === 'dom') {
+        // Apply highlighting to the editors
+        setTimeout(() => applyHighlighting(), 10);
       }
     }
 
-    // Function to download text as a file
-    function downloadFile(content: string, defaultFilename: string): void {
-      // Prompt user for filename
-      const filename = prompt('Enter a filename:', defaultFilename) || defaultFilename;
+    // Function to apply syntax highlighting to the editors
+    function applyHighlighting() {
+      if (jsonContainer && jsonCode && !jsonEditor) {
+        jsonEditor = new EditorView({
+          state: EditorState.create({
+            doc: jsonCode,
+            extensions: [basicSetup, json(), drawSelection()]
+          }),
+          parent: jsonContainer
+        });
+      } else if (jsonEditor && jsonCode) {
+        jsonEditor.dispatch({
+          changes: { from: 0, to: jsonEditor.state.doc.length, insert: jsonCode }
+        });
+      }
       
-      const blob = new Blob([content], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
-    // Function to import JSON files
-    function importJsonFile(): void {
-      // Create a file input element
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = '.json,application/json';
+      if (htmlContainer && generatedCode && !htmlEditor) {
+        htmlEditor = new EditorView({
+          state: EditorState.create({
+            doc: generatedCode,
+            extensions: [basicSetup, html(), drawSelection()]
+          }),
+          parent: htmlContainer
+        });
+      } else if (htmlEditor && generatedCode) {
+        htmlEditor.dispatch({
+          changes: { from: 0, to: htmlEditor.state.doc.length, insert: generatedCode }
+        });
+      }
       
-      fileInput.onchange = (e) => {
-        const file = (e.target as HTMLInputElement).files?.[0];
-        if (!file) return;
-        
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const contents = event.target?.result as string;
-          if (contents) {
-            loadFromJson(contents);
-          }
-        };
-        reader.readAsText(file);
-      };
-      
-      fileInput.click();
-    }
-
-    // Method to load from JSON
-    function loadFromJson(jsonString: string): void {
-      if (!workspace) return;
-      
-      try {
-        // Use the createBlocksFromJson function
-        createBlocksFromJson(workspace, jsonString);
-        
-        // Trigger an update after loading
-        generatedCode = javascriptGenerator.workspaceToCode(workspace);
-        jsonCode = generateJsonCode(workspace);
-        
-        // Dispatch change event
-        const xml = Blockly.Xml.workspaceToDom(workspace);
-        const xmlText = Blockly.Xml.domToText(xml);
-        dispatch('change', { code: generatedCode, json: jsonCode, xml: xmlText });
-      } catch (e) {
-        console.error('Error loading from JSON', e);
+      if (domContainer && modifiedDomString && !domEditor) {
+        domEditor = new EditorView({
+          state: EditorState.create({
+            doc: modifiedDomString,
+            extensions: [basicSetup, html(), drawSelection()]
+          }),
+          parent: domContainer
+        });
+      } else if (domEditor && modifiedDomString) {
+        domEditor.dispatch({
+          changes: { from: 0, to: domEditor.state.doc.length, insert: modifiedDomString }
+        });
       }
     }
+    
+    // Ensure highlighting is applied when components update
+    afterUpdate(() => {
+      if ((activeTab === 'json' || activeTab === 'code' || activeTab === 'dom') && componentsLoaded) {
+        applyHighlighting();
+      }
+    });
 </script>
 
 <div class="blockly-container">
@@ -359,12 +340,30 @@
     
     <!-- JSON view -->
     <div class="code-container" style="display: {activeTab === 'json' ? 'block' : 'none'}">
-      <div class="action-buttons">
-        <button on:click={() => copyToClipboard(jsonCode)}>Copy JSON</button>
-        <button on:click={() => downloadFile(jsonCode, 'component.json')}>Download JSON</button>
-        <button on:click={importJsonFile}>Import JSON</button>
-      </div>
       <div class="editor-wrapper" bind:this={jsonContainer}></div>
+    </div>
+    
+    <!-- HTML view -->
+    <div class="code-container" style="display: {activeTab === 'code' ? 'block' : 'none'}">
+      <div class="editor-wrapper" bind:this={htmlContainer}></div>
+    </div>
+
+    <!-- Preview view -->
+    <div class="preview-container" style="display: {activeTab === 'preview' ? 'block' : 'none'}">
+      <div class="preview-controls">
+        <button class="refresh-button">
+          Refresh Preview
+        </button>
+      </div>
+      <iframe
+        class="preview-iframe"
+        title="Component Preview"
+      ></iframe>
+    </div>
+
+    <!-- DOM view -->
+    <div class="code-container" style="display: {activeTab === 'dom' ? 'block' : 'none'}">
+      <div class="editor-wrapper" bind:this={domContainer}></div>
     </div>
   </div>
 </div>
