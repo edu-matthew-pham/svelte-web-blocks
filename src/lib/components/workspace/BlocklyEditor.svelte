@@ -350,16 +350,62 @@
         const highlighted = Prism.highlight(generatedCode, Prism.languages.markup, 'markup');
         htmlContainer.innerHTML = highlighted;
         
-        // Let Prism highlight any script and style elements inside the container
+        // Let Prism highlight any script and style elements
         Prism.highlightAllUnder(htmlContainer);
         
-        // Add classes to script tags
-        const scriptTags = htmlContainer.querySelectorAll('.token.tag');
-        scriptTags.forEach(tag => {
+        // Add classes to script and style tags
+        const tagElements = htmlContainer.querySelectorAll('.token.tag');
+        tagElements.forEach(tag => {
           if (tag.textContent.includes('<script') || tag.textContent.includes('</script')) {
             tag.classList.add('script-tag');
           }
+          if (tag.textContent.includes('<style') || tag.textContent.includes('</style')) {
+            tag.classList.add('style-tag');
+          }
         });
+        
+        // Find body start and Bootstrap script
+        let bodyStart = null;
+        let bootstrapScript = null;
+        
+        // Find the specific tags
+        tagElements.forEach(tag => {
+          if (tag.textContent.includes('<body')) {
+            bodyStart = tag;
+          }
+          if (tag.textContent.includes('bootstrap.bundle.min.js')) {
+            bootstrapScript = tag;
+          }
+        });
+        
+        // If we found both elements, mark everything in between
+        if (bodyStart && bootstrapScript) {
+          // Mark the body tag as start
+          bodyStart.classList.add('main-content-start');
+          
+          // Better approach: mark all elements between bodyStart and bootstrapScript
+          let insideMainContent = false;
+          // Get all tokens, not just tag tokens
+          const allTokens = htmlContainer.querySelectorAll('.token');
+          
+          allTokens.forEach(token => {
+            // If we found the body start, we're now inside the main content
+            if (token === bodyStart) {
+              insideMainContent = true;
+            }
+            
+            // If we're inside and not at the end yet, add the class
+            if (insideMainContent && token !== bodyStart && token !== bootstrapScript) {
+              token.classList.add('main-content-area');
+            }
+            
+            // If we found the bootstrap script, we're now outside the main content
+            if (token === bootstrapScript) {
+              insideMainContent = false;
+              token.classList.add('main-content-end');
+            }
+          });
+        }
       }
       
       if (domContainer && modifiedDomString) {
@@ -749,6 +795,25 @@
     /* Style script tags */
     :global(.code-display .script-tag) {
       background-color: rgba(255, 240, 200, 0.3);
+    }
+
+    /* Main content area highlighting */
+    :global(.code-display .main-content-start) {
+      border-top: 2px solid #4caf50;
+      margin-top: 8px;
+      padding-top: 8px;
+    }
+
+    :global(.code-display .main-content-area) {
+      border-left: 2px solid rgba(76, 175, 80, 0.3);
+      margin-left: 4px;
+      padding-left: 8px;
+    }
+
+    :global(.code-display .main-content-end) {
+      border-bottom: 2px solid #4caf50;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
     }
 
   </style> 
