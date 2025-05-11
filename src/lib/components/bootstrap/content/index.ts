@@ -1,0 +1,1 @@
+export { toolboxXml as bootstrapContentToolbox } from './toolbox.js';

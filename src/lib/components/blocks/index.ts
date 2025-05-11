@@ -28,6 +28,7 @@ const componentModules = [
   import('$lib/components/custom/index.js'),
   import('$lib/components/bootstrap/navigation/index.js'),
   import('$lib/components/bootstrap/hero/index.js'),
+  import('$lib/components/bootstrap/content/index.js'),
 
   //import('$lib/components/js/operations/index.js'),
   // Add new components here
