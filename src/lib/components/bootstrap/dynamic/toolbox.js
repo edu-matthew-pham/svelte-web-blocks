@@ -1,5 +1,5 @@
 // Components Toolbox (Gallery & Accordion)
-export const toolboxXml = `<category name="Components" colour="120">
+export const toolboxXml = `<category name="Bootstrap Components (dynamic)" colour="120">
 
   <!-- Component styles -->
   <block type="custom_style_css">

@@ -58,7 +58,7 @@
     }
     
     .editor-container {
-        height: 800px;
+        height: 830px;
         margin-bottom: 20px;
         border: 1px solid #ccc;
     }

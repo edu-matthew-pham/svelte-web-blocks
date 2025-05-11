@@ -1,7 +1,7 @@
 // Auto-generated from toolbox.xml
 // Do not edit directly - use the XML file instead
 
-export const toolboxXml = `<category name="Custom Code" colour="230" >
+export const toolboxXml = `<category name="HTML, CSS, JS" colour="230" >
   
   
   <block type="custom_style_css">

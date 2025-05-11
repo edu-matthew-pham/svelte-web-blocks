@@ -56,7 +56,7 @@ export async function initializeBlocks(): Promise<BlocksBundle> {
   const htmlToolboxCategories: string[] = [];
   const jsToolboxCategories: string[] = [];
   const customToolboxCategories: string[] = [];
-  const bootstrapToolboxCategories: string[] = [];
+
   
   // Combine all exports generically
   modules.forEach((module, index) => {
@@ -96,8 +96,9 @@ export async function initializeBlocks(): Promise<BlocksBundle> {
 
   <sep></sep>
   
-
+  <category name="Custom Code" expanded="true" colour="#a55b80">
     ${customToolboxCategories.join('\n')}
+  </category>
 
 </xml>
   `;
