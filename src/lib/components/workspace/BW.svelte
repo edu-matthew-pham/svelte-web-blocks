@@ -15,6 +15,7 @@
     import type { ConsoleMessage } from '$lib/utils/preview-safety.js';
     import { basicSetup } from '@codemirror/basic-setup';
     import { drawSelection, EditorView } from '@codemirror/view';
+    import { documentContext } from '$lib/utils/document-context.js';
 
     // Props with defaults
     export let initialXml = '';
@@ -168,6 +169,51 @@
           const xmlText = Blockly.Xml.domToText(xml);
           
           dispatch('change', { code: generatedCode, json: jsonCode, xml: xmlText, event });
+          
+          // Only process UI events that might change field values
+          if (event.type === Blockly.Events.BLOCK_CHANGE && workspace) {
+            const changeEvent = event as Blockly.Events.BlockChange;
+            
+            // Find document blocks
+            const documentBlocks = workspace.getBlocksByType('web_document');
+            
+            if (documentBlocks.length > 0) {
+              const docBlock = documentBlocks[0]; // First document block
+              
+              console.log('Document block change detected:', {
+                eventType: event.type,
+                blockId: changeEvent.blockId,
+                fieldName: changeEvent.name,
+                docBlockId: docBlock.id
+              });
+              
+              // Update context when relevant fields change
+              if (changeEvent.blockId === docBlock.id) {
+                const useBootstrap = docBlock.getFieldValue('USE_BOOTSTRAP') === 'TRUE';
+                const theme = docBlock.getFieldValue('THEME');
+                
+                console.log('Document settings changed:', {
+                  useBootstrap,
+                  theme,
+                  fieldChanged: changeEvent.name
+                });
+                
+                documentContext.updateSettings({
+                  useBootstrap,
+                  theme
+                });
+                
+                console.log('Updated document context:', documentContext.getSettings());
+                
+                // May need to regenerate code to reflect the change
+                if (changeEvent.name === 'USE_BOOTSTRAP') {
+                  console.log('Bootstrap toggle changed, regenerating code');
+                  // Trigger regeneration of code
+                  generatedCode = javascriptGenerator.workspaceToCode(workspace);
+                }
+              }
+            }
+          }
         });
   
           // Handle resize

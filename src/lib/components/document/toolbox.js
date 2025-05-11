@@ -7,12 +7,14 @@ export const toolboxXml = `<category name="Document" colour="290">
     <field name="CLASS"></field>
     <field name="TITLE">My Web Page</field>
     <field name="THEME">light</field>
+    <field name="USE_BOOTSTRAP">TRUE</field>
 </block>
 <block type="web_document">
     <field name="ID"></field>
     <field name="CLASS"></field>
     <field name="TITLE">My Web Page</field>
     <field name="THEME">light</field>
+    <field name="USE_BOOTSTRAP">TRUE</field>
     <statement name="STYLES">
         <block type="css_selector">
             <field name="SELECTOR_TYPE">element</field>
@@ -41,6 +43,7 @@ export const toolboxXml = `<category name="Document" colour="290">
     <field name="CLASS"></field>
     <field name="TITLE">My Web Page</field>
     <field name="THEME">light</field>
+    <field name="USE_BOOTSTRAP">TRUE</field>
     <statement name="SCRIPTS">
         <block type="procedures_defreturn">
             <field name="NAME">myFunction</field>

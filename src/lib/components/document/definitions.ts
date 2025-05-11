@@ -52,6 +52,13 @@ const documentBlocks: Record<string, BlockConfig> = {
         ]
       },
       {
+        type: "row", 
+        children: [
+          { type: "label", text: "Use Bootstrap" },
+          { type: "field_checkbox", name: "USE_BOOTSTRAP", checked: true }
+        ]
+      },
+      {
         type: "statement",
         name: "STYLES",
         label: "Styles",
@@ -104,6 +111,11 @@ const documentBlocks: Record<string, BlockConfig> = {
           enum: ["light", "dark", "cerulean", "cosmo", "flatly", "journal", "litera", 
                  "lumen", "minty", "pulse", "sandstone", "simplex", "sketchy", 
                  "spacelab", "united", "zephyr"]
+        },
+        USE_BOOTSTRAP: {
+          type: "boolean",
+          description: "Whether to use Bootstrap framework or raw HTML",
+          default: true
         }
       },
       required: ["TITLE", "THEME"]
