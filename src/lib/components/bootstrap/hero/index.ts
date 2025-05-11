@@ -1,0 +1,1 @@
+export { toolboxXml as bootstrapHeroToolbox } from './toolbox.js';
