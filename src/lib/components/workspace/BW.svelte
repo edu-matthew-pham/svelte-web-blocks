@@ -738,11 +738,15 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
   }
   .preview-iframe {
     width: 100%;
     flex: 1;
     border: none;
+    min-height: 700px; /* Add minimum height */
   }
   .preview-controls {
     padding: 8px;

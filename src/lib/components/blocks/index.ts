@@ -26,7 +26,8 @@ const componentModules = [
   import('$lib/components/js/lists/index.js'),
   import('$lib/components/js/default/index.js'),
   import('$lib/components/custom/index.js'),
-  
+  import('$lib/components/bootstrap/navigation/index.js'),
+
   //import('$lib/components/js/operations/index.js'),
   // Add new components here
 ];
@@ -49,6 +50,7 @@ export async function initializeBlocks(): Promise<BlocksBundle> {
   const htmlToolboxCategories: string[] = [];
   const jsToolboxCategories: string[] = [];
   const customToolboxCategories: string[] = [];
+  const bootstrapToolboxCategories: string[] = [];
   
   // Combine all exports generically
   modules.forEach((module, index) => {
