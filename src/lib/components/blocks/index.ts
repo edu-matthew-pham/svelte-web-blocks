@@ -31,6 +31,7 @@ const componentModules = [
   import('$lib/components/bootstrap/content/index.js'),
   import('$lib/components/bootstrap/features/index.js'),
   import('$lib/components/bootstrap/footer/index.js'),
+  import('$lib/components/bootstrap/forms/index.js'),
 
   //import('$lib/components/js/operations/index.js'),
   // Add new components here
