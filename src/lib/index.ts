@@ -43,3 +43,7 @@ export * from './components/js/create/index.js';
 export * from './components/js/dom/index.js';
 export * from './components/js/variables/index.js';
 export * from './components/js/default/index.js';
+
+// Export document context
+export { documentContext } from './utils/document-context.js';
+
