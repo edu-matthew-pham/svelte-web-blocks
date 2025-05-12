@@ -328,6 +328,10 @@ function overrideFunctionGenerators() {
 // ======== Collapse/Expand Extension ========
 function initCollapseExpandExtension() {
   if (!Blockly.Extensions.isRegistered('collapse_expand_control')) {
+    // Define SVG icons as data URIs with white fill color
+    const COLLAPSE_ICON = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 20 20"><path fill="white" d="M3 6l7 7 7-7z"/></svg>';
+    const EXPAND_ICON = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 20 20"><path fill="white" d="M10 3l-7 7 7 7 7-7z" transform="rotate(90 10 10)"/></svg>';
+    
     Blockly.Extensions.register('collapse_expand_control', function() {
       // Don't add collapse controls to blocks that can't be collapsed
       if (this.inputList.length === 0) {
@@ -339,9 +343,9 @@ function initCollapseExpandExtension() {
         return; // Already has collapse icon
       }
       
-      // Create collapse/expand icon using SVG files
+      // Create collapse/expand icon using inline SVG data
       const collapseExpandField = new Blockly.FieldImage(
-        '/assets/icons/collapse-icon.svg', // Path to your collapse icon SVG
+        COLLAPSE_ICON, // Using the data URI instead of file path
         18, 
         18,
         "",  // Alt text as string
@@ -374,10 +378,7 @@ function initCollapseExpandExtension() {
         if (event.type === 'collapse' && event.blockId === blockId) {
           const iconField = self.getField('COLLAPSE_EXPAND');
           if (iconField) {
-            iconField.setValue(event.collapsed ? 
-              '/assets/icons/expand-icon.svg' : // Expand icon
-              '/assets/icons/collapse-icon.svg' // Collapse icon
-            );
+            iconField.setValue(event.collapsed ? EXPAND_ICON : COLLAPSE_ICON);
           }
         }
       });
@@ -386,7 +387,7 @@ function initCollapseExpandExtension() {
       if (this.isCollapsed()) {
         const iconField = this.getField('COLLAPSE_EXPAND');
         if (iconField) {
-          iconField.setValue('/assets/icons/expand-icon.svg'); // Expand icon
+          iconField.setValue(EXPAND_ICON);
         }
       }
     });
