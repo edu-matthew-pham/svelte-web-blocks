@@ -418,6 +418,62 @@ function applyCollapseExpandToAllBlocks() {
   });
 }
 
+function initCustomCollapsedTextExtension() {
+  if (!Blockly.Extensions.isRegistered('custom_collapsed_text_extension')) {
+    Blockly.Extensions.register('custom_collapsed_text_extension', function() {
+      const block = this;
+      const originalToString = block.toString;
+      
+      block.toString = function(opt_maxLength) {
+        if (this.isCollapsed()) {
+          const collapseText = this.getFieldValue('COLLAPSE_TEXT');
+          return collapseText || originalToString.call(this, opt_maxLength);
+        }
+        return originalToString.call(this, opt_maxLength);
+      };
+    });
+  }
+}
+
+function initCollapsedTextContextMenu() {
+  if (!Blockly.Extensions.isRegistered('collapsed_text_context_menu')) {
+    Blockly.Extensions.register('collapsed_text_context_menu', function() {
+      // Store reference to block
+      const block = this;
+      
+      // Save original contextMenu function if it exists
+      const originalContextMenu = (this as any).customContextMenu;
+      
+      (this as any).customContextMenu = function(options: any) {
+        // Call the original if it exists
+        if (originalContextMenu) {
+          originalContextMenu.call(this, options);
+        }
+        
+        // Add option to edit collapsed text if the field exists
+        if (block.getField('COLLAPSE_TEXT') !== null) {
+          options.push({
+            text: 'Edit Collapsed View Text',
+            enabled: true,
+            callback: function() {
+              // Get current collapsed text value
+              const currentText = block.getFieldValue('COLLAPSE_TEXT') || '';
+              
+              // Prompt for new value
+              const newText = prompt('Enter text to show when block is collapsed:', currentText);
+              
+              // Update if user didn't cancel
+              if (newText !== null) {
+                block.setFieldValue(newText, 'COLLAPSE_TEXT');
+              }
+            }
+          });
+        }
+      };
+    });
+  }
+}
+
 // ======== Main Initialization Function ========
 export function initializeBlocklyOverrides(workspace: Blockly.Workspace) {
   // Skip if already initialized
@@ -437,6 +493,8 @@ export function initializeBlocklyOverrides(workspace: Blockly.Workspace) {
     overrideMathGenerators();
     overrideTextGenerators();
     overrideListGenerators();
+    initCustomCollapsedTextExtension();
+    initCollapsedTextContextMenu();
     
     // Enable double-click to toggle collapse/expand blocks
     enableDoubleClickToggle(workspace);

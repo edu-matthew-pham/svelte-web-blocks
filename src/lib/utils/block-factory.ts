@@ -85,6 +85,15 @@ function buildInput(block: Blockly.Block, input: BlockInputConfig) {
         .appendField(input.label || formatFieldName(input.name))
         .appendField(new Blockly.FieldVariable(input.variable || "item"), input.name);
     }
+    else if (input.type === "field_hidden") {
+      if (!input.name) return block.appendDummyInput();
+      // Create a hidden field - this adds a field that doesn't render visually
+      // but can still store data and be accessed via getFieldValue()
+      const hiddenField = new Blockly.FieldTextInput(input.default || "");
+      console.log("Creating hidden field", input.name, input.default);
+      hiddenField.setVisible(false); // Make it invisible
+      return block.appendDummyInput().appendField(hiddenField, input.name);
+    }
     else if (input.type === "row") {
       const dummyInput = block.appendDummyInput();
       if (!input.children) return dummyInput;

@@ -81,6 +81,12 @@ const documentBlocks: Record<string, BlockConfig> = {
         name: "ONLOAD",
         label: "On Page Load",
         check: "web_component"
+      },
+      { 
+        type: "field_text", 
+        name: "COLLAPSE_TEXT",
+        label: "Collapsed View Text",
+        default: "Document: My Web Page" 
       }
     ],
     connections: {
@@ -116,12 +122,18 @@ const documentBlocks: Record<string, BlockConfig> = {
           type: "boolean",
           description: "Whether to use Bootstrap framework or raw HTML",
           default: true
+        },
+        COLLAPSE_TEXT: {
+          type: "field_hidden",
+          description: "Text to display when block is collapsed",
+          default: "Document: My Web Page"
         }
       },
       required: ["TITLE", "THEME"]
-    }
+    },
+    extensions: ['custom_collapsed_text_extension']
   }
 };
 
 // Create block definitions using the factory
-export const documentDefinitions = createBlockDefinitions(documentBlocks); 
+export const documentDefinitions = createBlockDefinitions(documentBlocks);
