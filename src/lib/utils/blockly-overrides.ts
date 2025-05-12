@@ -344,7 +344,7 @@ function initCollapseExpandExtension() {
         'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgLTk2MCA5NjAgOTYwIiB3aWR0aD0iMjQiPjxwYXRoIGQ9Im00ODAtMzIwIDIwMC0yMDAtNTYtNTYtMTQ0IDE0NC0xNDQtMTQ0LTU2IDU2IDIwMCAyMDBabTAgMTYwTDI4MC01NjBsNTYtNTYgMTQ0IDE0NCAxNDQtMTQ0IDU2IDU2LTIwMCAyMDBaIi8+PC9zdmc+', // Toggle icon
         24, 
         24,
-        "Toggle",  // Alt text as string
+        "",  // Alt text as string
         () => "Expand/Collapse block"  // Tooltip as function
       );
       
