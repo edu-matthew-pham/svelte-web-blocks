@@ -325,6 +325,94 @@ function overrideFunctionGenerators() {
   }
 }
 
+// ======== Collapse/Expand Extension ========
+function initCollapseExpandExtension() {
+  if (!Blockly.Extensions.isRegistered('collapse_expand_control')) {
+    Blockly.Extensions.register('collapse_expand_control', function() {
+      // Don't add collapse controls to blocks that can't be collapsed
+      if (this.inputList.length === 0) {
+        return;
+      }
+      
+      // Create collapse/expand icon
+      const collapseExpandField = new Blockly.FieldImage(
+        'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgLTk2MCA5NjAgOTYwIiB3aWR0aD0iMjQiPjxwYXRoIGQ9Im00ODAtMzIwIDIwMC0yMDAtNTYtNTYtMTQ0IDE0NC0xNDQtMTQ0LTU2IDU2IDIwMCAyMDBabTAgMTYwTDI4MC01NjBsNTYtNTYgMTQ0IDE0NCAxNDQtMTQ0IDU2IDU2LTIwMCAyMDBaIi8+PC9zdmc+', // Toggle icon
+        24, 
+        24,
+        "Toggle",  // Alt text as string
+        () => "Expand/Collapse block"  // Tooltip as function
+      );
+      
+      // Add click handler
+      collapseExpandField.setOnClickHandler(() => {
+        this.setCollapsed(!this.isCollapsed());
+      });
+      
+      // For blocks with a mutator or custom collapse behavior
+      if ((this as any).mutator) {
+        const input = this.appendDummyInput('COLLAPSE_INPUT');
+        input.appendField(collapseExpandField, 'COLLAPSE_EXPAND');
+      }
+      // Otherwise add to the first visible field
+      else {
+        const input = this.inputList[0];
+        if (input) {
+          // Add field at the beginning of the input for better visibility
+          input.insertFieldAt(0, collapseExpandField, 'COLLAPSE_EXPAND');
+        }
+      }
+      
+      // Listen for collapse events
+      const blockId = this.id;
+      const self = this;
+      this.workspace.addChangeListener(function(event: any) {
+        if (event.type === 'collapse' && event.blockId === blockId) {
+          const iconField = self.getField('COLLAPSE_EXPAND');
+          if (iconField) {
+            iconField.setValue(event.collapsed ? 
+              'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgLTk2MCA5NjAgOTYwIiB3aWR0aD0iMjQiPjxwYXRoIGQ9Im00ODAtMTYwIDIwMC0yMDAtNTYtNTYtMTQ0IDE0NC0xNDQtMTQ0LTU2IDU2IDIwMCAyMDBaIi8+PC9zdmc+' : // Expand icon
+              'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgLTk2MCA5NjAgOTYwIiB3aWR0aD0iMjQiPjxwYXRoIGQ9Im00ODAtMzIwIDIwMC0yMDAtNTYtNTYtMTQ0IDE0NC0xNDQtMTQ0LTU2IDU2IDIwMCAyMDBabTAgMTYwTDI4MC01NjBsNTYtNTYgMTQ0IDE0NCAxNDQtMTQ0IDU2IDU2LTIwMCAyMDBaIi8+PC9zdmc+' // Collapse icon
+            );
+          }
+        }
+      });
+      
+      // Set initial state if block is already collapsed
+      if (this.isCollapsed()) {
+        const iconField = this.getField('COLLAPSE_EXPAND');
+        if (iconField) {
+          iconField.setValue('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgLTk2MCA5NjAgOTYwIiB3aWR0aD0iMjQiPjxwYXRoIGQ9Im00ODAtMTYwIDIwMC0yMDAtNTYtNTYtMTQ0IDE0NC0xNDQtMTQ0LTU2IDU2IDIwMCAyMDBaIi8+PC9zdmc+'); // Expand icon
+        }
+      }
+    });
+  }
+}
+
+// Function to apply collapse/expand extension to all block types
+function applyCollapseExpandToAllBlocks() {
+  // Get all registered block types
+  const allBlockTypes = Object.keys(Blockly.Blocks);
+  
+  // Apply the extension to each block type
+  allBlockTypes.forEach(blockType => {
+    try {
+      // Store the original init function
+      const originalInit = Blockly.Blocks[blockType].init;
+      
+      // Override the init function to apply our extension
+      Blockly.Blocks[blockType].init = function() {
+        // Call the original init
+        originalInit.call(this);
+        
+        // Apply our collapse/expand extension
+        Blockly.Extensions.apply('collapse_expand_control', this, false);
+      };
+    } catch (e) {
+      console.warn(`Couldn't apply collapse/expand extension to block type: ${blockType}`, e);
+    }
+  });
+}
+
 // ======== Main Initialization Function ========
 export function initializeBlocklyOverrides(workspace: Blockly.Workspace) {
   // Skip if already initialized
@@ -336,7 +424,9 @@ export function initializeBlocklyOverrides(workspace: Blockly.Workspace) {
   try {
     // Initialize all extensions
     initWebComponentExtensions();
+    initCollapseExpandExtension();
     applyWebCompatibilityToProcedureBlocks();
+    applyCollapseExpandToAllBlocks();
     overrideProcedureGenerators();
     overrideVariableGenerators();
     overrideMathGenerators();
