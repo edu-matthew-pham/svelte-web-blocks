@@ -438,8 +438,8 @@ export function initializeBlocklyOverrides(workspace: Blockly.Workspace) {
     overrideTextGenerators();
     overrideListGenerators();
     
-    // Enable double-click to expand collapsed blocks
-    enableDoubleClickExpand(workspace);
+    // Enable double-click to toggle collapse/expand blocks
+    enableDoubleClickToggle(workspace);
     
     // Register high-level generators
     registerHighLevelGenerators();
@@ -460,17 +460,17 @@ export function initializeBlocklyOverrides(workspace: Blockly.Workspace) {
   }
 }
 
-function enableDoubleClickExpand(workspace: Blockly.Workspace) {
+function enableDoubleClickToggle(workspace: Blockly.Workspace) {
   // Add workspace click handler
   workspace.addChangeListener((event: any) => {
     if (event.type === Blockly.Events.CLICK) {
       const block = workspace.getBlockById(event.blockId);
-      if (block && block.isCollapsed()) {
+      if (block) {
         // Check if this is a double click (within 500ms of last click)
         const now = Date.now();
-        if ((block as any).lastClickTime && now - (block as any).lastClickTime < 500) {
-          // Double click detected, expand the block
-          block.setCollapsed(false);
+        if ((block as any).lastClickTime && now - (block as any).lastClickTime < 300) {
+          // Double click detected, toggle collapsed state
+          block.setCollapsed(!block.isCollapsed());
         }
         // Store click time on the block
         (block as any).lastClickTime = now;
