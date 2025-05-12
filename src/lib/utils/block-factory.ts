@@ -87,12 +87,22 @@ function buildInput(block: Blockly.Block, input: BlockInputConfig) {
     }
     else if (input.type === "field_hidden") {
       if (!input.name) return block.appendDummyInput();
-      // Create a hidden field - this adds a field that doesn't render visually
-      // but can still store data and be accessed via getFieldValue()
+      // Create a hidden field that can store data but doesn't display
       const hiddenField = new Blockly.FieldTextInput(input.default || "");
-      console.log("Creating hidden field", input.name, input.default);
-      hiddenField.setVisible(false); // Make it invisible
-      return block.appendDummyInput().appendField(hiddenField, input.name);
+      
+      // Add _HIDDEN suffix to the field name so our event listener can identify it
+      const fieldName = input.name.endsWith('_HIDDEN') ? input.name : input.name + '_HIDDEN';
+      console.log("Creating hidden field", fieldName, input.default);
+      
+      // Append the field with the _HIDDEN suffix name
+      const dummyInput = block.appendDummyInput().appendField(hiddenField, fieldName);
+      
+      // Set visible false AFTER appending, and use setTimeout to ensure it happens after rendering
+      setTimeout(() => {
+        hiddenField.setVisible(false);
+      }, 0);
+      
+      return dummyInput;
     }
     else if (input.type === "row") {
       const dummyInput = block.appendDummyInput();

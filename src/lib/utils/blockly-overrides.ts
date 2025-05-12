@@ -426,7 +426,9 @@ function initCustomCollapsedTextExtension() {
       
       block.toString = function(opt_maxLength) {
         if (this.isCollapsed()) {
-          const collapseText = this.getFieldValue('COLLAPSE_TEXT');
+          // Check for both regular and hidden field names
+          const collapseText = this.getFieldValue('COLLAPSE_TEXT') || 
+                              this.getFieldValue('COLLAPSE_TEXT_HIDDEN');
           return collapseText || originalToString.call(this, opt_maxLength);
         }
         return originalToString.call(this, opt_maxLength);
@@ -450,21 +452,26 @@ function initCollapsedTextContextMenu() {
           originalContextMenu.call(this, options);
         }
         
+        // Check for both regular and hidden field names
+        const collapseField = block.getField('COLLAPSE_TEXT') || 
+                             block.getField('COLLAPSE_TEXT_HIDDEN');
+        
         // Add option to edit collapsed text if the field exists
-        if (block.getField('COLLAPSE_TEXT') !== null) {
+        if (collapseField !== null) {
           options.push({
             text: 'Edit Collapsed View Text',
             enabled: true,
             callback: function() {
-              // Get current collapsed text value
-              const currentText = block.getFieldValue('COLLAPSE_TEXT') || '';
+              // Get current collapsed text value - works with either field name
+              const fieldName = block.getField('COLLAPSE_TEXT') ? 'COLLAPSE_TEXT' : 'COLLAPSE_TEXT_HIDDEN';
+              const currentText = block.getFieldValue(fieldName) || '';
               
               // Prompt for new value
               const newText = prompt('Enter text to show when block is collapsed:', currentText);
               
               // Update if user didn't cancel
               if (newText !== null) {
-                block.setFieldValue(newText, 'COLLAPSE_TEXT');
+                block.setFieldValue(newText, fieldName);
               }
             }
           });
@@ -472,6 +479,106 @@ function initCollapsedTextContextMenu() {
       };
     });
   }
+}
+
+// ======== Hidden Fields Extension ========
+function initHiddenFieldsExtension() {
+  if (!Blockly.Extensions.isRegistered('hidden_fields_extension')) {
+    Blockly.Extensions.register('hidden_fields_extension', function() {
+      // This extension makes fields with specific names stay hidden
+      const block = this;
+      
+      // Function to hide fields marked as hidden
+      const hideFields = () => {
+        // Iterate over inputs directly since inputList is an array
+        block.inputList.forEach(input => {
+          if (input && input.fieldRow) {
+            input.fieldRow.forEach(field => {
+              if (field.name && (
+                  field.name.endsWith('_HIDDEN') || 
+                  ((block as any).blockConfig && 
+                   (block as any).blockConfig.hiddenFields && 
+                   (block as any).blockConfig.hiddenFields.includes(field.name))
+              )) {
+                field.setVisible(false);
+              }
+            });
+          }
+        });
+      };
+      
+      // Apply immediately
+      hideFields();
+      
+      // Listen for events that might cause re-rendering
+      this.workspace.addChangeListener((event) => {
+        if (event.type === Blockly.Events.BLOCK_CHANGE || 
+            event.type === Blockly.Events.MOVE || 
+            event.type === 'collapse' || 
+            event.type === 'expand') {
+          if ((event as any).blockId === block.id) {
+            // Re-hide fields after specific events for this block
+            setTimeout(hideFields, 0);
+          }
+        }
+      });
+    });
+  }
+}
+
+// Helper function to hide fields with _HIDDEN suffix
+function hideBlockHiddenFields(block: Blockly.Block) {
+  console.log("Hiding fields for block", block.id);
+  
+  // Debug: log all inputs and fields to check structure
+  console.log("Number of inputs:", block.inputList.length);
+  
+  block.inputList.forEach((input, i) => {
+    console.log(`Input ${i}:`, input.type, input.name);
+    
+    if (input && input.fieldRow) {
+      console.log(`Fields in input ${i}:`, input.fieldRow.length);
+      
+      input.fieldRow.forEach((field, j) => {
+        console.log(`Field ${j} in input ${i}:`, field.name, field.constructor.name);
+        
+        if (field.name) {
+          console.log(`Field name "${field.name}" ends with _HIDDEN:`, field.name.endsWith('_HIDDEN'));
+          if (field.name.endsWith('_HIDDEN')) {
+            console.log("Hiding field", field.name);
+            field.setVisible(false);
+          }
+        } else {
+          console.log("Field has no name");
+        }
+      });
+    } else {
+      console.log(`Input ${i} has no fieldRow`);
+    }
+  });
+}
+
+function enableHiddenFieldPersistence(workspace: Blockly.Workspace) {
+  workspace.addChangeListener((event: any) => {
+    // Handle any expand/collapse events regardless of how they were triggered
+    if ((event.type === Blockly.Events.BLOCK_CHANGE && event.element === 'collapsed') || 
+        event.type === 'expand' || 
+        event.type === 'collapse') {
+      console.log("Event", event);
+      
+      const blockId = event.blockId;
+      if (blockId) {
+        const block = workspace.getBlockById(blockId);
+        if (block) {
+          // Short delay to ensure rendering is complete
+          setTimeout(() => {
+            hideBlockHiddenFields(block);
+            
+          }, 10);
+        }
+      }
+    }
+  });
 }
 
 // ======== Main Initialization Function ========
@@ -498,9 +605,13 @@ export function initializeBlocklyOverrides(workspace: Blockly.Workspace) {
     
     // Enable double-click to toggle collapse/expand blocks
     enableDoubleClickToggle(workspace);
+    enableHiddenFieldPersistence(workspace);
     
     // Register high-level generators
     registerHighLevelGenerators();
+
+    // Initialize hidden fields extension
+    initHiddenFieldsExtension();
     
     // Import and initialize visibility extensions
     // This ensures both extension systems are initialized together

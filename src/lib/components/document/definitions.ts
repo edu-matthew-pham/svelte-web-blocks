@@ -83,7 +83,7 @@ const documentBlocks: Record<string, BlockConfig> = {
         check: "web_component"
       },
       { 
-        type: "field_text", 
+        type: "field_hidden", 
         name: "COLLAPSE_TEXT",
         label: "Collapsed View Text",
         default: "Document: My Web Page" 
@@ -131,7 +131,7 @@ const documentBlocks: Record<string, BlockConfig> = {
       },
       required: ["TITLE", "THEME"]
     },
-    extensions: ['custom_collapsed_text_extension']
+    extensions: ['custom_collapsed_text_extension', 'collapsed_text_context_menu']
   }
 };
 
