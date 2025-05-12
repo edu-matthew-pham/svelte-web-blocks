@@ -333,6 +333,11 @@ function initCollapseExpandExtension() {
       if (this.inputList.length === 0) {
         return;
       }
+
+      // Check if the collapse field already exists - prevent duplicates
+      if (this.getField('COLLAPSE_EXPAND')) {
+        return; // Already has collapse icon
+      }
       
       // Create collapse/expand icon
       const collapseExpandField = new Blockly.FieldImage(
